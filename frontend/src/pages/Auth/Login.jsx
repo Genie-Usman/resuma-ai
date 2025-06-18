@@ -1,13 +1,19 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
+// Utils
+import { validateEmail } from '../../utils/helper';
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    identifier: '',
+    email: '',
     password: '',
   });
-
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
 
   const onChange = (e) => {
     setFormData((prev) => ({
@@ -16,17 +22,33 @@ const Login = () => {
     }));
   };
 
+  // Form Submission Function
   const onSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
 
-    // Placeholder for login logic
-    setTimeout(() => {
-      console.log('Login submitted:', formData);
-      setLoading(false);
-    }, 1000);
+    const newErrors = {};
+
+    if (!validateEmail(formData.email)) newErrors.email = 'Please enter a valid email address.';
+    if (!formData.password) newErrors.password = 'Please enter your password.';
+
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+
+    // login API Call
+    try {
+
+    } catch (error) {
+
+    }
+
   };
 
+  // Show Password Function
   const [showPassword, setShowPassword] = useState(false);
 
   const handleKeyDown = (e) => {
@@ -55,19 +77,17 @@ const Login = () => {
 
       <form onSubmit={onSubmit} className="flex flex-col gap-y-4">
         <div className="flex flex-col">
-          <label htmlFor="identifier" className="mb-1 font-semibold text-sm">Email</label>
+          <label htmlFor="email" className="mb-1 font-semibold text-sm">Email</label>
           <input
             type="text"
-            name="identifier"
-            id="identifier"
-            value={formData.identifier}
+            name="email"
+            id="email"
+            value={formData.email}
             onChange={onChange}
             placeholder="john.doe@example.com"
             className="border border-gray-300 rounded px-3 py-2 lowercase"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            You can also enter your username.
-          </p>
+          {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
         </div>
 
         <div className="flex flex-col">
@@ -82,9 +102,7 @@ const Login = () => {
             onChange={onChange}
             className="border border-gray-300 rounded px-3 py-2"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            Hold <kbd className="font-bold">Ctrl</kbd> to display your password temporarily.
-          </p>
+          {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password}</p>}
         </div>
 
         <div className="mt-4 flex items-center gap-x-4">
@@ -100,6 +118,7 @@ const Login = () => {
             Forgot Password?
           </Link>
         </div>
+        
       </form>
     </div>
   );

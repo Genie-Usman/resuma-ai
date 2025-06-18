@@ -17,7 +17,7 @@ const LandingPage = () => {
   const handleCta = () => { }
 
   return (
-    <div className="w-full min-h-full bg-white">
+    <div className="w-full min-h-full bg-amber-950">
       <div className="container mx-auto px-4 py-6">
 
         {/* Header */}

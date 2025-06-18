@@ -1,16 +1,22 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+// Utils
+import { validateEmail } from '../../utils/helper';
+
+// Components
+import ProfilePhotoSelector from '../../components/Inputs/ProfilePhotoSelector';
+
 const SignUp = () => {
   const [formData, setFormData] = useState({
     name: '',
-    username: '',
     email: '',
     password: '',
   });
 
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [profilePic, setProfilePic] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,16 +27,24 @@ const SignUp = () => {
     e.preventDefault();
 
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.username.trim()) newErrors.username = 'Username is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    if (!formData.password.trim()) newErrors.password = 'Password is required';
 
-    setErrors(newErrors);
+    if (!formData.name) newErrors.name = 'Please enter your name.';
+    if (!validateEmail(formData.email)) newErrors.email = 'Please enter a valid email address.';
+    if (!formData.password) newErrors.password = 'Please enter your password.';
 
-    if (Object.keys(newErrors).length === 0) {
-      console.log('Submitted:', formData);
-      // You can handle actual submission later
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+
+    // Simulated API call
+    try {
+      console.log('Submitting data:', formData);
+      // Add your API request here
+    } catch (error) {
+      console.error('Sign up failed', error);
     }
   };
 
@@ -62,6 +76,8 @@ const SignUp = () => {
         onKeyUp={handleKeyUp}
         className="flex flex-col gap-y-3"
       >
+        <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} />
+
         <div>
           <label className="block mb-1 font-semibold text-sm">Name</label>
           <input
@@ -73,19 +89,6 @@ const SignUp = () => {
             className="w-full border border-gray-300 px-3 py-1.5 rounded"
           />
           {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
-        </div>
-
-        <div>
-          <label className="block mb-1 font-semibold text-sm">Username</label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            placeholder="john.doe"
-            className="w-full border border-gray-300 px-3 py-1.5 rounded lowercase"
-          />
-          {errors.username && <p className="text-sm text-red-500 mt-1">{errors.username}</p>}
         </div>
 
         <div>
