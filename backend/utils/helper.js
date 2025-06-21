@@ -1,4 +1,4 @@
-
+// Function to generate Slugs
 export const slugify = (text) => {
   return text
     .toString()

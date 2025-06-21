@@ -111,7 +111,7 @@ const updateResume = async (req, res) => {
 // @access  Private
 const deleteResume = async (req, res) => {
   try {
-     const resume = await Resume.findOne({
+    const resume = await Resume.findOne({
       _id: req.params.id,
       userId: req.user._id,
     });
@@ -120,22 +120,22 @@ const deleteResume = async (req, res) => {
       return res.status(404).json({ message: "Resume not found or unauthorized" });
     }
 
-    // Delete ThumbnailLink and ProfilePreviewURL images from the upload folder
-    const uploadsFolder = path.join(__dirname, '..', 'uploads');
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    // Delete thumbnail file from uploads folder (if it exists)
+    if (resume.thumbnailLink) {
+      const uploadsFolder = path.join(__dirname, '..', 'uploads');
+      const thumbnailPath = path.join(uploadsFolder, path.basename(resume.thumbnailLink));
 
-    if(resume.thumbnailLink){
-      const oldThumbnail = path.join(uploadsFolder, path.basename(resume.thumbnailLink));
-      if(fs.existsSync(oldThumbnail)) fs.unlinkSync(oldThumbnail);
+      if (fs.existsSync(thumbnailPath)) {
+        fs.unlinkSync(thumbnailPath);
+      }
     }
 
-    if(resume.profileInfo?.profilePreviewUrl){
-      const oldProfile = path.join(uploadsFolder, path.basename(resume.thumbnailLink));
-      if(fs.existsSync(oldProfile)) fs.unlinkSync(oldProfile); 
-    }
+    await resume.deleteOne();
+
+    res.json({ message: "Resume deleted successfully" });
 
   } catch (error) {
-    res.status(404).json({ error: 'Resume not found' });
+    res.status(500).json({ error: "Server error", message: error.message });
   }
 };
 

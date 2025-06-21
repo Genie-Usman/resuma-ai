@@ -11,7 +11,7 @@ export const getDefaultResumeData = (user = {}) => ({
     },
     customFields: [],
     picture: {
-      url: user.picture || '',
+      url: user.profileImageURL || '',
       size: 64,
       aspectRatio: 1,
       borderRadius: 0,
