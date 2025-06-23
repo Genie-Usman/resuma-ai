@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 // Utils
 import { validateEmail } from '../../utils/helper';
+import { UserContext } from '../../context/userContext';
+import axiosInstance from '../../utils/axiosInstance';
+import { API_PATHS } from '../../utils/apiPaths';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { updateUser } = useContext(UserContext);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -23,7 +27,7 @@ const Login = () => {
   };
 
   // Form Submission Function
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {};
@@ -41,9 +45,25 @@ const Login = () => {
 
     // login API Call
     try {
+      const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
+        email: formData.email,
+        password: formData.password
+      });
+
+      const { token } = response.data;
+
+      if (token) {
+        localStorage.setItem('token', token);
+        updateUser(response.data);
+        navigate('/dashboard');
+      }
 
     } catch (error) {
-
+      if (error.response && error.response.data.message) {
+        console.error(error.response.data.message);
+      } else {
+        console.error('Something went wrong. Please try again.');
+      }
     }
 
   };
@@ -118,7 +138,7 @@ const Login = () => {
             Forgot Password?
           </Link>
         </div>
-        
+
       </form>
     </div>
   );
