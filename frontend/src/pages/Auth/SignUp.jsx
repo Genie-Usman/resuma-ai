@@ -1,29 +1,37 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { UserContext } from '../../context/userContext';
 
 // Utils
 import { validateEmail } from '../../utils/helper';
+import axiosInstance from '../../utils/axiosInstance';
+import { API_PATHS } from '../../utils/apiPaths';
+import uploadImage from '../../utils/uploadImage';
 
 // Components
 import ProfilePhotoSelector from '../../components/Inputs/ProfilePhotoSelector';
 
 const SignUp = () => {
+  const navigate = useNavigate();
+  const { updateUser } = useContext(UserContext);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
+    profileImageURL: '',
   });
 
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const [profilePic, setProfilePic] = useState(false);
+  const [profilePic, setProfilePic] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {};
@@ -39,12 +47,35 @@ const SignUp = () => {
 
     setErrors({});
 
-    // Simulated API call
+    // SignUp API call
     try {
-      console.log('Submitting data:', formData);
-      // Add your API request here
+      if (profilePic) {
+        const imgUploadRes = await uploadImage(profilePic);
+        formData.profileImageURL = imgUploadRes.imageUrl || "";
+      }
+
+
+      const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        profileImageURL: formData.profileImageURL,
+      });
+
+      const { token } = response.data;
+
+      if (token) {
+        localStorage.setItem('token', token);
+        updateUser(response.data);
+        navigate('/dashboard');
+      }
+
     } catch (error) {
-      console.error('Sign up failed', error);
+      if (error.response && error.response.data.message) {
+        console.error(error.response.data.message);
+      } else {
+        console.error('Something went wrong. Please try again.');
+      }
     }
   };
 

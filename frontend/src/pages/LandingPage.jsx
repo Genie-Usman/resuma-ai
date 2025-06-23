@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom"
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { UserContext } from "../context/userContext";
 
 // Components
 import Header from "../components/shared/Header";
@@ -9,15 +10,19 @@ import Footer from "../components/shared/Footer";
 import HERO_IMG from "../assets/hero-img.png"
 
 const LandingPage = () => {
+  const {user} = useContext(UserContext);
   const navigate = useNavigate();
 
-  const [openAuthModal, setOpenAuthModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState("login");
-
-  const handleCta = () => { }
+  const handleCta = () => {
+    if (!user) {
+      navigate('/auth/login');
+    } else {
+      navigate('/dashboard');
+    }
+  }
 
   return (
-    <div className="w-full min-h-full bg-amber-950">
+    <div className="w-full min-h-full bg-white">
       <div className="container mx-auto px-4 py-6">
 
         {/* Header */}
@@ -86,8 +91,8 @@ const LandingPage = () => {
 
       </div>
 
-        {/* Footer */}
-        <Footer/>
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }
