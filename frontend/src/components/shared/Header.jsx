@@ -1,5 +1,5 @@
 import { useContext } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { UserContext } from "../../context/userContext"
 
 // Assets
@@ -9,13 +9,14 @@ import LOGO from "../../assets/logo.svg"
 import ProfileInfoCard from "../Cards/ProfileInfoCard"
 
 const Header = () => {
+    const navigate = useNavigate();
     const { user } = useContext(UserContext);
 
     return (
         <header className='flex justify-between items-center mb-16'>
             <div>
                 {/* Image */}
-                <img src={LOGO} alt="logo" className='w-[150px]' />
+                <img src={LOGO} alt="logo" className='w-[150px] cursor-pointer' onClick={() => navigate('/')} />
             </div>
             {/* Account Button */}
             {user ? <ProfileInfoCard /> : <Link
