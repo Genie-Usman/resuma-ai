@@ -1,3 +1,4 @@
+
 // Validate Email Function
 export const validateEmail = (email) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -61,4 +62,3 @@ export const getLightColorFromImage = (imageUrl) => {
     };
   });
 };
-

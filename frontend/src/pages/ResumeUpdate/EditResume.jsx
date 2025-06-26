@@ -9,8 +9,9 @@ import { useReactToPrint } from "react-to-print";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import StepProgress from "../../components/shared/StepProgress";
-import ProfileInfoForm from "./Forms/ProfileInfoForm";
+import PersonalInfoForm from "./Forms/PersonalInfoForm";
 import SummarySectionForm from "./Forms/SummarySectionForm";
+import ProfilesInfoForm from "./Forms/ProfilesInfoForm";
 
 const EditResume = () => {
   const { resumeId } = useParams();
@@ -22,11 +23,15 @@ const EditResume = () => {
   const [baseWidth, setBaseWidth] = useState(800);
   const [openThemeSelector, setOpenThemeSelector] = useState(false);
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState("profile-info");
+  const [currentPage, setCurrentPage] = useState("profiles-info");
   const [progess, setProgress] = useState(0);
   const [resumeData, setResumeData] = useState(getDefaultResumeData());
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+
+
+
 
   // Validate Inputs
   const validateAndNext = (e) => { };
@@ -40,34 +45,42 @@ const EditResume = () => {
   const renderForm = () => {
     if (!resumeData?.data || !resumeData.data.basics) return null;
     switch (currentPage) {
-      case "profile-info":
+      case "personal-info":
         return (
           <>
-          <ProfileInfoForm
-            profileData={resumeData.data.basics}
-            updateSection={(key, value) => updateSection("basics", key, value)}
-            onNext={validateAndNext}
-          />
+            <PersonalInfoForm
+              profileData={resumeData.data.basics}
+              updateSection={(key, value) => updateSection("basics", key, value)}
+              onNext={validateAndNext}
+            />
 
-          <SummarySectionForm
-          content={resumeData.data.sections?.summary?.content || ''}
-          updateContent={(newContent) =>
-            setResumeData((prev) => ({
-              ...prev,
-              data: {
-                ...prev.data,
-                sections: {
-                  ...prev.data.sections,
-                  summary: {
-                    ...prev.data.sections.summary,
-                    content: newContent,
+            <SummarySectionForm
+              content={resumeData.data.sections?.summary?.content || ''}
+              updateContent={(newContent) =>
+                setResumeData((prev) => ({
+                  ...prev,
+                  data: {
+                    ...prev.data,
+                    sections: {
+                      ...prev.data.sections,
+                      summary: {
+                        ...prev.data.sections.summary,
+                        content: newContent,
+                      },
+                    },
                   },
-                },
-              },
-            }))
-          }
-        />
-        </>
+                }))
+              }
+            />
+          </>
+        )
+
+      case 'profiles-info':
+        return (
+          <ProfilesInfoForm
+            profiles={resumeData.data.sections.profiles.items || []}
+            setResumeData={setResumeData}
+          />
         )
 
       default:
