@@ -36,3 +36,15 @@ export const defaultSkillsItem = {
         href: ""
     }
 };
+
+export const defaultProjectsItem = {
+    name: "",
+    description: "",
+    date: "",
+    summary: "",
+    keywords: [],
+    url: {
+        label: "",
+        href: ""
+    }
+};

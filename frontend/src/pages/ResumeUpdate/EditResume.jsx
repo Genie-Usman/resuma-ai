@@ -16,6 +16,7 @@ import ExperienceForm from "./Forms/ExperienceForm";
 import { defaultEducationItem, defaultExperienceItem, defaultSkillsItem } from "../../constants";
 import EducationForm from "./Forms/EducationForm";
 import SkillsForm from "./Forms/SkillsForm";
+import ProjectsForm from "./Forms/ProjectsForm";
 
 const EditResume = () => {
   const { resumeId } = useParams();
@@ -27,7 +28,7 @@ const EditResume = () => {
   const [baseWidth, setBaseWidth] = useState(800);
   const [openThemeSelector, setOpenThemeSelector] = useState(false);
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState("skills");
+  const [currentPage, setCurrentPage] = useState("projects");
   const [progess, setProgress] = useState(0);
   const [resumeData, setResumeData] = useState(getDefaultResumeData());
   const [errorMsg, setErrorMsg] = useState("");
@@ -113,6 +114,17 @@ const EditResume = () => {
               updateArrayItem={(index, key, value) => updateArrayItem('skills', index, key, value)}
               addArrayItem={() => addArrayItem('skills', defaultSkillsItem)}
               removeArrayItem={(index) => removeArrayItem('skills', index)}
+              setResumeData={setResumeData}
+            />
+        )
+
+      case 'projects':
+        return (
+            <ProjectsForm
+              projects={resumeData.data.sections.projects.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('projects', index, key, value)}
+              addArrayItem={() => addArrayItem('projects', defaultSkillsItem)}
+              removeArrayItem={(index) => removeArrayItem('projects', index)}
               setResumeData={setResumeData}
             />
         )
