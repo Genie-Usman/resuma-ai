@@ -227,6 +227,8 @@ const SummarySectionForm = ({ content, updateContent }) => {
         extensions: [
             StarterKit.configure({
                 heading: false,
+                hardBreak: false,
+                horizontalRule: false,
             }),
             Heading.configure({
                 levels: [1, 2, 3],
@@ -255,7 +257,6 @@ const SummarySectionForm = ({ content, updateContent }) => {
     });
 
     return (
-        <div className="px-5 pt-5">
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div className="col-span-2 mt-3">
                     <h2 className="mb-1 font-semibold text-lg">Summary</h2>
@@ -263,7 +264,6 @@ const SummarySectionForm = ({ content, updateContent }) => {
                     <EditorContent editor={editor} />
                 </div>
             </div>
-        </div>
     );
 };
 

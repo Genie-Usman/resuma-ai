@@ -12,6 +12,8 @@ import StepProgress from "../../components/shared/StepProgress";
 import PersonalInfoForm from "./Forms/PersonalInfoForm";
 import SummarySectionForm from "./Forms/SummarySectionForm";
 import ProfilesInfoForm from "./Forms/ProfilesInfoForm";
+import ExperienceForm from "./Forms/ExperienceForm";
+import { defaultExperienceItem } from "../../constants";
 
 const EditResume = () => {
   const { resumeId } = useParams();
@@ -23,14 +25,11 @@ const EditResume = () => {
   const [baseWidth, setBaseWidth] = useState(800);
   const [openThemeSelector, setOpenThemeSelector] = useState(false);
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState("profiles-info");
+  const [currentPage, setCurrentPage] = useState("experience");
   const [progess, setProgress] = useState(0);
   const [resumeData, setResumeData] = useState(getDefaultResumeData());
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-
-
 
 
   // Validate Inputs
@@ -83,6 +82,17 @@ const EditResume = () => {
           />
         )
 
+      case 'experience':
+        return (
+            <ExperienceForm
+              experience={resumeData.data.sections.experience.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('experience', index, key, value)}
+              addArrayItem={() => addArrayItem('experience', defaultExperienceItem)}
+              removeArrayItem={(index) => removeArrayItem('experience', index)}
+              setResumeData={setResumeData}
+            />
+        )
+
       default:
         return null;
     }
@@ -103,13 +113,88 @@ const EditResume = () => {
   };
 
   // Update Array Items
-  const updateArrayItem = (section, index, key, value) => { };
+  const updateArrayItem = (section, index, key, value) => {
+    setResumeData((prev) => {
+      const items = [...prev.data.sections[section].items];
+      const item = { ...items[index] };
 
-  // Add item to Array
-  const addArrayItem = (section, newItem) => { };
+      if (!key) {
+        // Replace the whole item if key is null
+        items[index] = value;
+      } else {
+        const keys = key.split(".");
+        let target = item;
+
+        for (let i = 0; i < keys.length - 1; i++) {
+          const key = keys[i];
+          // Ensure nested object exists
+          target[key] = target[key] || {};
+          target = target[key];
+        }
+
+        target[keys[keys.length - 1]] = value;
+        items[index] = item;
+      }
+
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          sections: {
+            ...prev.data.sections,
+            [section]: {
+              ...prev.data.sections[section],
+              items,
+            },
+          },
+        },
+      };
+    });
+  };
+
+  // Add new item to Array
+  const addArrayItem = (section, newItem) => {
+    setResumeData((prev) => {
+      const items = prev.data.sections[section]?.items || [];
+
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          sections: {
+            ...prev.data.sections,
+            [section]: {
+              ...prev.data.sections[section],
+              items: [...items, newItem],
+            },
+          },
+        },
+      };
+    });
+  };
 
   // Remove item from Array
-  const removeArrayItem = (section, index) => { };
+  const removeArrayItem = (section, index) => {
+    setResumeData((prev) => {
+      const items = [...(prev.data.sections[section]?.items || [])];
+      items.splice(index, 1);
+
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          sections: {
+            ...prev.data.sections,
+            [section]: {
+              ...prev.data.sections[section],
+              items,
+            },
+          },
+        },
+      };
+    });
+  };
+
 
   // Fetch Resume Info by ID
   const fetchResumeDetailsByID = async () => {
