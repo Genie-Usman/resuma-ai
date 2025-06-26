@@ -13,7 +13,9 @@ import PersonalInfoForm from "./Forms/PersonalInfoForm";
 import SummarySectionForm from "./Forms/SummarySectionForm";
 import ProfilesInfoForm from "./Forms/ProfilesInfoForm";
 import ExperienceForm from "./Forms/ExperienceForm";
-import { defaultExperienceItem } from "../../constants";
+import { defaultEducationItem, defaultExperienceItem, defaultSkillsItem } from "../../constants";
+import EducationForm from "./Forms/EducationForm";
+import SkillsForm from "./Forms/SkillsForm";
 
 const EditResume = () => {
   const { resumeId } = useParams();
@@ -25,7 +27,7 @@ const EditResume = () => {
   const [baseWidth, setBaseWidth] = useState(800);
   const [openThemeSelector, setOpenThemeSelector] = useState(false);
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState("experience");
+  const [currentPage, setCurrentPage] = useState("skills");
   const [progess, setProgress] = useState(0);
   const [resumeData, setResumeData] = useState(getDefaultResumeData());
   const [errorMsg, setErrorMsg] = useState("");
@@ -89,6 +91,28 @@ const EditResume = () => {
               updateArrayItem={(index, key, value) => updateArrayItem('experience', index, key, value)}
               addArrayItem={() => addArrayItem('experience', defaultExperienceItem)}
               removeArrayItem={(index) => removeArrayItem('experience', index)}
+              setResumeData={setResumeData}
+            />
+        )
+
+      case 'education':
+        return (
+            <EducationForm
+              education={resumeData.data.sections.education.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('education', index, key, value)}
+              addArrayItem={() => addArrayItem('education', defaultEducationItem)}
+              removeArrayItem={(index) => removeArrayItem('education', index)}
+              setResumeData={setResumeData}
+            />
+        )
+
+      case 'skills':
+        return (
+            <SkillsForm
+              skills={resumeData.data.sections.skills.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('skills', index, key, value)}
+              addArrayItem={() => addArrayItem('skills', defaultSkillsItem)}
+              removeArrayItem={(index) => removeArrayItem('skills', index)}
               setResumeData={setResumeData}
             />
         )
