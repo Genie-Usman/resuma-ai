@@ -13,10 +13,13 @@ import PersonalInfoForm from "./Forms/PersonalInfoForm";
 import SummarySectionForm from "./Forms/SummarySectionForm";
 import ProfilesInfoForm from "./Forms/ProfilesInfoForm";
 import ExperienceForm from "./Forms/ExperienceForm";
-import { defaultEducationItem, defaultExperienceItem, defaultSkillsItem } from "../../constants";
+import { defaultEducationItem, defaultExperienceItem, defaultInterestItem, defaultLanguageItem, defaultSkillsItem } from "../../constants";
 import EducationForm from "./Forms/EducationForm";
 import SkillsForm from "./Forms/SkillsForm";
 import ProjectsForm from "./Forms/ProjectsForm";
+import CertificationsForm from "./Forms/CertificationsForm";
+import InterestForm from "./Forms/InterestForm";
+import LanguageForm from "./Forms/LanguageForm";
 
 const EditResume = () => {
   const { resumeId } = useParams();
@@ -28,7 +31,7 @@ const EditResume = () => {
   const [baseWidth, setBaseWidth] = useState(800);
   const [openThemeSelector, setOpenThemeSelector] = useState(false);
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState("projects");
+  const [currentPage, setCurrentPage] = useState("interests-and-languages");
   const [progess, setProgress] = useState(0);
   const [resumeData, setResumeData] = useState(getDefaultResumeData());
   const [errorMsg, setErrorMsg] = useState("");
@@ -87,46 +90,78 @@ const EditResume = () => {
 
       case 'experience':
         return (
-            <ExperienceForm
-              experience={resumeData.data.sections.experience.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('experience', index, key, value)}
-              addArrayItem={() => addArrayItem('experience', defaultExperienceItem)}
-              removeArrayItem={(index) => removeArrayItem('experience', index)}
-              setResumeData={setResumeData}
-            />
+          <ExperienceForm
+            experience={resumeData.data.sections.experience.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem('experience', index, key, value)}
+            addArrayItem={() => addArrayItem('experience', defaultExperienceItem)}
+            removeArrayItem={(index) => removeArrayItem('experience', index)}
+            setResumeData={setResumeData}
+          />
         )
 
       case 'education':
         return (
-            <EducationForm
-              education={resumeData.data.sections.education.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('education', index, key, value)}
-              addArrayItem={() => addArrayItem('education', defaultEducationItem)}
-              removeArrayItem={(index) => removeArrayItem('education', index)}
-              setResumeData={setResumeData}
-            />
+          <EducationForm
+            education={resumeData.data.sections.education.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem('education', index, key, value)}
+            addArrayItem={() => addArrayItem('education', defaultEducationItem)}
+            removeArrayItem={(index) => removeArrayItem('education', index)}
+            setResumeData={setResumeData}
+          />
         )
 
       case 'skills':
         return (
-            <SkillsForm
-              skills={resumeData.data.sections.skills.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('skills', index, key, value)}
-              addArrayItem={() => addArrayItem('skills', defaultSkillsItem)}
-              removeArrayItem={(index) => removeArrayItem('skills', index)}
-              setResumeData={setResumeData}
-            />
+          <SkillsForm
+            skills={resumeData.data.sections.skills.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem('skills', index, key, value)}
+            addArrayItem={() => addArrayItem('skills', defaultSkillsItem)}
+            removeArrayItem={(index) => removeArrayItem('skills', index)}
+            setResumeData={setResumeData}
+          />
         )
 
       case 'projects':
         return (
-            <ProjectsForm
-              projects={resumeData.data.sections.projects.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('projects', index, key, value)}
-              addArrayItem={() => addArrayItem('projects', defaultSkillsItem)}
-              removeArrayItem={(index) => removeArrayItem('projects', index)}
+          <ProjectsForm
+            projects={resumeData.data.sections.projects.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem('projects', index, key, value)}
+            addArrayItem={() => addArrayItem('projects', defaultSkillsItem)}
+            removeArrayItem={(index) => removeArrayItem('projects', index)}
+            setResumeData={setResumeData}
+          />
+        )
+
+      case 'certifications':
+        return (
+          <CertificationsForm
+            certifications={resumeData.data.sections.certifications.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem('certifications', index, key, value)}
+            addArrayItem={() => addArrayItem('certifications', defaultSkillsItem)}
+            removeArrayItem={(index) => removeArrayItem('certifications', index)}
+            setResumeData={setResumeData}
+          />
+        )
+
+      case 'interests-and-languages':
+        return (
+          <>
+            <InterestForm
+              interests={resumeData.data.sections.interests.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('interests', index, key, value)}
+              addArrayItem={() => addArrayItem('interests', defaultInterestItem)}
+              removeArrayItem={(index) => removeArrayItem('interests', index)}
               setResumeData={setResumeData}
             />
+
+            <LanguageForm
+              languages={resumeData.data.sections.languages.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('languages', index, key, value)}
+              addArrayItem={() => addArrayItem('languages', defaultLanguageItem)}
+              removeArrayItem={(index) => removeArrayItem('languages', index)}
+              setResumeData={setResumeData}
+            />
+          </>
         )
 
       default:

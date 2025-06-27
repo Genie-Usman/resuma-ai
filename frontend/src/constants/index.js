@@ -48,3 +48,25 @@ export const defaultProjectsItem = {
         href: ""
     }
 };
+
+export const defaultCertificationsItem = {
+    name: "",
+    issuer: "",
+    date: "",
+    summary: "",
+    url: {
+        label: "",
+        href: ""
+    }
+};
+
+
+export const defaultInterestItem = {
+  name: "",
+  keywords: [],
+};
+
+export const defaultLanguageItem = {
+  name: "",   
+  level: "", 
+};
