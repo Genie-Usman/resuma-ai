@@ -62,11 +62,38 @@ export const defaultCertificationsItem = {
 
 
 export const defaultInterestItem = {
-  name: "",
-  keywords: [],
+    name: "",
+    keywords: [],
 };
 
 export const defaultLanguageItem = {
-  name: "",   
-  level: "", 
+    name: "",
+    level: "",
+};
+
+export const defaultPublicationItem = {
+    name: "",
+    publisher: "",
+    date: "",
+    summary: "",
+};
+
+export const defaultAwardItem = {
+    name: "",
+    awarder: "",
+    date: "",
+    summary: "",
+};
+export const defaultVolunteerItem = {
+    organization: "",
+    position: "",
+    date: "",
+    location: "",
+    summary: "",
+};
+
+export const defaultReferenceItem = {
+    name: "",
+    description: "",
+    summary: "",
 };

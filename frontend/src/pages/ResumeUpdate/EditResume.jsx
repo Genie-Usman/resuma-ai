@@ -13,13 +13,17 @@ import PersonalInfoForm from "./Forms/PersonalInfoForm";
 import SummarySectionForm from "./Forms/SummarySectionForm";
 import ProfilesInfoForm from "./Forms/ProfilesInfoForm";
 import ExperienceForm from "./Forms/ExperienceForm";
-import { defaultEducationItem, defaultExperienceItem, defaultInterestItem, defaultLanguageItem, defaultSkillsItem } from "../../constants";
+import { defaultAwardItem, defaultEducationItem, defaultExperienceItem, defaultInterestItem, defaultLanguageItem, defaultPublicationItem, defaultReferenceItem, defaultSkillsItem, defaultVolunteerItem } from "../../constants";
 import EducationForm from "./Forms/EducationForm";
 import SkillsForm from "./Forms/SkillsForm";
 import ProjectsForm from "./Forms/ProjectsForm";
 import CertificationsForm from "./Forms/CertificationsForm";
 import InterestForm from "./Forms/InterestForm";
 import LanguageForm from "./Forms/LanguageForm";
+import PublicationsForm from "./Forms/PublicationsForm";
+import AwardsForm from "./Forms/AwardsForm";
+import VolunteeringForm from "./Forms/VolunteeringForm";
+import ReferenceForm from "./Forms/ReferenceForm";
 
 const EditResume = () => {
   const { resumeId } = useParams();
@@ -31,7 +35,7 @@ const EditResume = () => {
   const [baseWidth, setBaseWidth] = useState(800);
   const [openThemeSelector, setOpenThemeSelector] = useState(false);
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState("interests-and-languages");
+  const [currentPage, setCurrentPage] = useState("volunteering-references");
   const [progess, setProgress] = useState(0);
   const [resumeData, setResumeData] = useState(getDefaultResumeData());
   const [errorMsg, setErrorMsg] = useState("");
@@ -159,6 +163,48 @@ const EditResume = () => {
               updateArrayItem={(index, key, value) => updateArrayItem('languages', index, key, value)}
               addArrayItem={() => addArrayItem('languages', defaultLanguageItem)}
               removeArrayItem={(index) => removeArrayItem('languages', index)}
+              setResumeData={setResumeData}
+            />
+          </>
+        )
+
+      case 'publications-awards':
+        return (
+          <>
+            <PublicationsForm
+              publications={resumeData.data.sections.publications.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('publications', index, key, value)}
+              addArrayItem={() => addArrayItem('publications', defaultPublicationItem)}
+              removeArrayItem={(index) => removeArrayItem('publications', index)}
+              setResumeData={setResumeData}
+            />
+
+            <AwardsForm
+              awards={resumeData.data.sections.awards.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('awards', index, key, value)}
+              addArrayItem={() => addArrayItem('awards', defaultAwardItem)}
+              removeArrayItem={(index) => removeArrayItem('awards', index)}
+              setResumeData={setResumeData}
+            />
+          </>
+        )
+
+      case 'volunteering-references':
+        return (
+          <>
+             <VolunteeringForm
+              volunteer={resumeData.data.sections.volunteer.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('volunteer', index, key, value)}
+              addArrayItem={() => addArrayItem('volunteer', defaultVolunteerItem)}
+              removeArrayItem={(index) => removeArrayItem('volunteer', index)}
+              setResumeData={setResumeData}
+            />
+
+            <ReferenceForm
+              references={resumeData.data.sections.references.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('references', index, key, value)}
+              addArrayItem={() => addArrayItem('references', defaultReferenceItem)}
+              removeArrayItem={(index) => removeArrayItem('references', index)}
               setResumeData={setResumeData}
             />
           </>
