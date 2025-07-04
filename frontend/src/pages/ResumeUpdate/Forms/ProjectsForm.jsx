@@ -26,7 +26,7 @@ const ProjectsForm = ({ projects, updateArrayItem, addArrayItem, removeArrayItem
             }
             return prev;
         });
-    }, [[]]);
+    }, []);
 
     return (
         <div className="px-5 pt-5">

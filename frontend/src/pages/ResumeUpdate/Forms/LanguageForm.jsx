@@ -26,7 +26,7 @@ const LanguageForm = ({ languages, updateArrayItem, addArrayItem, removeArrayIte
             }
             return prev;
         });
-    }, [[]]);
+    }, []);
 
     return (
         <div className="px-5 pt-5">

@@ -26,7 +26,7 @@ const ExperienceForm = ({ experience, updateArrayItem, addArrayItem, removeArray
             }
             return prev;
         });
-    }, [[]]);
+    }, []);
 
     return (
         <div className="px-5 pt-5">
@@ -49,14 +49,14 @@ const ExperienceForm = ({ experience, updateArrayItem, addArrayItem, removeArray
                         )}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Company */}
+                            {/* Company */}
                             <div className="flex flex-col">
                                 <label className="mb-1 font-semibold text-sm">Company</label>
                                 <input
                                     type="text"
                                     value={item.company || ""}
                                     onChange={({ target }) =>
-                                        updateArrayItem("experience", index, "company", target.value)
+                                        updateArrayItem(index, "company", target.value)
                                     }
                                     placeholder="ABC Corp"
                                     className="border border-gray-300 rounded px-3 py-2 w-full"
@@ -69,7 +69,7 @@ const ExperienceForm = ({ experience, updateArrayItem, addArrayItem, removeArray
                                     type="text"
                                     value={item.position || ""}
                                     onChange={({ target }) =>
-                                        updateArrayItem("experience", index, "position", target.value)
+                                        updateArrayItem(index, "position", target.value)
                                     }
                                     placeholder="Frontend Developer"
                                     className="border border-gray-300 rounded px-3 py-2 w-full"
@@ -82,7 +82,7 @@ const ExperienceForm = ({ experience, updateArrayItem, addArrayItem, removeArray
                                     type="text"
                                     value={item.location || ""}
                                     onChange={({ target }) =>
-                                        updateArrayItem("experience", index, "location", target.value)
+                                        updateArrayItem(index, "location", target.value)
                                     }
                                     placeholder="San Francisco, CA"
                                     className="border border-gray-300 rounded px-3 py-2 w-full"
@@ -95,7 +95,7 @@ const ExperienceForm = ({ experience, updateArrayItem, addArrayItem, removeArray
                                     type="text"
                                     value={item.date || ""}
                                     onChange={({ target }) =>
-                                        updateArrayItem("experience", index, "date", target.value)
+                                        updateArrayItem(index, "date", target.value)
                                     }
                                     placeholder="January 2025 to Present"
                                     className="border border-gray-300 rounded px-3 py-2 w-full"
@@ -106,7 +106,7 @@ const ExperienceForm = ({ experience, updateArrayItem, addArrayItem, removeArray
                                 <SummarySectionForm
                                     content={item.summary}
                                     updateContent={(newSummary) =>
-                                        updateArrayItem("experience", index, "summary", newSummary)
+                                        updateArrayItem(index, "summary", newSummary)
                                     }
                                 />
                             </div>
@@ -117,11 +117,7 @@ const ExperienceForm = ({ experience, updateArrayItem, addArrayItem, removeArray
                 {/* Add More Button */}
                 <button
                     type="button"
-                    onClick={() =>
-                        addArrayItem("experience", {
-                            ...defaultExperienceItem,
-                        })
-                    }
+                    onClick={() => addArrayItem({ ...defaultExperienceItem, })}
                     className="self-start flex items-center gap-2 px-4 py-2 rounded bg-purple-100 text-purple-800 text-sm font-medium hover:bg-purple-200 transition-colors  cursor-pointer"
                 >
                     <div className="flex flex-row items-center justify-center gap-1">

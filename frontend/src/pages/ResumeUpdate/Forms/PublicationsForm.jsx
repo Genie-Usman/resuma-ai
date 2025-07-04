@@ -26,7 +26,7 @@ const PublicationsForm = ({ publications, updateArrayItem, addArrayItem, removeA
             }
             return prev;
         });
-    }, [[]]);
+    }, []);
 
     return (
         <div className="px-5 pt-5">

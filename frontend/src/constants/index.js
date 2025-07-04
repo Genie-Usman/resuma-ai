@@ -1,9 +1,20 @@
+export const defaultProfileItem = {
+  network: "",
+  username: "",
+  icon: "",
+  visible: true,
+  url: {
+    label: "",
+    href: ""
+  }
+};
+
 export const defaultExperienceItem = {
     company: "",
     position: "",
     location: "",
     date: "",
-    summary: "",
+    summary: "<p></p>",
     visible: true,
     url: {
         label: "",
@@ -17,7 +28,7 @@ export const defaultEducationItem = {
     area: "",
     score: "",
     date: "",
-    summary: "",
+    summary: "<p></p>",
     url: {
         label: "",
         href: ""
@@ -27,10 +38,10 @@ export const defaultEducationItem = {
 export const defaultSkillsItem = {
     name: "",
     description: "",
-    level: "",
-    keywords: "",
+    level: 0,
+    keywords: [],
     date: "",
-    summary: "",
+    summary: "<p></p>",
     url: {
         label: "",
         href: ""
@@ -41,7 +52,7 @@ export const defaultProjectsItem = {
     name: "",
     description: "",
     date: "",
-    summary: "",
+    summary: "<p></p>",
     keywords: [],
     url: {
         label: "",
@@ -53,13 +64,12 @@ export const defaultCertificationsItem = {
     name: "",
     issuer: "",
     date: "",
-    summary: "",
+    summary: "<p></p>",
     url: {
         label: "",
         href: ""
     }
 };
-
 
 export const defaultInterestItem = {
     name: "",
@@ -68,32 +78,33 @@ export const defaultInterestItem = {
 
 export const defaultLanguageItem = {
     name: "",
-    level: "",
+    level: 0,
 };
 
 export const defaultPublicationItem = {
     name: "",
     publisher: "",
     date: "",
-    summary: "",
+    summary: "<p></p>",
 };
 
 export const defaultAwardItem = {
     name: "",
     awarder: "",
     date: "",
-    summary: "",
+    summary: "<p></p>",
 };
+
 export const defaultVolunteerItem = {
     organization: "",
     position: "",
     date: "",
     location: "",
-    summary: "",
+    summary: "<p></p>",
 };
 
 export const defaultReferenceItem = {
     name: "",
     description: "",
-    summary: "",
+    summary: "<p></p>",
 };

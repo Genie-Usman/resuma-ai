@@ -26,7 +26,7 @@ const VolunteeringForm = ({ volunteer, updateArrayItem, addArrayItem, removeArra
             }
             return prev;
         });
-    }, [[]]);
+    }, []);
 
     return (
         <div className="px-5 pt-5">

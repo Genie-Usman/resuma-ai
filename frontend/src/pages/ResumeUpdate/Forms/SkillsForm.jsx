@@ -26,7 +26,7 @@ const SkillsForm = ({ skills, updateArrayItem, addArrayItem, removeArrayItem, se
             }
             return prev;
         });
-    }, [[]]);
+    }, []);
 
     return (
         <div className="px-5 pt-5">

@@ -10,10 +10,9 @@ import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import StepProgress from "../../components/shared/StepProgress";
 import PersonalInfoForm from "./Forms/PersonalInfoForm";
-import SummarySectionForm from "./Forms/SummarySectionForm";
-import ProfilesInfoForm from "./Forms/ProfilesInfoForm";
+import ProfileForm from "./Forms/ProfileForm";
 import ExperienceForm from "./Forms/ExperienceForm";
-import { defaultAwardItem, defaultEducationItem, defaultExperienceItem, defaultInterestItem, defaultLanguageItem, defaultPublicationItem, defaultReferenceItem, defaultSkillsItem, defaultVolunteerItem } from "../../constants";
+import { defaultAwardItem, defaultEducationItem, defaultExperienceItem, defaultInterestItem, defaultLanguageItem, defaultProfileItem, defaultPublicationItem, defaultReferenceItem, defaultSkillsItem, defaultVolunteerItem } from "../../constants";
 import EducationForm from "./Forms/EducationForm";
 import SkillsForm from "./Forms/SkillsForm";
 import ProjectsForm from "./Forms/ProjectsForm";
@@ -24,6 +23,8 @@ import PublicationsForm from "./Forms/PublicationsForm";
 import AwardsForm from "./Forms/AwardsForm";
 import VolunteeringForm from "./Forms/VolunteeringForm";
 import ReferenceForm from "./Forms/ReferenceForm";
+import { stripHtml } from "../../utils/helper.jsx";
+import RenderResume from "../../components/ResumeTemplates/RenderResume";
 
 const EditResume = () => {
   const { resumeId } = useParams();
@@ -35,64 +36,237 @@ const EditResume = () => {
   const [baseWidth, setBaseWidth] = useState(800);
   const [openThemeSelector, setOpenThemeSelector] = useState(false);
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState("volunteering-references");
+  const [currentPage, setCurrentPage] = useState("personal-info");
   const [progess, setProgress] = useState(0);
   const [resumeData, setResumeData] = useState(getDefaultResumeData());
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
 
-  // Validate Inputs
-  const validateAndNext = (e) => { };
+  const goToNextStep = () => {
+    const pages = [
+      "personal-info",
+      "profile-info",
+      "experience-info",
+      "education-info",
+      "skills-info",
+      "projects-info",
+      "certifications-info",
+      "interests-and-languages-info",
+      "publications-awards-info",
+      "volunteering-info",
+      "references-info"
+    ]
 
-  // Next Step Navigation Function
-  const goToNextStep = () => { };
+    if (currentPage === "references-info") { setOpenPreviewModal(true) }
+
+    const currentIndex = pages.indexOf(currentPage);
+
+    if (currentIndex !== -1 && currentIndex < pages.length - 1) {
+      const nextIndex = currentIndex + 1;
+      setCurrentPage(pages[nextIndex]);
+
+      // Set Progress as Percentage
+      const percent = Math.round((nextIndex / (pages.length - 1)) * 100);
+      setProgress(percent);
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+  };
+
+  // Validate Inputs
+  const validateAndNext = (e) => {
+    e.preventDefault();
+    const errors = [];
+
+    const basics = resumeData.data.basics;
+    const sections = resumeData.data.sections;
+    const basicSummary = sections.summary?.content;
+
+    // switch (currentPage) {
+    //   case 'personal-info': {
+    //     const { name, headline, email, phone, location, url } = basics;
+
+    //     if (!name.trim()) errors.push("Name is required.");
+    //     if (!headline.trim()) errors.push("Headline is required.");
+    //     // if (!email.trim() || !/^\S+@S+\.\S+$/.test(email)) errors.push("Valid email is required.");
+    //     if (!phone.trim()) errors.push("Phone is required.");
+    //     if (!location.trim()) errors.push("Location is required.");
+    //     if (!url?.href?.trim()) errors.push("Website URL is required.");
+    //     if (!basicSummary || !basicSummary.trim()) {
+    //       errors.push("Summary cannot be empty.");
+    //     }
+    //     break;
+    //   }
+
+    //   case 'profile-info': {
+    //     const profiles = sections.profiles?.items || [];
+
+    //     if (profiles.length === 0) {
+    //       errors.push("At least one profile is required.");
+    //     } else {
+    //       profiles.forEach((profile, i) => {
+    //         if (!profile.visible) return;
+
+    //         if (!profile.network?.trim()) {
+    //           errors.push(`Profile #${i + 1}: Network is required.`);
+    //         }
+
+    //         if (!profile.username?.trim()) {
+    //           errors.push(`Profile #${i + 1}: Username is required.`);
+    //         }
+
+    //         if (!profile.url?.href?.trim()) {
+    //           errors.push(`Profile #${i + 1}: URL is required.`);
+    //         }
+    //       });
+    //     }
+    //     break;
+    //   }
+
+    //   case 'experience-info': {
+    //     const experienceItems = sections.experience?.items || [];
+
+    //     if (experienceItems.length === 0) {
+    //       errors.push("At least one experience entry is required.");
+    //     } else {
+    //       experienceItems.forEach((item, i) => {
+    //         if (!item.company?.trim()) errors.push(`Experience #${i + 1}: Company is required.`);
+    //         if (!item.position?.trim()) errors.push(`Experience #${i + 1}: Position is required.`);
+    //         if (!item.location?.trim()) errors.push(`Experience #${i + 1}: Location is required.`);
+    //         if (!item.date?.trim()) errors.push(`Experience #${i + 1}: Date is required.`);
+    //         if (!stripHtml(item.summary)?.trim()) {
+    //           errors.push(`Experience #${i + 1}: Summary cannot be empty.`);
+    //         }
+    //       });
+    //     }
+    //     break;
+    //   }
+
+    //   case 'education-info': {
+    //     const educationItems = sections.education?.items || [];
+    //     if (educationItems.length === 0) {
+    //       errors.push("At least one education entry is required.");
+    //     } else {
+    //       educationItems.forEach((item, i) => {
+    //         if (!item.institution?.trim()) errors.push(`Education #${i + 1}: Institution is required.`);
+    //         if (!item.studyType?.trim()) errors.push(`Education #${i + 1}: Degree is required.`);
+    //       });
+    //     }
+    //     break;
+    //   }
+
+    //   case 'skills-info': {
+    //     const skillsItems = sections.skills?.items || [];
+    //     if (skillsItems.length === 0) {
+    //       errors.push("At least one skill is required.");
+    //     } else {
+    //       skillsItems.forEach((item, i) => {
+    //         if (!item.name?.trim()) errors.push(`Skill #${i + 1}: Name is required.`);
+    //       });
+    //     }
+    //     break;
+    //   }
+
+    //   case 'projects-info': {
+    //     const projects = sections.projects?.items || [];
+    //     if (projects.length > 0) {
+    //       projects.forEach((item, i) => {
+    //         if (!item.name?.trim()) errors.push(`Project #${i + 1}: Name is required.`);
+    //         if (!item.description?.trim()) errors.push(`Project #${i + 1}: Description is required.`);
+    //       });
+    //     }
+    //     break;
+    //   }
+
+    //   case 'interests-and-languages-info': {
+    //     const languages = sections.languages?.items || [];
+    //     const interests = sections.interests?.items || [];
+    //     if (languages.length === 0) {
+    //       errors.push("At least one language is required.");
+    //     }
+    //     if (languages.length > 0) {
+    //       languages.forEach((item, i) => {
+    //         if (!item.name?.trim()) errors.push(`Language #${i + 1}: Name is required.`);
+    //       })
+    //     }
+    //     if (interests.length === 0) {
+    //       errors.push("At least one interest is required.");
+    //     }
+    //     break;
+    //   }
+
+    // }
+
+    // Handle the result
+    if (errors.length > 0) {
+      setErrorMsg(errors.join(", "))
+      return;
+    }
+
+    // Proceed to the next step
+    setErrorMsg('');
+    goToNextStep();
+  };
+
 
   // Previous Step Navigation Function
-  const goBack = () => { };
+  const goBack = () => {
+    const pages = [
+      "personal-info",
+      "profile-info",
+      "experience-info",
+      "education-info",
+      "skills-info",
+      "projects-info",
+      "certifications-info",
+      "interests-and-languages-info",
+      "publications-awards-info",
+      "volunteering-info",
+      "references-info"
+    ]
+
+    if (currentPage === "personal-info") navigate("/dashboard");
+
+    const currentIndex = pages.indexOf(currentPage);
+
+    if (currentIndex > 0) {
+      const prevIndex = currentIndex - 1;
+      setCurrentPage(pages[prevIndex]);
+
+      // Set Progress as Percentage
+      const percent = Math.round((prevIndex / (pages.length - 1)) * 100);
+      setProgress(percent);
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  };
 
   const renderForm = () => {
     if (!resumeData?.data || !resumeData.data.basics) return null;
     switch (currentPage) {
       case "personal-info":
         return (
-          <>
-            <PersonalInfoForm
-              profileData={resumeData.data.basics}
-              updateSection={(key, value) => updateSection("basics", key, value)}
-              onNext={validateAndNext}
-            />
-
-            <SummarySectionForm
-              content={resumeData.data.sections?.summary?.content || ''}
-              updateContent={(newContent) =>
-                setResumeData((prev) => ({
-                  ...prev,
-                  data: {
-                    ...prev.data,
-                    sections: {
-                      ...prev.data.sections,
-                      summary: {
-                        ...prev.data.sections.summary,
-                        content: newContent,
-                      },
-                    },
-                  },
-                }))
-              }
-            />
-          </>
+          <PersonalInfoForm
+            profileData={resumeData.data.basics}
+            updateSection={(key, value) => updateSection("basics", key, value)}
+            resumeData={resumeData}
+            setResumeData={setResumeData}
+            onNext={validateAndNext}
+          />
         )
 
-      case 'profiles-info':
+      case 'profile-info':
         return (
-          <ProfilesInfoForm
+          <ProfileForm
             profiles={resumeData.data.sections.profiles.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem('profiles', index, key, value)}
+            addArrayItem={() => addArrayItem('profiles', defaultProfileItem)}
+            removeArrayItem={(index) => removeArrayItem('profiles', index)}
             setResumeData={setResumeData}
           />
         )
 
-      case 'experience':
+      case 'experience-info':
         return (
           <ExperienceForm
             experience={resumeData.data.sections.experience.items || []}
@@ -103,7 +277,7 @@ const EditResume = () => {
           />
         )
 
-      case 'education':
+      case 'education-info':
         return (
           <EducationForm
             education={resumeData.data.sections.education.items || []}
@@ -114,7 +288,7 @@ const EditResume = () => {
           />
         )
 
-      case 'skills':
+      case 'skills-info':
         return (
           <SkillsForm
             skills={resumeData.data.sections.skills.items || []}
@@ -125,7 +299,7 @@ const EditResume = () => {
           />
         )
 
-      case 'projects':
+      case 'projects-info':
         return (
           <ProjectsForm
             projects={resumeData.data.sections.projects.items || []}
@@ -136,7 +310,7 @@ const EditResume = () => {
           />
         )
 
-      case 'certifications':
+      case 'certifications-info':
         return (
           <CertificationsForm
             certifications={resumeData.data.sections.certifications.items || []}
@@ -147,7 +321,7 @@ const EditResume = () => {
           />
         )
 
-      case 'interests-and-languages':
+      case 'interests-and-languages-info':
         return (
           <>
             <InterestForm
@@ -168,7 +342,7 @@ const EditResume = () => {
           </>
         )
 
-      case 'publications-awards':
+      case 'publications-awards-info':
         return (
           <>
             <PublicationsForm
@@ -189,25 +363,27 @@ const EditResume = () => {
           </>
         )
 
-      case 'volunteering-references':
+      case 'volunteering-info':
         return (
-          <>
-             <VolunteeringForm
-              volunteer={resumeData.data.sections.volunteer.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('volunteer', index, key, value)}
-              addArrayItem={() => addArrayItem('volunteer', defaultVolunteerItem)}
-              removeArrayItem={(index) => removeArrayItem('volunteer', index)}
-              setResumeData={setResumeData}
-            />
+          <VolunteeringForm
+            volunteer={resumeData.data.sections.volunteer.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem('volunteer', index, key, value)}
+            addArrayItem={() => addArrayItem('volunteer', defaultVolunteerItem)}
+            removeArrayItem={(index) => removeArrayItem('volunteer', index)}
+            setResumeData={setResumeData}
+          />
+        )
 
-            <ReferenceForm
-              references={resumeData.data.sections.references.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('references', index, key, value)}
-              addArrayItem={() => addArrayItem('references', defaultReferenceItem)}
-              removeArrayItem={(index) => removeArrayItem('references', index)}
-              setResumeData={setResumeData}
-            />
-          </>
+      case 'references-info':
+        return (
+
+          <ReferenceForm
+            references={resumeData.data.sections.references.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem('references', index, key, value)}
+            addArrayItem={() => addArrayItem('references', defaultReferenceItem)}
+            removeArrayItem={(index) => removeArrayItem('references', index)}
+            setResumeData={setResumeData}
+          />
         )
 
       default:
@@ -345,7 +521,11 @@ const EditResume = () => {
   const reactToPrintFn = useReactToPrint({ contentRef: resumeDownloadRef });
 
   // Function to update baseWidth based on the resume container size
-  const updateBaseWidth = () => { };
+  const updateBaseWidth = () => {
+    if (resumeRef.current) {
+      setBaseWidth(resumeRef.current.offsetWidth);
+    }
+  };
 
   useEffect(() => {
     updateBaseWidth();
@@ -421,6 +601,7 @@ const EditResume = () => {
                   disabled={isLoading}
                 >
                   <LuArrowLeft className="text-[16px]" />
+                  Back
                 </button>
 
                 <button
@@ -453,6 +634,15 @@ const EditResume = () => {
 
           <div ref={resumeRef} className="h-[100vh]">
             {/* Resume Template */}
+
+            {resumeData?.data?.basics && (
+              <RenderResume
+                templateId={resumeData?.template?.theme || ""}
+                resumeData={resumeData}
+                colorPalette={resumeData?.template?.colorPalette || []}
+                containerWidth={baseWidth}
+              />
+            )}
           </div>
 
         </div>

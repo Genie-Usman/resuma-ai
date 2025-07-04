@@ -30,7 +30,7 @@ const CertificationsForm = ({ certifications, updateArrayItem, addArrayItem, rem
 
     return (
         <div className="px-5 pt-5">
-            <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Certifications</h2>
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Certifications <span className="ml-1 text-sm text-gray-400">(Optional)</span></h2>
 
             <div className="mt-4 flex flex-col gap-4 mb-3">
                 {certifications.map((item, index) => (

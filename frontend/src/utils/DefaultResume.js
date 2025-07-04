@@ -9,7 +9,6 @@ export const getDefaultResumeData = (user = {}) => ({
       label: '',
       href: ''
     },
-    customFields: [],
     picture: {
       url: user.profileImageURL || '',
       size: 64,
@@ -117,7 +116,7 @@ export const getDefaultResumeData = (user = {}) => ({
       name: 'References',
       columns: 1,
       separateLinks: true,
-      visible: false,
+      visible: true,
       items: []
     },
     skills: {

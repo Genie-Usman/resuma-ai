@@ -1,6 +1,7 @@
 import ProfilePhotoSelector from "../../../components/Inputs/ProfilePhotoSelector";
+import SummarySectionForm from "./SummarySectionForm";
 
-const ProfileInfoForm = ({ profileData, updateSection, onNext }) => {
+const ProfileInfoForm = ({ profileData, updateSection, resumeData, setResumeData, onNext }) => {
     return (
         <div className="px-5 pt-5">
             <h2 className="text-lg md:text-xl font-semibold text-gray-900">Personal Information</h2>
@@ -99,6 +100,27 @@ const ProfileInfoForm = ({ profileData, updateSection, onNext }) => {
                             }
                             placeholder="https://johndoe.me"
                             className="border border-gray-300 rounded px-3 py-2 w-full"
+                        />
+                    </div>
+                    {/* Summary */}
+                    <div className="flex flex-col md:col-span-2">
+                        <SummarySectionForm
+                            content={resumeData.data.sections?.summary?.content || ''}
+                            updateContent={(newContent) =>
+                                setResumeData((prev) => ({
+                                    ...prev,
+                                    data: {
+                                        ...prev.data,
+                                        sections: {
+                                            ...prev.data.sections,
+                                            summary: {
+                                                ...prev.data.sections.summary,
+                                                content: newContent,
+                                            },
+                                        },
+                                    },
+                                }))
+                            }
                         />
                     </div>
 

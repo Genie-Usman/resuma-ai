@@ -26,7 +26,7 @@ const ReferenceForm = ({ references, updateArrayItem, addArrayItem, removeArrayI
             }
             return prev;
         });
-    }, [[]]);
+    }, []);
 
     return (
         <div className="px-5 pt-5">
@@ -110,4 +110,3 @@ const ReferenceForm = ({ references, updateArrayItem, addArrayItem, removeArrayI
 }
 
 export default ReferenceForm;
-
