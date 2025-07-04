@@ -1,24 +1,19 @@
-import { LinkedEntity } from '../../utils/helper';
-
-// Components
 import Section from './Section';
 
-const Experience = ({ section }) => (
-    <Section section={section} urlKey="url" summaryKey="summary">
-        {(item) => (
-            <div key={item.id}>
-                <LinkedEntity
-                    name={item.company}
-                    url={item.url}
-                    separateLinks={section.separateLinks}
-                    className="font-bold"
-                />
-                <div>{item.position}</div>
-                <div>{item.location}</div>
-                <div className="font-bold">{item.date}</div>
-            </div>
-        )}
-    </Section>
-);
+const Experience = ({ section, themeColors }) => {
 
-export default Experience
+    return (
+        <Section section={section} urlKey="url" summaryKey="summary" themeColors={themeColors}>
+            {(item) => (
+                <div key={item.id}>
+                    <div style={{ fontWeight: 'bold', color: themeColors[1] }}>{item.company}</div>
+                    <div style={{ color: themeColors[1] }}>{item.position}</div>
+                    <div style={{ color: themeColors[1] }}>{item.location}</div>
+                    <div style={{ fontWeight: 'bold', color: themeColors[1] }}>{item.date}</div>
+                </div>
+            )}
+        </Section>
+    );
+};
+
+export default Experience;

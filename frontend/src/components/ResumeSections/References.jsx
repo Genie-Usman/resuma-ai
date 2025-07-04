@@ -3,17 +3,18 @@ import { LinkedEntity } from '../../utils/helper';
 // Components
 import Section from './Section';
 
-const References = ({ section }) => (
-    <Section section={section} urlKey="url" summaryKey="summary">
+const References = ({ section, themeColors }) => (
+    <Section section={section} urlKey="url" summaryKey="summary" themeColors={themeColors}>
         {(item) => (
             <div key={item.id}>
                 <LinkedEntity
                     name={item.name}
                     url={item.url}
                     separateLinks={section.separateLinks}
+                    themeColors={themeColors}
                     className="font-bold"
                 />
-                <div>{item.description}</div>
+                <div style={{ color: themeColors[1] }}>{item.description}</div>
             </div>
         )}
     </Section>

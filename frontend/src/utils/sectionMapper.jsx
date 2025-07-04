@@ -13,21 +13,21 @@ import Languages from "../components/ResumeSections/Languages";
 import Projects from "../components/ResumeSections/Projects";
 import References from "../components/ResumeSections/References";
 
-export const mapSectionToComponent = (key, section, reactKey) => {
+export const mapSectionToComponent = (key, section, reactKey, themeColors) => {
   const sectionComponentMap = {
-    profiles: <Profiles section={section} />,
-    summary: <Summary section={section} />,
-    experience: <Experience section={section} />,
-    education: <Education section={section} />,
-    awards: <Awards section={section} />,
-    certifications: <Certifications section={section} />,
-    skills: <Skills section={section} />,
-    interests: <Interests section={section} />,
-    publications: <Publications section={section} />,
-    volunteer: <Volunteer section={section} />,
-    languages: <Languages section={section} />,
-    projects: <Projects section={section} />,
-    references: <References section={section} />,
+    profiles: <Profiles section={section} themeColors={themeColors} />,
+    summary: <Summary section={section} themeColors={themeColors} />,
+    experience: <Experience section={section} themeColors={themeColors} />,
+    education: <Education section={section} themeColors={themeColors} />,
+    awards: <Awards section={section} themeColors={themeColors} />,
+    certifications: <Certifications section={section} themeColors={themeColors} />,
+    skills: <Skills section={section} themeColors={themeColors} />,
+    interests: <Interests section={section} themeColors={themeColors} />,
+    publications: <Publications section={section} themeColors={themeColors} />,
+    volunteer: <Volunteer section={section} themeColors={themeColors} />,
+    languages: <Languages section={section} themeColors={themeColors} />,
+    projects: <Projects section={section} themeColors={themeColors} />,
+    references: <References section={section} themeColors={themeColors} />,
   };
 
   return sectionComponentMap[key]

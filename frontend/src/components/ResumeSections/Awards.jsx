@@ -1,19 +1,12 @@
-import { LinkedEntity } from '../../utils/helper';
-
-// Components
 import Section from './Section';
 
-const Awards = ({ section }) => (
-    <Section section={section} urlKey="url" summaryKey="summary">
+const Awards = ({ section, themeColors }) => (
+    <Section section={section} urlKey="url" summaryKey="summary" themeColors={themeColors}>
         {(item) => (
             <div key={item.id}>
-                <div className="font-bold">{item.title}</div>
-                <LinkedEntity
-                    name={item.awarder}
-                    url={item.url}
-                    separateLinks={section.separateLinks}
-                />
-                <div className="font-bold">{item.date}</div>
+                <div style={{ fontWeight: 'bold', color: themeColors[1] }}>{item.name}</div>
+                <div style={{ color: themeColors[1] }}>{item.awarder}</div>
+                <div style={{ fontWeight: 'bold', color: themeColors[1] }}>{item.date}</div>
             </div>
         )}
     </Section>

@@ -14,6 +14,8 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
                     sections={resumeData.data.sections}
                     metadata={resumeData.data.metadata}
                     isFirstPage={true}
+                    containerWidth={containerWidth}
+                    colorPalette={colorPalette}
                 />
             )
 
@@ -24,6 +26,8 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
                     sections={resumeData.data.sections}
                     metadata={resumeData.data.metadata}
                     isFirstPage={true}
+                    containerWidth={containerWidth}
+                    colorPalette={colorPalette}
                 />
             )
     }

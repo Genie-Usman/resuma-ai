@@ -1,6 +1,6 @@
 import Rating from './Rating';
 
-const Section = ({ section, children, className, urlKey, levelKey, summaryKey, keywordsKey }) => {
+const Section = ({ section, children, className, urlKey, levelKey, summaryKey, keywordsKey, themeColors }) => {
 
   if (!section.visible || section.items.length === 0) return null;
 
@@ -8,15 +8,18 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
     <section id={section.id} className="grid">
 
       {/* Main Name */}
-      <div className="mb-2 hidden font-bold text-primary group-[.main]:block">
+      <div className="mb-2 hidden font-bold group-[.main]:block" style={{ color: themeColors[2] }}>
         <h4>{section.name}</h4>
       </div>
 
       {/* Sidebar Name */}
-      <div className="mx-auto mb-2 hidden items-center gap-x-2 text-center font-bold text-primary group-[.sidebar]:flex">
-        <div className="size-1.5 rounded-full border border-primary" />
+      <div
+        className="mx-auto mb-2 hidden items-center gap-x-2 text-center font-bold group-[.sidebar]:flex"
+        style={{ color: themeColors[2] }}
+      >
+        <div className="size-1.5 rounded-full border " style={{ color: themeColors[2] }} />
         <h4>{section.name}</h4>
-        <div className="size-1.5 rounded-full border border-primary" />
+        <div className="size-1.5 rounded-full border " style={{ color: themeColors[2] }} />
       </div>
 
       {/* Sidebar & Main Section */}
@@ -44,14 +47,15 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
               if (Array.isArray(value)) {
                 keywords = value;
               } else if (typeof value === "string" && value.trim() !== "") {
-                keywords = value.split(/,\s*/); 
+                keywords = value.split(/,\s*/);
               }
             }
 
             return (
               <div
                 key={item.id || `${section.id}-${index}`}
-                className={`relative space-y-2 border-primary group-[.main]:border-l group-[.main]:pl-4 ${className || ''}`}
+                className={`relative space-y-2 group-[.main]:border-l group-[.main]:pl-4 ${className || ''}`}
+                style={{ color: themeColors[2] }}
               >
                 <div>{children?.(item)}</div>
 
@@ -64,11 +68,12 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
                 )}
 
                 {/* Level */}
-                {level !== undefined && level !== null && !isNaN(level) && <Rating level={level} />}
+                {level !== undefined && level !== null && !isNaN(level) && 
+                <Rating level={level} themeColors={themeColors}/>}
 
                 {/* Keywords */}
                 {keywords.length > 0 && (
-                  <p className="text-sm">{keywords.join(", ")}</p>
+                  <p className="text-sm" style={{ color: themeColors[1] }}>{keywords.join(", ")}</p>
                 )}
 
                 {/* URL */}
@@ -77,13 +82,14 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
                     href={url.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-500 underline"
+                    className="text-sm underline"
+                    style={{ color: themeColors[2] }}
                   >
                     {url.label || url.href}
                   </a>
                 )}
 
-                <div className="absolute left-[-4.5px] top-px hidden size-[8px] rounded-full bg-primary group-[.main]:block" />
+                <div className="absolute left-[-4.5px] top-px hidden size-[8px] rounded-full group-[.main]:block" style={{ backgroundColor: themeColors[2] }} />
               </div>
             );
           })}

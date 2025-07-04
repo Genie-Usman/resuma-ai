@@ -26,7 +26,7 @@ const CertificationsForm = ({ certifications, updateArrayItem, addArrayItem, rem
             }
             return prev;
         });
-    }, [[]]);
+    }, []);
 
     return (
         <div className="px-5 pt-5">

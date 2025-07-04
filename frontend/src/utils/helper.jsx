@@ -72,7 +72,7 @@ export const stripHtml = (html) => {
 };
 
 // LinkedEntity component
-export const LinkedEntity = ({ name, url, separateLinks, className }) => {
+export const LinkedEntity = ({ name, url, separateLinks, className, themeColors }) => {
   const isValidUrl = url && typeof url.href === 'string' && url.href.startsWith('http');
 
   return !separateLinks && isValidUrl ? (
@@ -83,22 +83,22 @@ export const LinkedEntity = ({ name, url, separateLinks, className }) => {
       className={className}
     >
       <span>{name}</span>
-      <LuLink className="font-bold text-primary" />
+      <LuLink className="font-bold " style={{ color: themeColors[2] }} />
     </a>
   ) : (
-    <div className={className}>{name}</div>
+    <div className={className} style={{ color: themeColors[1] }}>{name}</div>
   );
 };
 
 // Generic Link component
-export const Link = ({ url, icon, iconOnRight, label, className }) => {
+export const Link = ({ url, icon, iconOnRight, label, className, themeColors }) => {
   const isValidUrl = url && typeof url.href === 'string' && url.href.startsWith('http');
 
   if (!isValidUrl) return null;
 
   return (
     <div className="flex items-center gap-x-1.5">
-      {!iconOnRight && (icon || <LuLink className="font-bold text-primary" />)}
+      {!iconOnRight && (icon || <LuLink className="font-bold" style={{ color: themeColors[2] }} />)}
       <a
         href={url.href}
         target="_blank"
@@ -107,7 +107,7 @@ export const Link = ({ url, icon, iconOnRight, label, className }) => {
       >
         {label || url.label || url.href}
       </a>
-      {iconOnRight && (icon || <LuLink className="font-bold text-primary" />)}
+      {iconOnRight && (icon || <LuLink className="font-bold" style={{ color: themeColors[2] }} />)}
     </div>
   );
 };
