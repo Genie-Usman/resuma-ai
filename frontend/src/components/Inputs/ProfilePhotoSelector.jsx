@@ -1,43 +1,41 @@
 import { useRef, useState } from 'react';
 import { LuUser, LuUpload, LuTrash } from 'react-icons/lu';
+import uploadImage from '../../utils/uploadImage';
 
-const ProfilePhotoSelector = ({ image, setImage, preview, setPreview }) => {
+const ProfilePhotoSelector = ({ image, setImage, preview, setPreview, onImageUploaded }) => {
     const inputRef = useRef();
     const [previewURL, setPreviewURL] = useState(null);
 
-    const handleImageChange = (event) => {
+    const handleImageChange = async (event) => {
         const file = event.target.files[0];
 
         if (file) {
-            // Update the image state
-            setImage(file);
-
-            // Generate preview url from the file
+            setImage(file); // just in case needed
             const preview = URL.createObjectURL(file);
-            if (setPreview) {
-                setPreview(preview);
+            setPreview?.(preview);
+            setPreviewURL(preview);
+
+            try {
+                const response = await uploadImage(file);
+                if (response?.imageUrl) {
+                    onImageUploaded?.(response.imageUrl);
+                }
+            } catch (err) {
+                console.error("Image upload failed:", err);
             }
-            setPreviewURL(preview)
         }
-    }
+    };
 
     const handleRemoveImage = () => {
         setImage(null);
         setPreviewURL(null);
-
-        if (setPreview) {
-            setPreview(null);
-        }
-        
-        if (inputRef.current) {
-            inputRef.current.value = null;
-        }
-
-    }
+        setPreview?.(null);
+        inputRef.current.value = null;
+    };
 
     const onChooseFile = () => {
         inputRef.current.click();
-    }
+    };
 
     return (
         <div className='flex justify-center mb-6'>
@@ -52,10 +50,9 @@ const ProfilePhotoSelector = ({ image, setImage, preview, setPreview }) => {
             {!image ? (
                 <div className='w-20 h-20 flex items-center justify-center bg-purple-50 rounded-full relative cursor-pointer'>
                     <LuUser className='text-4xl text-purple-500' />
-
                     <button
                         type='button'
-                        className='w-8 h-8 flex items-center justify-center bg-linear-to-r from-purple-500/85 to-purple-700 text-white rounded-full absolute -bottom-1 -right-1 cursor-pointer'
+                        className='w-8 h-8 flex items-center justify-center bg-purple-700 text-white rounded-full absolute -bottom-1 -right-1 cursor-pointer'
                         onClick={onChooseFile}
                     >
                         <LuUpload />
@@ -76,10 +73,9 @@ const ProfilePhotoSelector = ({ image, setImage, preview, setPreview }) => {
                         <LuTrash />
                     </button>
                 </div>
-            )
-            }
+            )}
         </div>
-    )
-}
+    );
+};
 
-export default ProfilePhotoSelector
+export default ProfilePhotoSelector;

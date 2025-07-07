@@ -1,7 +1,8 @@
 import ProfilePhotoSelector from "../../../components/Inputs/ProfilePhotoSelector";
 import SummarySectionForm from "./SummarySectionForm";
 
-const ProfileInfoForm = ({ profileData, updateSection, resumeData, setResumeData, onNext }) => {
+const PersonalInfoForm = ({ profileData, updateSection, resumeData, setResumeData, onNext }) => {
+
     return (
         <div className="px-5 pt-5">
             <h2 className="text-lg md:text-xl font-semibold text-gray-900">Personal Information</h2>
@@ -23,6 +24,12 @@ const ProfileInfoForm = ({ profileData, updateSection, resumeData, setResumeData
                             url: value,
                         })
                     }
+                    onImageUploaded={(url) =>
+                        updateSection('picture', {
+                            ...profileData?.picture,
+                            url,
+                        })
+                    }
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -31,8 +38,8 @@ const ProfileInfoForm = ({ profileData, updateSection, resumeData, setResumeData
                         <label className="mb-1 font-semibold text-sm">Full Name</label>
                         <input
                             type="text"
-                            value={profileData?.name || ''}
-                            onChange={({ target }) => updateSection('name', target.value)}
+                            value={profileData?.name || ""}
+                            onChange={({ target }) => updateSection("name", target.value)}
                             placeholder="John Doe"
                             className="border border-gray-300 rounded px-3 py-2 w-full"
                         />
@@ -43,8 +50,8 @@ const ProfileInfoForm = ({ profileData, updateSection, resumeData, setResumeData
                         <label className="mb-1 font-semibold text-sm">Headline</label>
                         <input
                             type="text"
-                            value={profileData?.headline || ''}
-                            onChange={({ target }) => updateSection('headline', target.value)}
+                            value={profileData?.headline || ""}
+                            onChange={({ target }) => updateSection("headline", target.value)}
                             placeholder="Full Stack Developer"
                             className="border border-gray-300 rounded px-3 py-2 w-full"
                         />
@@ -55,8 +62,8 @@ const ProfileInfoForm = ({ profileData, updateSection, resumeData, setResumeData
                         <label className="mb-1 font-semibold text-sm">Email</label>
                         <input
                             type="email"
-                            value={profileData?.email || ''}
-                            onChange={({ target }) => updateSection('email', target.value)}
+                            value={profileData?.email || ""}
+                            onChange={({ target }) => updateSection("email", target.value)}
                             placeholder="johndoe@gmail.com"
                             className="border border-gray-300 rounded px-3 py-2 w-full"
                         />
@@ -67,8 +74,8 @@ const ProfileInfoForm = ({ profileData, updateSection, resumeData, setResumeData
                         <label className="mb-1 font-semibold text-sm">Phone</label>
                         <input
                             type="tel"
-                            value={profileData?.phone || ''}
-                            onChange={({ target }) => updateSection('phone', target.value)}
+                            value={profileData?.phone || ""}
+                            onChange={({ target }) => updateSection("phone", target.value)}
                             placeholder="+1 (234) 567-8901"
                             className="border border-gray-300 rounded px-3 py-2 w-full"
                         />
@@ -79,8 +86,8 @@ const ProfileInfoForm = ({ profileData, updateSection, resumeData, setResumeData
                         <label className="mb-1 font-semibold text-sm">Location</label>
                         <input
                             type="text"
-                            value={profileData?.location || ''}
-                            onChange={({ target }) => updateSection('location', target.value)}
+                            value={profileData?.location || ""}
+                            onChange={({ target }) => updateSection("location", target.value)}
                             placeholder="Sesame Street, New York"
                             className="border border-gray-300 rounded px-3 py-2 w-full"
                         />
@@ -91,9 +98,9 @@ const ProfileInfoForm = ({ profileData, updateSection, resumeData, setResumeData
                         <label className="mb-1 font-semibold text-sm">Website</label>
                         <input
                             type="url"
-                            value={profileData?.url?.href || ''}
+                            value={profileData?.url?.href || ""}
                             onChange={({ target }) =>
-                                updateSection('url', {
+                                updateSection("url", {
                                     ...profileData?.url,
                                     href: target.value,
                                 })
@@ -102,10 +109,11 @@ const ProfileInfoForm = ({ profileData, updateSection, resumeData, setResumeData
                             className="border border-gray-300 rounded px-3 py-2 w-full"
                         />
                     </div>
+
                     {/* Summary */}
                     <div className="flex flex-col md:col-span-2">
                         <SummarySectionForm
-                            content={resumeData.data.sections?.summary?.content || ''}
+                            content={resumeData.data.sections?.summary?.content || ""}
                             updateContent={(newContent) =>
                                 setResumeData((prev) => ({
                                     ...prev,
@@ -123,11 +131,11 @@ const ProfileInfoForm = ({ profileData, updateSection, resumeData, setResumeData
                             }
                         />
                     </div>
-
                 </div>
             </div>
+
         </div>
     );
 };
 
-export default ProfileInfoForm;
+export default PersonalInfoForm;

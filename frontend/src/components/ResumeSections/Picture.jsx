@@ -22,6 +22,7 @@ const Picture = ({ picture, fontSize = 16, className = "" }) => {
       src={picture.url}
       alt="Profile"
       className={classes}
+      crossOrigin="anonymous"
       style={{
         maxWidth: `${picture.size}px`,
         aspectRatio: `${picture.aspectRatio}`,

@@ -23,8 +23,9 @@ import PublicationsForm from "./Forms/PublicationsForm";
 import AwardsForm from "./Forms/AwardsForm";
 import VolunteeringForm from "./Forms/VolunteeringForm";
 import ReferenceForm from "./Forms/ReferenceForm";
-import { stripHtml } from "../../utils/helper.jsx";
+import { captureElementAsImage, dataURLToFile, fixTailwindColors, stripHtml } from "../../utils/helper.jsx";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
+import uploadImage from "../../utils/uploadImage.js";
 
 const EditResume = () => {
   const { resumeId } = useParams();
@@ -40,9 +41,10 @@ const EditResume = () => {
   const [progess, setProgress] = useState(0);
   const [resumeData, setResumeData] = useState(getDefaultResumeData());
   const [errorMsg, setErrorMsg] = useState("");
+  const [newProfileImageFile, setNewProfileImageFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-
+  // Next Step Function
   const goToNextStep = () => {
     const pages = [
       "personal-info",
@@ -208,7 +210,6 @@ const EditResume = () => {
     setErrorMsg('');
     goToNextStep();
   };
-
 
   // Previous Step Navigation Function
   const goBack = () => {
@@ -488,7 +489,6 @@ const EditResume = () => {
     });
   };
 
-
   // Fetch Resume Info by ID
   const fetchResumeDetailsByID = async () => {
     try {
@@ -510,9 +510,73 @@ const EditResume = () => {
   };
 
   // Upload thumbnail and Resume Profile Image
-  const uploadResumeImages = async () => { };
+  const uploadResumeImages = async () => {
+    try {
+      setIsLoading(true);
 
-  const updateResumeDetails = async (thumbnailLink, profilePreviewUrl) => { };
+      // Generate resume preview image
+      fixTailwindColors(resumeRef.current);
+      const imageDataUrl = await captureElementAsImage(resumeRef.current);
+      const thumbnailFile = dataURLToFile(imageDataUrl, `resume-${resumeId}.png`);
+
+      let uploadedProfileImageUrl = resumeData.data.basics.picture.url || '';
+
+      if (newProfileImageFile) {
+        const imgUploadRes = await uploadImage(newProfileImageFile);
+
+        if (imgUploadRes.imageUrl) {
+          uploadedProfileImageUrl = imgUploadRes.imageUrl;
+        } else {
+          console.warn('No imageUrl returned from uploadImage');
+        }
+      }
+
+      const formData = new FormData();
+      if (thumbnailFile) formData.append('thumbnail', thumbnailFile);
+
+      const uploadResponse = await axiosInstance.put(
+        API_PATHS.RESUME.UPLOAD_IMAGES(resumeId),
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+
+      const { thumbnailLink } = uploadResponse.data;
+
+      const updatedResumeData = {
+        ...resumeData,
+        thumbnailLink: thumbnailLink || '',
+        data: {
+          ...resumeData.data,
+          basics: {
+            ...resumeData.data.basics,
+            picture: {
+              ...resumeData.data.basics.picture,
+              url: uploadedProfileImageUrl,
+              file: undefined,
+            },
+          },
+        },
+      };
+
+      setResumeData(updatedResumeData);
+      await updateResumeDetails(updatedResumeData);
+
+      toast.success('Resume Updated Successfully!');
+      navigate('/dashboard');
+    } catch (error) {
+      toast.error('Failed to upload images');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateResumeDetails = async (updatedResume) => {
+    try {
+      await axiosInstance.put(API_PATHS.RESUME.UPDATE(resumeId), updatedResume);
+    } catch (error) {
+      console.error('Error updating resume details:', error);
+    }
+  };
 
   // Delete Resume 
   const handleDeleteResume = async () => { };
@@ -540,8 +604,6 @@ const EditResume = () => {
     }
 
   }, [])
-
-
 
   return (
     <DashboardLayout>

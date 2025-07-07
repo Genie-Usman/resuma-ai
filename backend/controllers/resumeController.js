@@ -69,7 +69,6 @@ const getResumeById = async (req, res) => {
 
     res.json(resume);
 
-    res.json(resume);
   } catch (error) {
     res.status(404).json({ message: 'Server Error', error: error.message });
   }
@@ -104,7 +103,6 @@ const updateResume = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
-
 
 // @desc    Delete a Resume
 // @route   DELETE /api/resumes/:id
