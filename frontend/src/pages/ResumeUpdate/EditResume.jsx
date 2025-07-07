@@ -23,7 +23,7 @@ import PublicationsForm from "./Forms/PublicationsForm";
 import AwardsForm from "./Forms/AwardsForm";
 import VolunteeringForm from "./Forms/VolunteeringForm";
 import ReferenceForm from "./Forms/ReferenceForm";
-import { captureElementAsImage, dataURLToFile, fixTailwindColors, stripHtml } from "../../utils/helper.jsx";
+import { captureElementAsImage, dataURLToFile, fixTailwindColors, stripHtml, waitForImageToLoad } from "../../utils/helper.jsx";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
 import uploadImage from "../../utils/uploadImage.js";
 
@@ -514,22 +514,47 @@ const EditResume = () => {
     try {
       setIsLoading(true);
 
-      // Generate resume preview image
-      fixTailwindColors(resumeRef.current);
-      const imageDataUrl = await captureElementAsImage(resumeRef.current);
-      const thumbnailFile = dataURLToFile(imageDataUrl, `resume-${resumeId}.png`);
-
       let uploadedProfileImageUrl = resumeData.data.basics.picture.url || '';
 
       if (newProfileImageFile) {
         const imgUploadRes = await uploadImage(newProfileImageFile);
-
         if (imgUploadRes.imageUrl) {
           uploadedProfileImageUrl = imgUploadRes.imageUrl;
+
+          setResumeData((prev) => ({
+            ...prev,
+            data: {
+              ...prev.data,
+              basics: {
+                ...prev.data.basics,
+                picture: {
+                  ...prev.data.basics.picture,
+                  url: uploadedProfileImageUrl,
+                  file: undefined,
+                },
+              },
+            },
+          }));
+
+          await new Promise((resolve) => setTimeout(resolve, 300));
         } else {
           console.warn('No imageUrl returned from uploadImage');
         }
       }
+
+      const profileImgUrl = resumeData.data.basics?.picture?.url;
+      if (profileImgUrl) {
+        try {
+          await waitForImageToLoad(profileImgUrl);
+        } catch (e) {
+          console.warn("Profile image failed to preload. It may be missing from the thumbnail.");
+        }
+      }
+
+      fixTailwindColors(resumeRef.current);
+      await new Promise((r) => setTimeout(r, 1000));
+      const imageDataUrl = await captureElementAsImage(resumeRef.current);
+      const thumbnailFile = dataURLToFile(imageDataUrl, `resume-${resumeId}.png`);
 
       const formData = new FormData();
       if (thumbnailFile) formData.append('thumbnail', thumbnailFile);

@@ -1,22 +1,22 @@
 import { useEffect, useState } from 'react'
 
 // Utils
-import { getLightColorFromImage } from '../../utils/helper.jsx';
+// import { getLightColorFromImage } from '../../utils/helper.jsx';
 
 const ResumeSummaryCard = ({ imgUrl, title, lastUpdated, onSelect }) => {
     const [bgColor, setBgColor] = useState('#FFFFFF');
 
-    useEffect(() => {
-        if (imgUrl) {
-            getLightColorFromImage(imgUrl)
-                .then((color) => {
-                    setBgColor(color)
-                })
-                .catch(() => {
-                    setBgColor('#FFFFFF')
-                })
-        }
-    }, [imgUrl])
+    // useEffect(() => {
+    //     if (imgUrl) {
+    //         getLightColorFromImage(imgUrl)
+    //             .then((color) => {
+    //                 setBgColor(color)
+    //             })
+    //             .catch(() => {
+    //                 setBgColor('#FFFFFF')
+    //             })
+    //     }
+    // }, [imgUrl])
 
     return (
         <div

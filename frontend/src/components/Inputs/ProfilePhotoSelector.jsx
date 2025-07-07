@@ -64,6 +64,7 @@ const ProfilePhotoSelector = ({ image, setImage, preview, setPreview, onImageUpl
                         src={preview || previewURL}
                         alt="Profile Photo"
                         className='w-20 h-20 rounded-full object-cover'
+                        crossOrigin='anonymous'
                     />
                     <button
                         type='button'

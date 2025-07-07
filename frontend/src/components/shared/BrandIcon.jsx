@@ -13,6 +13,7 @@ const BrandIcon = forwardRef(({ slug = ""}, ref) => {
         alt=""
         className="size-6"
         src={LINKEDIN}
+        crossOrigin="anonymous"
         loading="lazy"
       />
     );
