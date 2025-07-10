@@ -1,4 +1,4 @@
-// Imports for all section components
+// utils/sectionMapper.js
 import Profiles from "../components/ResumeSections/Profiles";
 import Summary from "../components/ResumeSections/Summary";
 import Experience from "../components/ResumeSections/Experience";
@@ -13,24 +13,33 @@ import Languages from "../components/ResumeSections/Languages";
 import Projects from "../components/ResumeSections/Projects";
 import References from "../components/ResumeSections/References";
 
-export const mapSectionToComponent = (key, section, reactKey, themeColors) => {
-  const sectionComponentMap = {
-    profiles: <Profiles section={section} themeColors={themeColors} />,
-    summary: <Summary section={section} themeColors={themeColors} />,
-    experience: <Experience section={section} themeColors={themeColors} />,
-    education: <Education section={section} themeColors={themeColors} />,
-    awards: <Awards section={section} themeColors={themeColors} />,
-    certifications: <Certifications section={section} themeColors={themeColors} />,
-    skills: <Skills section={section} themeColors={themeColors} />,
-    interests: <Interests section={section} themeColors={themeColors} />,
-    publications: <Publications section={section} themeColors={themeColors} />,
-    volunteer: <Volunteer section={section} themeColors={themeColors} />,
-    languages: <Languages section={section} themeColors={themeColors} />,
-    projects: <Projects section={section} themeColors={themeColors} />,
-    references: <References section={section} themeColors={themeColors} />,
-  };
+const components = {
+  profiles: Profiles,
+  summary: Summary,
+  experience: Experience,
+  education: Education,
+  awards: Awards,
+  certifications: Certifications,
+  skills: Skills,
+  interests: Interests,
+  publications: Publications,
+  volunteer: Volunteer,
+  languages: Languages,
+  projects: Projects,
+  references: References,
+};
 
-  return sectionComponentMap[key]
-    ? <div key={reactKey}>{sectionComponentMap[key]}</div>
-    : null;
+export const mapSectionToComponent = (key, section, reactKey, themeColors) => {
+  if (!section?.visible) return null;
+
+  const usesItems = ['profiles', 'experience', 'education', 'awards', 'certifications', 'skills', 'interests', 'publications', 'volunteer', 'languages', 'projects', 'references'];
+
+  if (usesItems.includes(key) && !section.items?.length) return null;
+
+  const Component = components[key];
+  return Component ? (
+    <div key={reactKey}>
+      <Component section={section} themeColors={themeColors} />
+    </div>
+  ) : null;
 };

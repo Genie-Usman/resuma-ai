@@ -1,43 +1,21 @@
-import { useEffect } from "react";
 import { LuPlus, LuTrash2 } from "react-icons/lu";
 import { defaultVolunteerItem } from "../../../constants";
 import SummarySectionForm from "./SummarySectionForm";
 
-const VolunteeringForm = ({ volunteer, updateArrayItem, addArrayItem, removeArrayItem, setResumeData }) => {
-
-    // Ensure at least one volunteer item exists
-    useEffect(() => {
-        setResumeData((prev) => {
-            const volunteerItem = prev.data.sections.volunteer.items || [];
-            if (volunteerItem.length === 0) {
-                return {
-                    ...prev,
-                    data: {
-                        ...prev.data,
-                        sections: {
-                            ...prev.data.sections,
-                            volunteer: {
-                                ...prev.data.sections.volunteer,
-                                items: [{ ...defaultVolunteerItem }],
-                            },
-                        },
-                    },
-                };
-            }
-            return prev;
-        });
-    }, []);
+const VolunteeringForm = ({ volunteer, updateArrayItem, addArrayItem, removeArrayItem }) => {
 
     return (
         <div className="px-5 pt-5">
-            <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Volunteering</h2>
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Volunteering 
+                <span className="ml-2 text-sm text-gray-400">(Optional)</span>
+            </h2>
 
             <div className="mt-4 flex flex-col gap-4 mb-3">
                 {volunteer.map((item, index) => (
                     <div key={item.id || index} className="relative border border-gray-200/50 p-4 rounded-lg">
 
                         {/* Remove Button */}
-                        {volunteer.length > 1 && (
+                        {volunteer.length > 0 && (
                             <button
                                 type="button"
                                 onClick={() => removeArrayItem(index)}
@@ -127,7 +105,7 @@ const VolunteeringForm = ({ volunteer, updateArrayItem, addArrayItem, removeArra
                 >
                     <div className="flex flex-row items-center justify-center gap-1">
                         <LuPlus className="w-6 h-6" />{" "}
-                        <span className="py-0.5 text-base">Add Another Volunteering</span>
+                        <span className="py-0.5 text-base">{volunteer.length > 0 ? 'Add Another Volunteering' : 'Add a Volunteering'}</span>
                     </div>
                 </button>
             </div>

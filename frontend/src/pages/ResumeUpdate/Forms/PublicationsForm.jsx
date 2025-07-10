@@ -1,43 +1,22 @@
-import { useEffect } from "react";
 import { LuPlus, LuTrash2 } from "react-icons/lu";
 import { defaultPublicationItem } from "../../../constants";
 import SummarySectionForm from "./SummarySectionForm";
 
-const PublicationsForm = ({ publications, updateArrayItem, addArrayItem, removeArrayItem, setResumeData }) => {
-
-    // Ensure at least one publication item exists
-    useEffect(() => {
-        setResumeData((prev) => {
-            const publicationItem = prev.data.sections.publications.items || [];
-            if (publicationItem.length === 0) {
-                return {
-                    ...prev,
-                    data: {
-                        ...prev.data,
-                        sections: {
-                            ...prev.data.sections,
-                            publications: {
-                                ...prev.data.sections.publications,
-                                items: [{ ...defaultPublicationItem }],
-                            },
-                        },
-                    },
-                };
-            }
-            return prev;
-        });
-    }, []);
+const PublicationsForm = ({ publications, updateArrayItem, addArrayItem, removeArrayItem }) => {
 
     return (
         <div className="px-5 pt-5">
-            <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Publications</h2>
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-900">
+                Publications
+                <span className="ml-2 text-sm text-gray-400">(Optional)</span>
+            </h2>
 
             <div className="mt-4 flex flex-col gap-4 mb-3">
                 {publications.map((item, index) => (
                     <div key={item.id || index} className="relative border border-gray-200/50 p-4 rounded-lg">
 
                         {/* Remove Button */}
-                        {publications.length > 1 && (
+                        {publications.length > 0 && (
                             <button
                                 type="button"
                                 onClick={() => removeArrayItem(index)}
@@ -114,7 +93,7 @@ const PublicationsForm = ({ publications, updateArrayItem, addArrayItem, removeA
                 >
                     <div className="flex flex-row items-center justify-center gap-1">
                         <LuPlus className="w-6 h-6" />{" "}
-                        <span className="py-0.5 text-base">Add Another Publication</span>
+                        <span className="py-0.5 text-base">{publications.length > 0 ? 'Add Another Publication' : 'Add a Publication'}</span>
                     </div>
                 </button>
             </div>

@@ -1,43 +1,21 @@
-import { useEffect } from "react";
 import { LuPlus, LuTrash2 } from "react-icons/lu";
 import { defaultReferenceItem } from "../../../constants";
 import SummarySectionForm from "./SummarySectionForm";
 
-const ReferenceForm = ({ references, updateArrayItem, addArrayItem, removeArrayItem, setResumeData }) => {
-
-    // Ensure at least one Reference item exists
-    useEffect(() => {
-        setResumeData((prev) => {
-            const referenceItem = prev.data.sections.references.items || [];
-            if (referenceItem.length === 0) {
-                return {
-                    ...prev,
-                    data: {
-                        ...prev.data,
-                        sections: {
-                            ...prev.data.sections,
-                            references: {
-                                ...prev.data.sections.references,
-                                items: [{ ...defaultReferenceItem }],
-                            },
-                        },
-                    },
-                };
-            }
-            return prev;
-        });
-    }, []);
+const ReferenceForm = ({ references, updateArrayItem, addArrayItem, removeArrayItem }) => {
 
     return (
         <div className="px-5 pt-5">
-            <h2 className="text-xl md:text-2xl font-semibold text-gray-900">References</h2>
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-900">References 
+                <span className="ml-2 text-sm text-gray-400">(Optional)</span>
+            </h2>
 
             <div className="mt-4 flex flex-col gap-4 mb-3">
                 {references.map((item, index) => (
                     <div key={item.id || index} className="relative border border-gray-200/50 p-4 rounded-lg">
 
                         {/* Remove Button */}
-                        {references.length > 1 && (
+                        {references.length > 0 && (
                             <button
                                 type="button"
                                 onClick={() => removeArrayItem(index)}
@@ -101,7 +79,7 @@ const ReferenceForm = ({ references, updateArrayItem, addArrayItem, removeArrayI
                 >
                     <div className="flex flex-row items-center justify-center gap-1">
                         <LuPlus className="w-6 h-6" />{" "}
-                        <span className="py-0.5 text-base">Add Another Reference</span>
+                        <span className="py-0.5 text-base">{references.length > 0 ? 'Add Another Reference' : 'Add a Reference'}</span>
                     </div>
                 </button>
             </div>

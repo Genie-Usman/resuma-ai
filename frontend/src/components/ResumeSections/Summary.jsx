@@ -1,12 +1,14 @@
+import { stripHtml } from "../../utils/helper";
+
 const Summary = ({ section, themeColors }) => {
-  if (!section || !section.visible || !section.content || section.content.trim() === "") {
-    return null;
-  }
+  if (!section || !section.content || stripHtml(section.content)?.trim() === "") {
+  return null;
+}
 
   return (
     <section id={section.id}>
       {/* Section Header */}
-      <div className="mb-2 font-bol" style={{ color: themeColors[2] }}>
+      <div className="mb-2 font-bold" style={{ color: themeColors[2] }}>
         <h4>{section.name}</h4>
       </div>
 

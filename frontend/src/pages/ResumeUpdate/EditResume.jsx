@@ -53,8 +53,8 @@ const EditResume = () => {
       "education-info",
       "skills-info",
       "projects-info",
-      "certifications-info",
       "interests-and-languages-info",
+      "certifications-info",
       "publications-awards-info",
       "volunteering-info",
       "references-info"
@@ -83,122 +83,115 @@ const EditResume = () => {
 
     const basics = resumeData.data.basics;
     const sections = resumeData.data.sections;
-    const basicSummary = sections.summary?.content;
+    const basicSummary = sections.summary?.content || '';
 
-    // switch (currentPage) {
-    //   case 'personal-info': {
-    //     const { name, headline, email, phone, location, url } = basics;
+    switch (currentPage) {
+      case 'personal-info': {
+        const { name, headline, email, phone, location } = basics;
 
-    //     if (!name.trim()) errors.push("Name is required.");
-    //     if (!headline.trim()) errors.push("Headline is required.");
-    //     // if (!email.trim() || !/^\S+@S+\.\S+$/.test(email)) errors.push("Valid email is required.");
-    //     if (!phone.trim()) errors.push("Phone is required.");
-    //     if (!location.trim()) errors.push("Location is required.");
-    //     if (!url?.href?.trim()) errors.push("Website URL is required.");
-    //     if (!basicSummary || !basicSummary.trim()) {
-    //       errors.push("Summary cannot be empty.");
-    //     }
-    //     break;
-    //   }
+        const cleanedSummary = stripHtml(basicSummary)?.trim();
 
-    //   case 'profile-info': {
-    //     const profiles = sections.profiles?.items || [];
+        if (!name.trim()) errors.push("Name is required.");
+        if (!headline.trim()) errors.push("Headline is required.");
+        if (!email.trim()) errors.push("Valid email is required.");
+        if (!phone.trim()) errors.push("Phone is required.");
+        if (!location.trim()) errors.push("Location is required.");
+        if (!cleanedSummary) {
+          errors.push("Summary cannot be empty.");
+        }
 
-    //     if (profiles.length === 0) {
-    //       errors.push("At least one profile is required.");
-    //     } else {
-    //       profiles.forEach((profile, i) => {
-    //         if (!profile.visible) return;
+        break;
+      }
 
-    //         if (!profile.network?.trim()) {
-    //           errors.push(`Profile #${i + 1}: Network is required.`);
-    //         }
+      case 'profile-info': {
+        const profiles = sections.profiles?.items || [];
 
-    //         if (!profile.username?.trim()) {
-    //           errors.push(`Profile #${i + 1}: Username is required.`);
-    //         }
+        if (profiles.length === 0) {
+          errors.push("At least one profile is required.");
+        } else {
+          profiles.forEach((profile, i) => {
+            if (!profile.visible) return;
 
-    //         if (!profile.url?.href?.trim()) {
-    //           errors.push(`Profile #${i + 1}: URL is required.`);
-    //         }
-    //       });
-    //     }
-    //     break;
-    //   }
+            if (!profile.network?.trim()) { errors.push(`Profile #${i + 1}: Network is required.`) }
+            if (!profile.username?.trim()) { errors.push(`Profile #${i + 1}: Username is required.`) }
+            if (!profile.url?.href?.trim()) { errors.push(`Profile #${i + 1}: URL is required.`) }
+          });
+        }
+        break;
+      }
 
-    //   case 'experience-info': {
-    //     const experienceItems = sections.experience?.items || [];
+      case 'experience-info': {
+        const experienceItems = sections.experience?.items || [];
 
-    //     if (experienceItems.length === 0) {
-    //       errors.push("At least one experience entry is required.");
-    //     } else {
-    //       experienceItems.forEach((item, i) => {
-    //         if (!item.company?.trim()) errors.push(`Experience #${i + 1}: Company is required.`);
-    //         if (!item.position?.trim()) errors.push(`Experience #${i + 1}: Position is required.`);
-    //         if (!item.location?.trim()) errors.push(`Experience #${i + 1}: Location is required.`);
-    //         if (!item.date?.trim()) errors.push(`Experience #${i + 1}: Date is required.`);
-    //         if (!stripHtml(item.summary)?.trim()) {
-    //           errors.push(`Experience #${i + 1}: Summary cannot be empty.`);
-    //         }
-    //       });
-    //     }
-    //     break;
-    //   }
+        if (experienceItems.length === 0) {
+          errors.push("At least one experience entry is required.");
+        } else {
+          experienceItems.forEach((item, i) => {
+            if (!item.company?.trim()) errors.push(`Experience #${i + 1}: Company is required.`);
+            if (!item.position?.trim()) errors.push(`Experience #${i + 1}: Position is required.`);
+            if (!item.location?.trim()) errors.push(`Experience #${i + 1}: Location is required.`);
+            if (!item.date?.trim()) errors.push(`Experience #${i + 1}: Date is required.`);
+            if (!stripHtml(item.summary)?.trim()) {
+              errors.push(`Experience #${i + 1}: Summary cannot be empty.`);
+            }
+          });
+        }
+        break;
+      }
 
-    //   case 'education-info': {
-    //     const educationItems = sections.education?.items || [];
-    //     if (educationItems.length === 0) {
-    //       errors.push("At least one education entry is required.");
-    //     } else {
-    //       educationItems.forEach((item, i) => {
-    //         if (!item.institution?.trim()) errors.push(`Education #${i + 1}: Institution is required.`);
-    //         if (!item.studyType?.trim()) errors.push(`Education #${i + 1}: Degree is required.`);
-    //       });
-    //     }
-    //     break;
-    //   }
+      case 'education-info': {
+        const educationItems = sections.education?.items || [];
+        if (educationItems.length === 0) {
+          errors.push("At least one education entry is required.");
+        } else {
+          educationItems.forEach((item, i) => {
+            if (!item.institution?.trim()) errors.push(`Education #${i + 1}: Institution is required.`);
+            if (!item.studyType?.trim()) errors.push(`Education #${i + 1}: Degree is required.`);
+          });
+        }
+        break;
+      }
 
-    //   case 'skills-info': {
-    //     const skillsItems = sections.skills?.items || [];
-    //     if (skillsItems.length === 0) {
-    //       errors.push("At least one skill is required.");
-    //     } else {
-    //       skillsItems.forEach((item, i) => {
-    //         if (!item.name?.trim()) errors.push(`Skill #${i + 1}: Name is required.`);
-    //       });
-    //     }
-    //     break;
-    //   }
+      case 'skills-info': {
+        const skillsItems = sections.skills?.items || [];
+        if (skillsItems.length === 0) {
+          errors.push("At least one skill is required.");
+        } else {
+          skillsItems.forEach((item, i) => {
+            if (!item.name?.trim()) errors.push(`Skill #${i + 1}: Name is required.`);
+          });
+        }
+        break;
+      }
 
-    //   case 'projects-info': {
-    //     const projects = sections.projects?.items || [];
-    //     if (projects.length > 0) {
-    //       projects.forEach((item, i) => {
-    //         if (!item.name?.trim()) errors.push(`Project #${i + 1}: Name is required.`);
-    //         if (!item.description?.trim()) errors.push(`Project #${i + 1}: Description is required.`);
-    //       });
-    //     }
-    //     break;
-    //   }
+      case 'projects-info': {
+        const projects = sections.projects?.items || [];
+        if (projects.length > 0) {
+          projects.forEach((item, i) => {
+            if (!item.name?.trim()) errors.push(`Project #${i + 1}: Name is required.`);
+            if (!item.description?.trim()) errors.push(`Project #${i + 1}: Description is required.`);
+          });
+        }
+        break;
+      }
 
-    //   case 'interests-and-languages-info': {
-    //     const languages = sections.languages?.items || [];
-    //     const interests = sections.interests?.items || [];
-    //     if (languages.length === 0) {
-    //       errors.push("At least one language is required.");
-    //     }
-    //     if (languages.length > 0) {
-    //       languages.forEach((item, i) => {
-    //         if (!item.name?.trim()) errors.push(`Language #${i + 1}: Name is required.`);
-    //       })
-    //     }
-    //     if (interests.length === 0) {
-    //       errors.push("At least one interest is required.");
-    //     }
-    //     break;
-    //   }
-
-    // }
+      case 'interests-and-languages-info': {
+        const languages = sections.languages?.items || [];
+        const interests = sections.interests?.items || [];
+        if (languages.length === 0) {
+          errors.push("At least one language is required.");
+        }
+        if (languages.length > 0) {
+          languages.forEach((item, i) => {
+            if (!item.name?.trim()) errors.push(`Language #${i + 1}: Name is required.`);
+          })
+        }
+        if (interests.length === 0) {
+          errors.push("At least one interest is required.");
+        }
+        break;
+      }
+    }
 
     // Handle the result
     if (errors.length > 0) {
@@ -225,22 +218,69 @@ const EditResume = () => {
       "publications-awards-info",
       "volunteering-info",
       "references-info"
-    ]
+    ];
 
-    if (currentPage === "personal-info") navigate("/dashboard");
+    if (currentPage === "personal-info") {
+      navigate("/dashboard");
+      return;
+    }
 
     const currentIndex = pages.indexOf(currentPage);
 
     if (currentIndex > 0) {
       const prevIndex = currentIndex - 1;
-      setCurrentPage(pages[prevIndex]);
+      const prevPage = pages[prevIndex];
+      setCurrentPage(prevPage);
 
-      // Set Progress as Percentage
+      // 👇 Restore section visibility on back
+      const sectionMap = {
+        "profile-info": "profiles",
+        "experience-info": "experience",
+        "education-info": "education",
+        "skills-info": "skills",
+        "projects-info": "projects",
+        "certifications-info": "certifications",
+        "interests-and-languages-info": ["interests", "languages"],
+        "publications-awards-info": ["publications", "awards"],
+        "volunteering-info": "volunteer",
+        "references-info": "references",
+      };
+
+      const targetSections = sectionMap[prevPage];
+
+      setResumeData((prev) => {
+        const updatedSections = { ...prev.data.sections };
+
+        if (Array.isArray(targetSections)) {
+          targetSections.forEach((sec) => {
+            updatedSections[sec] = {
+              ...updatedSections[sec],
+              visible: true,
+            };
+          });
+        } else if (targetSections) {
+          updatedSections[targetSections] = {
+            ...updatedSections[targetSections],
+            visible: true,
+          };
+        }
+
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            sections: updatedSections,
+          },
+        };
+      });
+
+      // Update Progress
       const percent = Math.round((prevIndex / (pages.length - 1)) * 100);
       setProgress(percent);
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
+
 
   const renderForm = () => {
     if (!resumeData?.data || !resumeData.data.basics) return null;
@@ -311,20 +351,17 @@ const EditResume = () => {
           />
         )
 
-      case 'certifications-info':
-        return (
-          <CertificationsForm
-            certifications={resumeData.data.sections.certifications.items || []}
-            updateArrayItem={(index, key, value) => updateArrayItem('certifications', index, key, value)}
-            addArrayItem={() => addArrayItem('certifications', defaultSkillsItem)}
-            removeArrayItem={(index) => removeArrayItem('certifications', index)}
-            setResumeData={setResumeData}
-          />
-        )
-
       case 'interests-and-languages-info':
         return (
           <>
+          <LanguageForm
+            languages={resumeData.data.sections.languages.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem('languages', index, key, value)}
+            addArrayItem={() => addArrayItem('languages', defaultLanguageItem)}
+            removeArrayItem={(index) => removeArrayItem('languages', index)}
+            setResumeData={setResumeData}
+          />
+
             <InterestForm
               interests={resumeData.data.sections.interests.items || []}
               updateArrayItem={(index, key, value) => updateArrayItem('interests', index, key, value)}
@@ -332,26 +369,24 @@ const EditResume = () => {
               removeArrayItem={(index) => removeArrayItem('interests', index)}
               setResumeData={setResumeData}
             />
-
-            <LanguageForm
-              languages={resumeData.data.sections.languages.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('languages', index, key, value)}
-              addArrayItem={() => addArrayItem('languages', defaultLanguageItem)}
-              removeArrayItem={(index) => removeArrayItem('languages', index)}
-              setResumeData={setResumeData}
-            />
           </>
         )
 
-      case 'publications-awards-info':
+      case 'certifications-info':
         return (
           <>
+            <CertificationsForm
+              certifications={resumeData.data.sections.certifications.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('certifications', index, key, value)}
+              addArrayItem={() => addArrayItem('certifications', defaultSkillsItem)}
+              removeArrayItem={(index) => removeArrayItem('certifications', index)}
+            />
+
             <PublicationsForm
               publications={resumeData.data.sections.publications.items || []}
               updateArrayItem={(index, key, value) => updateArrayItem('publications', index, key, value)}
               addArrayItem={() => addArrayItem('publications', defaultPublicationItem)}
               removeArrayItem={(index) => removeArrayItem('publications', index)}
-              setResumeData={setResumeData}
             />
 
             <AwardsForm
@@ -359,33 +394,40 @@ const EditResume = () => {
               updateArrayItem={(index, key, value) => updateArrayItem('awards', index, key, value)}
               addArrayItem={() => addArrayItem('awards', defaultAwardItem)}
               removeArrayItem={(index) => removeArrayItem('awards', index)}
-              setResumeData={setResumeData}
+            />
+
+            <VolunteeringForm
+              volunteer={resumeData.data.sections.volunteer.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('volunteer', index, key, value)}
+              addArrayItem={() => addArrayItem('volunteer', defaultVolunteerItem)}
+              removeArrayItem={(index) => removeArrayItem('volunteer', index)}
+            />
+
+            <ReferenceForm
+              references={resumeData.data.sections.references.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('references', index, key, value)}
+              addArrayItem={() => addArrayItem('references', defaultReferenceItem)}
+              removeArrayItem={(index) => removeArrayItem('references', index)}
             />
           </>
         )
 
-      case 'volunteering-info':
-        return (
-          <VolunteeringForm
-            volunteer={resumeData.data.sections.volunteer.items || []}
-            updateArrayItem={(index, key, value) => updateArrayItem('volunteer', index, key, value)}
-            addArrayItem={() => addArrayItem('volunteer', defaultVolunteerItem)}
-            removeArrayItem={(index) => removeArrayItem('volunteer', index)}
-            setResumeData={setResumeData}
-          />
-        )
+      // case 'publications-awards-info':
+      //   return (
+      //     <>
+      //     </>
+      //   )
 
-      case 'references-info':
-        return (
+      // case 'volunteering-info':
+      //   return (
 
-          <ReferenceForm
-            references={resumeData.data.sections.references.items || []}
-            updateArrayItem={(index, key, value) => updateArrayItem('references', index, key, value)}
-            addArrayItem={() => addArrayItem('references', defaultReferenceItem)}
-            removeArrayItem={(index) => removeArrayItem('references', index)}
-            setResumeData={setResumeData}
-          />
-        )
+      //   )
+
+      // case 'references-info':
+      //   return (
+
+
+      //   )
 
       default:
         return null;

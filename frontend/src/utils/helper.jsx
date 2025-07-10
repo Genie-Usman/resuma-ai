@@ -140,10 +140,10 @@ export const fixTailwindColors = (element) => {
 }
 
 export const captureElementAsImage = async (element) => {
-  if (!element) throw new Error('No element provided.');
+  if (!element) throw new Error("No element provided.");
 
-  // Wait for all <img> tags inside the element to load
-  const images = Array.from(element.querySelectorAll('img'));
+  // Wait for images to fully load
+  const images = Array.from(element.querySelectorAll("img"));
   await Promise.all(
     images.map((img) => {
       return new Promise((resolve, reject) => {
@@ -151,22 +151,36 @@ export const captureElementAsImage = async (element) => {
           resolve();
         } else {
           img.onload = () => resolve();
-          img.onerror = (err) => reject(`Image failed to load: ${img.src}`);
+          img.onerror = () => reject(`Image failed to load: ${img.src}`);
         }
       });
     })
   );
 
-  // Capture with useCORS enabled
+  // Save original styles
+  const originalTransform = element.style.transform;
+  const originalWidth = element.style.width;
+
+  // Remove scaling before capture
+  element.style.transform = "none";
+  element.style.width = `${element.scrollWidth}px`;
+  
+  // Capture full element
   const canvas = await html2canvas(element, {
     useCORS: true,
     scale: 2,
-    backgroundColor: null, 
+    backgroundColor: null,
+    scrollY: -window.scrollY,
+    windowWidth: element.scrollWidth,
+    windowHeight: element.scrollHeight,
   });
+
+  // Restore styles
+  element.style.transform = originalTransform;
+  element.style.width = originalWidth;
 
   return canvas.toDataURL("image/png");
 };
-
 
 export const dataURLToFile = (dataUrl, fileName) => {
   const arr = dataUrl.split(',');
