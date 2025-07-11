@@ -11,7 +11,7 @@ const BrandIcon = forwardRef(({ slug = ""}, ref) => {
       <img
         ref={ref}
         alt=""
-        className="size-6"
+        className="size-5"
         src={LINKEDIN}
         crossOrigin="anonymous"
         loading="lazy"
@@ -23,7 +23,7 @@ const BrandIcon = forwardRef(({ slug = ""}, ref) => {
     <img
       ref={ref}
       alt=""
-      className="size-6"
+      className="size-5"
       src={`https://cdn.simpleicons.org/${iconSlug}`}
       loading="lazy"
     />

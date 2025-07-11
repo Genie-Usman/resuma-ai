@@ -1,4 +1,4 @@
-import { linearTransform } from '../../utils/helper';
+import { linearTransform } from '../../../utils/helper';
 
 const Rating = ({ level, themeColors }) => {
     return (

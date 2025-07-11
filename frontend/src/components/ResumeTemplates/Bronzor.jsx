@@ -1,18 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import ResumeHeader from "../ResumeSections/Azurill/ResumeHeader.jsx";
-import Profiles from "../ResumeSections/Azurill/Profiles";
-import Summary from "../ResumeSections/Azurill/Summary";
-import Experience from "../ResumeSections/Azurill/Experience";
-import Education from "../ResumeSections/Azurill/Education";
-import Skills from "../ResumeSections/Azurill/Skills";
-import Projects from "../ResumeSections/Azurill/Projects";
-import Languages from "../ResumeSections/Azurill/Languages";
-import Interests from "../ResumeSections/Azurill/Interests";
-import Certifications from "../ResumeSections/Azurill/Certifications";
-import Awards from "../ResumeSections/Azurill/Awards";
-import Publications from "../ResumeSections/Azurill/Publications";
-import Volunteer from "../ResumeSections/Azurill/Volunteer";
-import References from "../ResumeSections/Azurill/References";
+import ResumeHeader from "../ResumeSections/Bronzor/ResumeHeader.jsx";
+import Profiles from "../ResumeSections/Bronzor/Profiles";
+import Summary from "../ResumeSections/Bronzor/Summary";
+import Experience from "../ResumeSections/Bronzor/Experience";
+import Education from "../ResumeSections/Bronzor/Education";
+import Skills from "../ResumeSections/Bronzor/Skills";
+import Projects from "../ResumeSections/Bronzor/Projects";
+import Languages from "../ResumeSections/Bronzor/Languages";
+import Interests from "../ResumeSections/Bronzor/Interests";
+import Certifications from "../ResumeSections/Bronzor/Certifications";
+import Awards from "../ResumeSections/Bronzor/Awards";
+import Publications from "../ResumeSections/Bronzor/Publications";
+import Volunteer from "../ResumeSections/Bronzor/Volunteer";
+import References from "../ResumeSections/Bronzor/References";
+
+const DEFAULT_THEME = ['#ffffff', '#000000', '#059669']
 
 const components = {
     profiles: Profiles,
@@ -47,10 +49,7 @@ const mapSectionToComponent = (key, section, reactKey, themeColors) => {
     ) : null;
 };
 
-// [Background, Text, Accent]
-const DEFAULT_THEME = ['#FFFFFF', '#000000', '#CA8A04']
-
-const Azurill = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false, containerWidth, colorPalette }) => {
+const Bronzor = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false, containerWidth, colorPalette }) => {
 
     const themeColors = colorPalette?.length > 0 ? colorPalette : DEFAULT_THEME;
 
@@ -85,24 +84,22 @@ const Azurill = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
                 <ResumeHeader basics={basics} themeColors={themeColors} />
             )}
 
-            <div className="grid grid-cols-3 gap-x-4">
-                <aside className="sidebar group space-y-4">
-                    {sidebarIds.map((key) =>
-                        mapSectionToComponent(key, sections[key], key, themeColors)
-                    )}
-                </aside>
-
-                <main
-                    className={`main group space-y-4 ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"
-                        }`}
-                >
-                    {mainIds.map((key) =>
-                        mapSectionToComponent(key, sections[key], key, themeColors)
-                    )}
-                </main>
+            <div
+                className='space-y-4 px-3'
+            >
+                {mainIds.map((key) =>
+                    mapSectionToComponent(key, sections[key], key, themeColors)
+                )}
             </div>
+
+            <div className="space-y-4 px-3">
+                {sidebarIds.map((key) =>
+                    mapSectionToComponent(key, sections[key], key, themeColors)
+                )}
+            </div>
+
         </div>
     );
 };
 
-export default Azurill;
+export default Bronzor;

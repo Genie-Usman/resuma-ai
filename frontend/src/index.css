@@ -22,6 +22,16 @@
 }
 
 /* Custom Scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(100, 100, 100, 0.4) transparent; /* Firefox */
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(100, 100, 100, 0.4);
   border-radius: 10px;
@@ -30,6 +40,7 @@
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 
 @layer utilities {
 

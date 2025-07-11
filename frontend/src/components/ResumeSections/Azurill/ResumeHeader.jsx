@@ -1,4 +1,4 @@
-import Picture from "./Picture";
+import Picture from "../Picture";
 import { LuMapPin, LuPhone, LuLink } from "react-icons/lu";
 import { MdAlternateEmail } from "react-icons/md";
 

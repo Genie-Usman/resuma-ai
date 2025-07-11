@@ -1,4 +1,4 @@
-import { stripHtml } from "../../utils/helper";
+import { stripHtml } from "../../../utils/helper";
 
 const Summary = ({ section, themeColors }) => {
   if (!section || !section.content || stripHtml(section.content)?.trim() === "") {

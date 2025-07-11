@@ -1,9 +1,9 @@
-import { LinkedEntity } from '../../utils/helper';
+import { LinkedEntity } from '../../../utils/helper';
 
 // Components
 import Section from './Section';
 
-const Publications = ({ section, themeColors }) => (
+const References = ({ section, themeColors }) => (
     <Section section={section} urlKey="url" summaryKey="summary" themeColors={themeColors}>
         {(item) => (
             <div key={item.id}>
@@ -14,11 +14,10 @@ const Publications = ({ section, themeColors }) => (
                     themeColors={themeColors}
                     className="font-bold"
                 />
-                <div style={{ color: themeColors[1] }}>{item.publisher}</div>
-                <div style={{ fontWeight: 'bold', color: themeColors[1] }}>{item.date}</div>
+                <div style={{ color: themeColors[1] }}>{item.description}</div>
             </div>
         )}
     </Section>
 );
 
-export default Publications
+export default References

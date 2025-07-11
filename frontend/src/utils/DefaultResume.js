@@ -127,7 +127,6 @@ export const getDefaultResumeData = (user = {}) => ({
       visible: true,
       items: []
     },
-    custom: {}
   },
 
   metadata: {

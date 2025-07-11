@@ -6,10 +6,6 @@ const ResumeSchema = new mongoose.Schema(
         title: { type: String, required: true },
         slug: { type: String, required: true },
         thumbnailLink: { type: String },
-        template: {
-            theme: String,
-            colorPalette: [String]
-        },
         data: { type: mongoose.Schema.Types.Mixed, default: {} },
     },
     { timestamps: true }

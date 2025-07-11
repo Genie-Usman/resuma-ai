@@ -1,13 +1,13 @@
-import { Link } from '../../utils/helper';
+import { Link } from '../../../utils/helper';
 
 // Components
-import BrandIcon from '../shared/BrandIcon';
+import BrandIcon from '../../shared/BrandIcon';
 import Section from './Section';
 
 const Profiles = ({ section, themeColors }) => (
     <Section section={section} themeColors={themeColors}>
         {(item) => (
-            <div key={item.id} className="flex items-center gap-x-2">
+            <div key={item.id} className="flex items-center gap-x-1">
                 <BrandIcon
                     slug={item.icon}
                     className="size-4"

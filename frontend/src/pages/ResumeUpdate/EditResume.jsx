@@ -26,6 +26,8 @@ import ReferenceForm from "./Forms/ReferenceForm";
 import { captureElementAsImage, dataURLToFile, fixTailwindColors, stripHtml, waitForImageToLoad } from "../../utils/helper.jsx";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
 import uploadImage from "../../utils/uploadImage.js";
+import ThemeSelector from "./ThemeSelector.jsx";
+import Modal from "../../components/shared/Modal.jsx";
 
 const EditResume = () => {
   const { resumeId } = useParams();
@@ -354,13 +356,13 @@ const EditResume = () => {
       case 'interests-and-languages-info':
         return (
           <>
-          <LanguageForm
-            languages={resumeData.data.sections.languages.items || []}
-            updateArrayItem={(index, key, value) => updateArrayItem('languages', index, key, value)}
-            addArrayItem={() => addArrayItem('languages', defaultLanguageItem)}
-            removeArrayItem={(index) => removeArrayItem('languages', index)}
-            setResumeData={setResumeData}
-          />
+            <LanguageForm
+              languages={resumeData.data.sections.languages.items || []}
+              updateArrayItem={(index, key, value) => updateArrayItem('languages', index, key, value)}
+              addArrayItem={() => addArrayItem('languages', defaultLanguageItem)}
+              removeArrayItem={(index) => removeArrayItem('languages', index)}
+              setResumeData={setResumeData}
+            />
 
             <InterestForm
               interests={resumeData.data.sections.interests.items || []}
@@ -411,23 +413,6 @@ const EditResume = () => {
             />
           </>
         )
-
-      // case 'publications-awards-info':
-      //   return (
-      //     <>
-      //     </>
-      //   )
-
-      // case 'volunteering-info':
-      //   return (
-
-      //   )
-
-      // case 'references-info':
-      //   return (
-
-
-      //   )
 
       default:
         return null;
@@ -766,16 +751,51 @@ const EditResume = () => {
 
             {resumeData?.data?.basics && (
               <RenderResume
-                templateId={resumeData?.template?.theme || ""}
+                templateId={resumeData?.metadata?.template || ""}
                 resumeData={resumeData}
-                colorPalette={resumeData?.template?.colorPalette || []}
+                colorPalette={[
+                  resumeData?.metadata?.theme?.background || "#ffffff",
+                  resumeData?.metadata?.theme?.text || "#000000",
+                  resumeData?.metadata?.theme?.primary || "#ca8a04"
+                ]}
                 containerWidth={baseWidth}
               />
             )}
           </div>
-
         </div>
       </div>
+
+      <Modal
+        isOpen={openThemeSelector}
+        onClose={() => setOpenThemeSelector(false)}
+        title="Change Theme"
+      >
+        <div className="w-full h-[80vh]">
+          <ThemeSelector
+            selectedTheme={resumeData?.template}
+            setSelectedTheme={(value) => {
+              setResumeData((prev) => ({
+                ...prev,
+                data: {
+                  ...prev.data,
+                  metadata: {
+                    ...prev.data.metadata,
+                    template: value?.template || prev.data.metadata.template,
+                    theme: {
+                      background: value?.colorPalette?.[0] || prev.data.metadata.theme.background,
+                      text: value?.colorPalette?.[1] || prev.data.metadata.theme.text,
+                      primary: value?.colorPalette?.[2] || prev.data.metadata.theme.primary
+                    }
+                  }
+                }
+              }));
+            }}
+            resumeData={resumeData}
+            setResumeData={setResumeData}
+            onClose={() => setOpenThemeSelector(false)}
+          />
+        </div>
+      </Modal>
     </DashboardLayout>
   )
 }

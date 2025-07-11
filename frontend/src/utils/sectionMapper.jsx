@@ -3,7 +3,7 @@ import Profiles from "../components/ResumeSections/Profiles";
 import Summary from "../components/ResumeSections/Summary";
 import Experience from "../components/ResumeSections/Experience";
 import Education from "../components/ResumeSections/Education";
-import Awards from "../components/ResumeSections/Awards";
+import Awards from "../components/ResumeSections/Azurill/Awards";
 import Certifications from "../components/ResumeSections/Certifications";
 import Skills from "../components/ResumeSections/Skills";
 import Interests from "../components/ResumeSections/Interests";

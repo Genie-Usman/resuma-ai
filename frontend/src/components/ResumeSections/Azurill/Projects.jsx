@@ -1,10 +1,10 @@
-import { LinkedEntity } from '../../utils/helper';
+import { LinkedEntity } from '../../../utils/helper';
 
 // Components
 import Section from './Section';
 
-const References = ({ section, themeColors }) => (
-    <Section section={section} urlKey="url" summaryKey="summary" themeColors={themeColors}>
+const Projects = ({ section, themeColors }) => (
+    <Section section={section} urlKey="url" summaryKey="summary" keywordsKey="keywords" themeColors={themeColors}>
         {(item) => (
             <div key={item.id}>
                 <LinkedEntity
@@ -15,9 +15,10 @@ const References = ({ section, themeColors }) => (
                     className="font-bold"
                 />
                 <div style={{ color: themeColors[1] }}>{item.description}</div>
+                <div style={{ fontWeight: 'bold', color: themeColors[1] }}>{item.date}</div>
             </div>
         )}
     </Section>
 );
 
-export default References
+export default Projects

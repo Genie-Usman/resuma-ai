@@ -1,4 +1,4 @@
-import { LinkedEntity } from '../../utils/helper';
+import { LinkedEntity } from '../../../utils/helper';
 
 // Components
 import Section from './Section';
