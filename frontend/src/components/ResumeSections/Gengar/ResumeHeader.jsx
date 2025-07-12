@@ -11,7 +11,11 @@ const ResumeHeader = ({ basics, themeColors }) => {
             className="pt-4 pl-3 pb-4 space-y-4"
             style={{ color: themeColors[0], backgroundColor: themeColors[2] }}
         >
-            <Picture picture={basics.picture} className='border-2 border-white' />
+            <Picture
+                picture={basics.picture}
+                border={true}
+                borderColor={themeColors[0]}
+                borderWidth={3} />
 
             <div>
                 <h2 className="text-2xl font-bold">{basics.name}</h2>
