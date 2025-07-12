@@ -1,7 +1,7 @@
 import Azurill from './Azurill'
 import Bronzor from './Bronzor';
 import Chikorita from './Chikorita';
-// import Ditto from './Ditto';
+import Ditto from './Ditto';
 // import Gengar from './Gengar';
 // import Glalie from './Glalie';
 // import Kakuna from './Kakuna';
@@ -36,7 +36,7 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
     case 'azurill': return <Azurill {...sharedProps} />;
     case 'bronzor': return <Bronzor {...sharedProps} />;
     case 'chikorita': return <Chikorita {...sharedProps} />;
-    // case 'ditto': return <Ditto {...sharedProps} />;
+    case 'ditto': return <Ditto {...sharedProps} />;
     // case 'gengar': return <Gengar {...sharedProps} />;
     // case 'glalie': return <Glalie {...sharedProps} />;
     // case 'kakuna': return <Kakuna {...sharedProps} />;
@@ -45,7 +45,7 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
     // case 'onyx': return <Onyx {...sharedProps} />;
     // case 'pikachu': return <Pikachu {...sharedProps} />;
     // case 'rhyhorn': return <Rhyhorn {...sharedProps} />;
-    default: return <Chikorita {...sharedProps} />;
+    default: return <Ditto {...sharedProps} />;
   }
 };
 
