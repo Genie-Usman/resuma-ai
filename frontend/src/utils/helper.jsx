@@ -73,7 +73,7 @@ export const stripHtml = (html) => {
 };
 
 // LinkedEntity component
-export const LinkedEntity = ({ name, url, separateLinks, className, themeColors }) => {
+export const LinkedEntity = ({ name, url, separateLinks, className, themeColors, isSidebar = false }) => {
   const isValidUrl = url && typeof url.href === 'string' && url.href.startsWith('http');
 
   return !separateLinks && isValidUrl ? (
@@ -87,7 +87,7 @@ export const LinkedEntity = ({ name, url, separateLinks, className, themeColors 
       <LuLink className="font-bold " style={{ color: themeColors[2] }} />
     </a>
   ) : (
-    <div className={className} style={{ color: themeColors[1] }}>{name}</div>
+    <div className={className} style={{ color: isSidebar ? themeColors[0] : themeColors[1] }}>{name}</div>
   );
 };
 
