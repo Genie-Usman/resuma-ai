@@ -3,7 +3,7 @@ import Bronzor from './Bronzor';
 import Chikorita from './Chikorita';
 import Ditto from './Ditto';
 import Gengar from './Gengar';
-// import Glalie from './Glalie';
+import Glalie from './Glalie';
 // import Kakuna from './Kakuna';
 // import Leafish from './Leafish';
 // import Nosepass from './Nosepass';
@@ -38,14 +38,14 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
     case 'chikorita': return <Chikorita {...sharedProps} />;
     case 'ditto': return <Ditto {...sharedProps} />;
     case 'gengar': return <Gengar {...sharedProps} />;
-    // case 'glalie': return <Glalie {...sharedProps} />;
+    case 'glalie': return <Glalie {...sharedProps} />;
     // case 'kakuna': return <Kakuna {...sharedProps} />;
     // case 'leafish': return <Leafish {...sharedProps} />;
     // case 'nosepass': return <Nosepass {...sharedProps} />;
     // case 'onyx': return <Onyx {...sharedProps} />;
     // case 'pikachu': return <Pikachu {...sharedProps} />;
     // case 'rhyhorn': return <Rhyhorn {...sharedProps} />;
-    default: return <Gengar {...sharedProps} />;
+    default: return <Glalie {...sharedProps} />;
   }
 };
 
