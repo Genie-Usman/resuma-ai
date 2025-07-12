@@ -1,9 +1,9 @@
 import Section from './Section';
 
-const Skills = ({ section, themeColors }) => {
+const Languages = ({ section, themeColors }) => {
 
     return (
-        <Section section={section} levelKey="level" keywordsKey="keywords" themeColors={themeColors}>
+        <Section section={section} levelKey="level" themeColors={themeColors}>
             {(item) => (
                 <div>
                     <div style={{ fontWeight: 'bold', color: themeColors[1] }}>{item.name}</div>
@@ -14,4 +14,4 @@ const Skills = ({ section, themeColors }) => {
     );
 };
 
-export default Skills
+export default Languages
