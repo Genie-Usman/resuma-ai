@@ -32,8 +32,6 @@ const components = {
     references: References,
 };
 
-// [Background, Text, Accent]
-
 const mapSectionToComponent = (key, section, reactKey, themeColors) => {
     if (!section?.visible) return null;
 

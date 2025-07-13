@@ -13,7 +13,7 @@ const Summary = ({ section, themeColors }) => {
 
       <div
         dangerouslySetInnerHTML={{ __html: section.content }}
-        style={{ columns: section.columns }}
+        style={{ columns: section.columns, color: themeColors[1] }}
         className="wysiwyg col-span-4"
       />
     </section>

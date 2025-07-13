@@ -65,6 +65,7 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
                                 {summary?.trim() !== '' && (
                                     <div
                                         dangerouslySetInnerHTML={{ __html: summary }}
+                                        style={{ color: themeColors[1] }}
                                         className="wysiwyg"
                                     />
                                 )}

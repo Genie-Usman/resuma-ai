@@ -22,7 +22,7 @@ const Summary = ({ section, themeColors }) => {
         {/* Summary content */}
         <div
           dangerouslySetInnerHTML={{ __html: section.content }}
-          style={{ columns: section.columns || 1 }}
+          style={{ columns: section.columns || 1, color: themeColors[1] }}
           className="wysiwyg"
         />
       </main>

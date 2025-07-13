@@ -4,8 +4,8 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
     if (!section.visible || section.items.length === 0) return null;
 
     return (
-        <section id={section.id} className="grid">
-            <h4 className="mb-2 border-b text-center font-bold" style={{ color: themeColors[2], borderColor: themeColors[2] }}>
+        <section id={section.id} className="grid py-3 px-4">
+            <h4 className="mb-2 border-b text-left" style={{ color: themeColors[2], borderColor: themeColors[2] }}>
                 {section.name}
             </h4>
 
@@ -50,7 +50,7 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
                                 {summary && summary.trim() !== '' && (
                                     <div
                                         dangerouslySetInnerHTML={{ __html: summary }}
-                                        style={{color: themeColors[1]}}
+                                        style={{ color: themeColors[1] }}
                                         className="wysiwyg"
                                     />
                                 )}

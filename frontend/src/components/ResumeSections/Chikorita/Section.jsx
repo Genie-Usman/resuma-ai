@@ -74,7 +74,7 @@ const Section = ({
                   <div
                     dangerouslySetInnerHTML={{ __html: summary }}
                     className="wysiwyg"
-                    style={{ color: isSidebar ? themeColors[0] : undefined }}
+                    style={{ color: isSidebar ? themeColors[0] : themeColors[1] }}
                   />
                 )}
 

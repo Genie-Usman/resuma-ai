@@ -63,13 +63,14 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
                 {summary && summary.trim() !== '' && (
                   <div
                     dangerouslySetInnerHTML={{ __html: summary }}
+                    style={{ color: themeColors[1] }}
                     className="wysiwyg"
                   />
                 )}
 
                 {/* Level */}
-                {level !== undefined && level !== null && !isNaN(level) && 
-                <Rating level={level} themeColors={themeColors}/>}
+                {level !== undefined && level !== null && !isNaN(level) &&
+                  <Rating level={level} themeColors={themeColors} />}
 
                 {/* Keywords */}
                 {keywords.length > 0 && (

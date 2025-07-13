@@ -1,11 +1,47 @@
 import { useEffect, useRef, useState } from "react";
-import { mapSectionToComponent } from "../../utils/sectionMapper";
+import ResumeHeader from "../ResumeSections/Leafish/ResumeHeader.jsx";
+import Experience from "../ResumeSections/Leafish/Experience";
+import Education from "../ResumeSections/Leafish/Education";
+import Skills from "../ResumeSections/Leafish/Skills";
+import Projects from "../ResumeSections/Leafish/Projects";
+import Languages from "../ResumeSections/Leafish/Languages";
+import Interests from "../ResumeSections/Leafish/Interests";
+import Certifications from "../ResumeSections/Leafish/Certifications";
+import Awards from "../ResumeSections/Leafish/Awards";
+import Publications from "../ResumeSections/Leafish/Publications";
+import Volunteer from "../ResumeSections/Leafish/Volunteer";
+import References from "../ResumeSections/Leafish/References";
 
-// Components
-import ResumeHeader from "../ResumeSections/Azurill/ResumeHeader.jsx";
+const DEFAULT_THEME = ['#ffffff', '#000000', '#7B4F1A']
 
-// [Background, Text, Accent]
-const DEFAULT_THEME = ['#ffffff', '#000000', '#059669']
+const components = {
+    experience: Experience,
+    education: Education,
+    skills: Skills,
+    projects: Projects,
+    languages: Languages,
+    interests: Interests,
+    certifications: Certifications,
+    awards: Awards,
+    publications: Publications,
+    volunteer: Volunteer,
+    references: References,
+};
+
+const mapSectionToComponent = (key, section, reactKey, themeColors) => {
+    if (!section?.visible) return null;
+
+    const usesItems = ['profiles', 'experience', 'education', 'awards', 'certifications', 'skills', 'interests', 'publications', 'volunteer', 'languages', 'projects', 'references'];
+
+    if (usesItems.includes(key) && !section.items?.length) return null;
+
+    const Component = components[key];
+    return Component ? (
+        <div key={reactKey}>
+            <Component section={section} themeColors={themeColors} />
+        </div>
+    ) : null;
+};
 
 const Leafish = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false, containerWidth, colorPalette }) => {
 
@@ -28,7 +64,7 @@ const Leafish = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
     return (
         <div
             ref={resumeRef}
-            className="py-5 px-1 space-y-3 min-h-[800px]"
+            className=""
             style={{
                 backgroundColor: themeColors[0],
                 color: themeColors[1],
@@ -39,24 +75,21 @@ const Leafish = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
             }}
         >
             {isFirstPage && (
-                <ResumeHeader basics={basics} themeColors={themeColors} />
+                <ResumeHeader basics={basics} themeColors={themeColors} sections={sections} />
             )}
 
-            <div className="grid grid-cols-3 gap-x-4">
-                <aside className="sidebar group space-y-4">
-                    {sidebarIds.map((key) =>
-                        mapSectionToComponent(key, sections[key], key, themeColors)
-                    )}
-                </aside>
-
-                <main
-                    className={`main group space-y-4 ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"
-                        }`}
-                >
+            <div className="p-custom grid grid-cols-2 items-start space-x-6">
+                <div className={`grid gap-y-4 ${sidebarIds.length === 0 ? "col-span-2" : ""}`}>
                     {mainIds.map((key) =>
                         mapSectionToComponent(key, sections[key], key, themeColors)
                     )}
-                </main>
+                </div>
+
+                <div className={`grid gap-y-4 ${sidebarIds.length === 0 ? "hidden" : ""}`}>
+                    {sidebarIds.map((key) =>
+                        mapSectionToComponent(key, sections[key], key, themeColors)
+                    )}
+                </div>
             </div>
         </div>
     );
