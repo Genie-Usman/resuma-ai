@@ -1,11 +1,52 @@
 import { useEffect, useRef, useState } from "react";
-import { mapSectionToComponent } from "../../utils/sectionMapper";
+import EUROPASS from '../../assets/europass.png'
+import ResumeHeader from "../ResumeSections/Nosepass/ResumeHeader.jsx";
+import Summary from "../ResumeSections/Nosepass/Summary";
+import Profiles from "../ResumeSections/Nosepass/Profiles";
+import Experience from "../ResumeSections/Nosepass/Experience";
+import Education from "../ResumeSections/Nosepass/Education";
+import Skills from "../ResumeSections/Nosepass/Skills";
+import Projects from "../ResumeSections/Nosepass/Projects";
+import Languages from "../ResumeSections/Nosepass/Languages";
+import Interests from "../ResumeSections/Nosepass/Interests";
+import Certifications from "../ResumeSections/Nosepass/Certifications";
+import Awards from "../ResumeSections/Nosepass/Awards";
+import Publications from "../ResumeSections/Nosepass/Publications";
+import Volunteer from "../ResumeSections/Nosepass/Volunteer";
+import References from "../ResumeSections/Nosepass/References";
 
-// Components
-import ResumeHeader from "../ResumeSections/Azurill/ResumeHeader.jsx";
+const DEFAULT_THEME = ['#ffffff', '#000000', '#7B4F1A']
 
-// [Background, Text, Accent]
-const DEFAULT_THEME = ['#ffffff', '#000000', '#059669']
+const components = {
+    summary: Summary,
+    profiles: Profiles,
+    experience: Experience,
+    education: Education,
+    skills: Skills,
+    projects: Projects,
+    languages: Languages,
+    interests: Interests,
+    certifications: Certifications,
+    awards: Awards,
+    publications: Publications,
+    volunteer: Volunteer,
+    references: References,
+};
+
+const mapSectionToComponent = (key, section, reactKey, themeColors) => {
+    if (!section?.visible) return null;
+
+    const usesItems = ['profiles', 'experience', 'education', 'awards', 'certifications', 'skills', 'interests', 'publications', 'volunteer', 'languages', 'projects', 'references'];
+
+    if (usesItems.includes(key) && !section.items?.length) return null;
+
+    const Component = components[key];
+    return Component ? (
+        <div key={reactKey}>
+            <Component section={section} themeColors={themeColors} />
+        </div>
+    ) : null;
+};
 
 const Nosepass = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false, containerWidth, colorPalette }) => {
 
@@ -28,7 +69,7 @@ const Nosepass = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fal
     return (
         <div
             ref={resumeRef}
-            className="py-5 px-1 space-y-3 min-h-[800px]"
+            className="p-5 space-y-6"
             style={{
                 backgroundColor: themeColors[0],
                 color: themeColors[1],
@@ -38,25 +79,24 @@ const Nosepass = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fal
                 height: "auto",
             }}
         >
+            <div className="flex items-center justify-between">
+                <img alt="Europass Logo" className="h-[42px]" src={EUROPASS} />
+                <p className="font-medium" style={{ color: themeColors[2] }}>Curriculum Vitae</p>
+
+                <p className="font-medium" style={{ color: themeColors[2] }}>{basics.name}</p>
+            </div>
+
             {isFirstPage && (
                 <ResumeHeader basics={basics} themeColors={themeColors} />
             )}
 
-            <div className="grid grid-cols-3 gap-x-4">
-                <aside className="sidebar group space-y-4">
-                    {sidebarIds.map((key) =>
-                        mapSectionToComponent(key, sections[key], key, themeColors)
-                    )}
-                </aside>
-
-                <main
-                    className={`main group space-y-4 ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"
-                        }`}
-                >
-                    {mainIds.map((key) =>
-                        mapSectionToComponent(key, sections[key], key, themeColors)
-                    )}
-                </main>
+            <div className="space-y-4">
+                {sidebarIds.map((key) =>
+                    mapSectionToComponent(key, sections[key], key, themeColors)
+                )}
+                {mainIds.map((key) =>
+                    mapSectionToComponent(key, sections[key], key, themeColors)
+                )}
             </div>
         </div>
     );
