@@ -1,11 +1,49 @@
 import { useEffect, useRef, useState } from "react";
-import { mapSectionToComponent } from "../../utils/sectionMapper";
+import ResumeHeader from "../ResumeSections/Kakuna/ResumeHeader.jsx";
+import Summary from "../ResumeSections/Kakuna/Summary";
+import Experience from "../ResumeSections/Kakuna/Experience";
+import Education from "../ResumeSections/Kakuna/Education";
+import Skills from "../ResumeSections/Kakuna/Skills";
+import Projects from "../ResumeSections/Kakuna/Projects";
+import Languages from "../ResumeSections/Kakuna/Languages";
+import Interests from "../ResumeSections/Kakuna/Interests";
+import Certifications from "../ResumeSections/Kakuna/Certifications";
+import Awards from "../ResumeSections/Kakuna/Awards";
+import Publications from "../ResumeSections/Kakuna/Publications";
+import Volunteer from "../ResumeSections/Kakuna/Volunteer";
+import References from "../ResumeSections/Kakuna/References";
 
-// Components
-import ResumeHeader from "../ResumeSections/Azurill/ResumeHeader.jsx";
+const DEFAULT_THEME = ['#ffffff', '#000000', '#57534E']
 
-// [Background, Text, Accent]
-const DEFAULT_THEME = ['#ffffff', '#000000', '#059669']
+const components = {
+    summary: Summary,
+    experience: Experience,
+    education: Education,
+    skills: Skills,
+    projects: Projects,
+    languages: Languages,
+    interests: Interests,
+    certifications: Certifications,
+    awards: Awards,
+    publications: Publications,
+    volunteer: Volunteer,
+    references: References,
+};
+
+const mapSectionToComponent = (key, section, reactKey, themeColors) => {
+    if (!section?.visible) return null;
+
+    const usesItems = ['profiles', 'experience', 'education', 'awards', 'certifications', 'skills', 'interests', 'publications', 'volunteer', 'languages', 'projects', 'references'];
+
+    if (usesItems.includes(key) && !section.items?.length) return null;
+
+    const Component = components[key];
+    return Component ? (
+        <div key={reactKey}>
+            <Component section={section} themeColors={themeColors} />
+        </div>
+    ) : null;
+};
 
 const Kakuna = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false, containerWidth, colorPalette }) => {
 
@@ -28,7 +66,7 @@ const Kakuna = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false
     return (
         <div
             ref={resumeRef}
-            className="py-5 px-1 space-y-3 min-h-[800px]"
+            className="p-4 space-y-4"
             style={{
                 backgroundColor: themeColors[0],
                 color: themeColors[1],
@@ -39,24 +77,16 @@ const Kakuna = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false
             }}
         >
             {isFirstPage && (
-                <ResumeHeader basics={basics} themeColors={themeColors} />
+                <ResumeHeader basics={basics} themeColors={themeColors} sections={sections} />
             )}
 
-            <div className="grid grid-cols-3 gap-x-4">
-                <aside className="sidebar group space-y-4">
-                    {sidebarIds.map((key) =>
-                        mapSectionToComponent(key, sections[key], key, themeColors)
-                    )}
-                </aside>
-
-                <main
-                    className={`main group space-y-4 ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"
-                        }`}
-                >
-                    {mainIds.map((key) =>
-                        mapSectionToComponent(key, sections[key], key, themeColors)
-                    )}
-                </main>
+            <div className="space-y-4">
+                {mainIds.map((key) =>
+                    mapSectionToComponent(key, sections[key], key, themeColors)
+                )}
+                {sidebarIds.map((key) =>
+                    mapSectionToComponent(key, sections[key], key, themeColors)
+                )}
             </div>
         </div>
     );
