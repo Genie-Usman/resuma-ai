@@ -130,7 +130,7 @@ export const getDefaultResumeData = (user = {}) => ({
   },
 
   metadata: {
-    template: 'rhyhorn',
+    template: 'pikachu',
     layout: [
       [
         ['profiles', 'summary', 'experience', 'education', 'projects', 'volunteer', 'references'],

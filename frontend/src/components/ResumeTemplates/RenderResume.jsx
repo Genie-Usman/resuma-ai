@@ -45,7 +45,7 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
     case 'onyx': return <Onyx {...sharedProps} />;
     case 'pikachu': return <Pikachu {...sharedProps} />;
     case 'rhyhorn': return <Rhyhorn {...sharedProps} />;
-    default: return <Rhyhorn {...sharedProps} />;
+    default: return <Azurill {...sharedProps} />;
   }
 };
 

@@ -131,7 +131,7 @@ export const getDefaultResumeData = (user = {}) => ({
   },
 
   metadata: {
-    template: 'rhyhorn',
+    template: 'ditto',
     layout: [
       [
         ['profiles', 'summary', 'experience', 'education', 'projects', 'volunteer', 'references'],
@@ -153,7 +153,7 @@ export const getDefaultResumeData = (user = {}) => ({
     theme: {
       background: '#ffffff',
       text: '#000000',
-      primary: '#dc2626'
+      primary: '#9966CC'
     },
     typography: {
       font: {

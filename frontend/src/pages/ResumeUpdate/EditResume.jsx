@@ -56,13 +56,10 @@ const EditResume = () => {
       "skills-info",
       "projects-info",
       "interests-and-languages-info",
-      "certifications-info",
-      "publications-awards-info",
-      "volunteering-info",
-      "references-info"
+      "additional-info",
     ]
 
-    if (currentPage === "references-info") { setOpenPreviewModal(true) }
+    if (currentPage === "additional-info") { setOpenPreviewModal(true) }
 
     const currentIndex = pages.indexOf(currentPage);
 
@@ -215,11 +212,8 @@ const EditResume = () => {
       "education-info",
       "skills-info",
       "projects-info",
-      "certifications-info",
       "interests-and-languages-info",
-      "publications-awards-info",
-      "volunteering-info",
-      "references-info"
+      "additional-info",
     ];
 
     if (currentPage === "personal-info") {
@@ -233,48 +227,6 @@ const EditResume = () => {
       const prevIndex = currentIndex - 1;
       const prevPage = pages[prevIndex];
       setCurrentPage(prevPage);
-
-      // 👇 Restore section visibility on back
-      const sectionMap = {
-        "profile-info": "profiles",
-        "experience-info": "experience",
-        "education-info": "education",
-        "skills-info": "skills",
-        "projects-info": "projects",
-        "certifications-info": "certifications",
-        "interests-and-languages-info": ["interests", "languages"],
-        "publications-awards-info": ["publications", "awards"],
-        "volunteering-info": "volunteer",
-        "references-info": "references",
-      };
-
-      const targetSections = sectionMap[prevPage];
-
-      setResumeData((prev) => {
-        const updatedSections = { ...prev.data.sections };
-
-        if (Array.isArray(targetSections)) {
-          targetSections.forEach((sec) => {
-            updatedSections[sec] = {
-              ...updatedSections[sec],
-              visible: true,
-            };
-          });
-        } else if (targetSections) {
-          updatedSections[targetSections] = {
-            ...updatedSections[targetSections],
-            visible: true,
-          };
-        }
-
-        return {
-          ...prev,
-          data: {
-            ...prev.data,
-            sections: updatedSections,
-          },
-        };
-      });
 
       // Update Progress
       const percent = Math.round((prevIndex / (pages.length - 1)) * 100);
@@ -374,7 +326,7 @@ const EditResume = () => {
           </>
         )
 
-      case 'certifications-info':
+      case 'additional-info':
         return (
           <>
             <CertificationsForm
@@ -751,14 +703,14 @@ const EditResume = () => {
 
             {resumeData?.data?.basics && (
               <RenderResume
-                templateId={resumeData?.metadata?.template || ""}
-                resumeData={resumeData}
-                colorPalette={[
-                  resumeData?.metadata?.theme?.background || "#ffffff",
-                  resumeData?.metadata?.theme?.text || "#000000",
-                  resumeData?.metadata?.theme?.primary || "#ca8a04"
-                ]}
+                templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
+                resumeData={resumeData?.data || DUMMY_RESUME_DATA}
                 containerWidth={baseWidth}
+                colorPalette={[
+                  resumeData?.data?.metadata?.theme?.background,
+                  resumeData?.data?.metadata?.theme?.text,
+                  resumeData?.data?.metadata?.theme?.primary,
+                ]}
               />
             )}
           </div>

@@ -15,7 +15,7 @@ import Volunteer from "../ResumeSections/Pikachu/Volunteer";
 import References from "../ResumeSections/Pikachu/References";
 import Picture from "../ResumeSections/Picture.jsx";
 
-const DEFAULT_THEME = ['#ffffff', '#000000', '#059669']
+const DEFAULT_THEME = ['#ffffff', '#000000', '#ca8a04']
 
 const components = {
     profiles: Profiles,

@@ -14,7 +14,7 @@ import Publications from "../ResumeSections/Rhyhorn/Publications";
 import Volunteer from "../ResumeSections/Rhyhorn/Volunteer";
 import References from "../ResumeSections/Rhyhorn/References";
 
-const DEFAULT_THEME = ['#ffffff', '#000000', '#059669']
+const DEFAULT_THEME = ['#ffffff', '#000000', '#ca8a04']
 
 const components = {
     profiles: Profiles,

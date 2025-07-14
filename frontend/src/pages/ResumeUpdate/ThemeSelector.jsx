@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { DUMMY_RESUME_DATA, RESUME_TEMPLATES, THEME_COLOR_PALETTE } from "../../utils/data";
+import { RESUME_TEMPLATES, THEME_COLOR_PALETTE } from "../../utils/data";
 import { LuCircleCheckBig } from "react-icons/lu";
 import Tabs from "../../components/shared/Tabs";
 import TemplateCard from "../../components/Cards/TemplateCard";
@@ -13,8 +13,8 @@ const ThemeSelector = ({ selectedTheme, setSelectedTheme, setResumeData, resumeD
   const [baseWidth, setBaseWidth] = useState(800);
   const [tabValue, setTabValue] = useState("Templates");
 
-  const currentTemplate = resumeData?.metadata?.template || RESUME_TEMPLATES[0].id;
-  const currentTheme = resumeData?.metadata?.theme || {};
+  const currentTemplate = resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id;
+  const currentTheme = resumeData?.data?.metadata?.theme || {};
   const currentColors = [currentTheme.background, currentTheme.text, currentTheme.primary];
 
   const [selectedTemplate, setSelectedTemplate] = useState({
@@ -36,32 +36,35 @@ const ThemeSelector = ({ selectedTheme, setSelectedTheme, setResumeData, resumeD
   });
 
   const handleThemeSelection = () => {
-    const [background, text, primary] = selectedColorPalette.colors;
+  const [background, text, primary] = selectedColorPalette.colors;
 
-    // 1. Update resumeData
-    setResumeData((prev) => ({
-      ...prev,
-      data: {
-        ...prev.data,
-        metadata: {
-          ...prev.data.metadata,
-          template: selectedTemplate.template,
-          theme: { background, text, primary }
+  setResumeData((prev) => ({
+    ...prev,
+    data: {
+      ...prev.data,
+      metadata: {
+        ...prev.data.metadata,
+        template: selectedTemplate.template,
+        theme: {
+          background,
+          text,
+          primary
         }
       }
-    }));
+    }
+  }));
 
-    // 2. Update selectedTheme (if needed elsewhere)
-    setSelectedTheme({
-      template: selectedTemplate.template,
-      colorPalette: {
-        name: selectedColorPalette.name,
-        colors: selectedColorPalette.colors
-      }
-    });
+  setSelectedTheme({
+    template: selectedTemplate.template,
+    colorPalette: {
+      name: selectedColorPalette.name,
+      colors: selectedColorPalette.colors
+    }
+  });
 
-    onClose();
-  };
+  onClose();
+};
+
 
   const updateBaseWidth = () => {
     if (resumeRef.current) {
@@ -116,7 +119,7 @@ const ThemeSelector = ({ selectedTheme, setSelectedTheme, setResumeData, resumeD
         <div className="col-span-12 md:col-span-7 bg-white -mt-3" ref={resumeRef}>
           <RenderResume
             templateId={selectedTemplate.template}
-            resumeData={resumeData || DUMMY_RESUME_DATA}
+            resumeData={resumeData}
             containerWidth={baseWidth}
             colorPalette={selectedColorPalette.colors}
           />
