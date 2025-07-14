@@ -8,7 +8,7 @@ import Kakuna from './Kakuna';
 import Leafish from './Leafish';
 import Nosepass from './Nosepass';
 import Onyx from './Onyx';
-// import Pikachu from './Pikachu';
+import Pikachu from './Pikachu';
 // import Rhyhorn from './Rhyhorn';
 
 const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) => {
@@ -43,9 +43,9 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
     case 'leafish': return <Leafish {...sharedProps} />;
     case 'nosepass': return <Nosepass {...sharedProps} />;
     case 'onyx': return <Onyx {...sharedProps} />;
-    // case 'pikachu': return <Pikachu {...sharedProps} />;
+    case 'pikachu': return <Pikachu {...sharedProps} />;
     // case 'rhyhorn': return <Rhyhorn {...sharedProps} />;
-    default: return <Onyx {...sharedProps} />;
+    default: return <Pikachu {...sharedProps} />;
   }
 };
 

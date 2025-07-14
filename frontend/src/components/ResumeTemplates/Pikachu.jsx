@@ -1,11 +1,53 @@
 import { useEffect, useRef, useState } from "react";
-import { mapSectionToComponent } from "../../utils/sectionMapper";
+import ResumeHeader from "../ResumeSections/Pikachu/ResumeHeader.jsx";
+import Profiles from "../ResumeSections/Pikachu/Profiles";
+import Summary from "../ResumeSections/Pikachu/Summary";
+import Experience from "../ResumeSections/Pikachu/Experience";
+import Education from "../ResumeSections/Pikachu/Education";
+import Skills from "../ResumeSections/Pikachu/Skills";
+import Projects from "../ResumeSections/Pikachu/Projects";
+import Languages from "../ResumeSections/Pikachu/Languages";
+import Interests from "../ResumeSections/Pikachu/Interests";
+import Certifications from "../ResumeSections/Pikachu/Certifications";
+import Awards from "../ResumeSections/Pikachu/Awards";
+import Publications from "../ResumeSections/Pikachu/Publications";
+import Volunteer from "../ResumeSections/Pikachu/Volunteer";
+import References from "../ResumeSections/Pikachu/References";
+import Picture from "../ResumeSections/Picture.jsx";
 
-// Components
-import ResumeHeader from "../ResumeSections/Azurill/ResumeHeader.jsx";
-
-// [Background, Text, Accent]
 const DEFAULT_THEME = ['#ffffff', '#000000', '#059669']
+
+const components = {
+    profiles: Profiles,
+    summary: Summary,
+    experience: Experience,
+    education: Education,
+    skills: Skills,
+    projects: Projects,
+    languages: Languages,
+    interests: Interests,
+    certifications: Certifications,
+    awards: Awards,
+    publications: Publications,
+    volunteer: Volunteer,
+    references: References,
+};
+
+const mapSectionToComponent = (key, section, reactKey, themeColors) => {
+    if (!section?.visible) return null;
+
+    const usesItems = ['profiles', 'experience', 'education', 'awards', 'certifications', 'skills', 'interests', 'publications', 'volunteer', 'languages', 'projects', 'references'];
+
+    if (usesItems.includes(key) && !section.items?.length) return null;
+
+    const Component = components[key];
+    return Component ? (
+        <div key={reactKey}>
+            <Component section={section} themeColors={themeColors} />
+        </div>
+    ) : null;
+};
+
 
 const Pikachu = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false, containerWidth, colorPalette }) => {
 
@@ -28,7 +70,7 @@ const Pikachu = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
     return (
         <div
             ref={resumeRef}
-            className="py-5 px-1 space-y-3 min-h-[800px]"
+            className="p-5 grid grid-cols-3 space-x-5"
             style={{
                 backgroundColor: themeColors[0],
                 color: themeColors[1],
@@ -38,25 +80,23 @@ const Pikachu = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
                 height: "auto",
             }}
         >
-            {isFirstPage && (
-                <ResumeHeader basics={basics} themeColors={themeColors} />
-            )}
+            <div className="sidebar group space-y-4">
+                {isFirstPage && (
+                    <Picture picture={basics.picture} size={250}/>
+                )}
 
-            <div className="grid grid-cols-3 gap-x-4">
-                <aside className="sidebar group space-y-4">
-                    {sidebarIds.map((key) =>
-                        mapSectionToComponent(key, sections[key], key, themeColors)
-                    )}
-                </aside>
+                {sidebarIds.map((key) =>
+                    mapSectionToComponent(key, sections[key], key, themeColors)
+                )}
+            </div>
+            <div className={`main group space-y-4 ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"}`}>
+                {isFirstPage && (
+                    <ResumeHeader basics={basics} themeColors={themeColors} />
+                )}
 
-                <main
-                    className={`main group space-y-4 ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"
-                        }`}
-                >
-                    {mainIds.map((key) =>
-                        mapSectionToComponent(key, sections[key], key, themeColors)
-                    )}
-                </main>
+                {mainIds.map((key) =>
+                    mapSectionToComponent(key, sections[key], key, themeColors)
+                )}
             </div>
         </div>
     );
