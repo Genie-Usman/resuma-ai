@@ -7,7 +7,7 @@ import Glalie from './Glalie';
 import Kakuna from './Kakuna';
 import Leafish from './Leafish';
 import Nosepass from './Nosepass';
-// import Onyx from './Onyx';
+import Onyx from './Onyx';
 // import Pikachu from './Pikachu';
 // import Rhyhorn from './Rhyhorn';
 
@@ -42,10 +42,10 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
     case 'kakuna': return <Kakuna {...sharedProps} />;
     case 'leafish': return <Leafish {...sharedProps} />;
     case 'nosepass': return <Nosepass {...sharedProps} />;
-    // case 'onyx': return <Onyx {...sharedProps} />;
+    case 'onyx': return <Onyx {...sharedProps} />;
     // case 'pikachu': return <Pikachu {...sharedProps} />;
     // case 'rhyhorn': return <Rhyhorn {...sharedProps} />;
-    default: return <Nosepass {...sharedProps} />;
+    default: return <Onyx {...sharedProps} />;
   }
 };
 
