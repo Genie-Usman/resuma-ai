@@ -9,7 +9,7 @@ import Leafish from './Leafish';
 import Nosepass from './Nosepass';
 import Onyx from './Onyx';
 import Pikachu from './Pikachu';
-// import Rhyhorn from './Rhyhorn';
+import Rhyhorn from './Rhyhorn';
 
 const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) => {
   const data = resumeData?.data || resumeData || {};
@@ -44,8 +44,8 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
     case 'nosepass': return <Nosepass {...sharedProps} />;
     case 'onyx': return <Onyx {...sharedProps} />;
     case 'pikachu': return <Pikachu {...sharedProps} />;
-    // case 'rhyhorn': return <Rhyhorn {...sharedProps} />;
-    default: return <Pikachu {...sharedProps} />;
+    case 'rhyhorn': return <Rhyhorn {...sharedProps} />;
+    default: return <Rhyhorn {...sharedProps} />;
   }
 };
 

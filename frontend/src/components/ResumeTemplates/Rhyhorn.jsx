@@ -1,11 +1,51 @@
 import { useEffect, useRef, useState } from "react";
-import { mapSectionToComponent } from "../../utils/sectionMapper";
+import ResumeHeader from "../ResumeSections/Rhyhorn/ResumeHeader.jsx";
+import Profiles from "../ResumeSections/Rhyhorn/Profiles";
+import Summary from "../ResumeSections/Rhyhorn/Summary";
+import Experience from "../ResumeSections/Rhyhorn/Experience";
+import Education from "../ResumeSections/Rhyhorn/Education";
+import Skills from "../ResumeSections/Rhyhorn/Skills";
+import Projects from "../ResumeSections/Rhyhorn/Projects";
+import Languages from "../ResumeSections/Rhyhorn/Languages";
+import Interests from "../ResumeSections/Rhyhorn/Interests";
+import Certifications from "../ResumeSections/Rhyhorn/Certifications";
+import Awards from "../ResumeSections/Rhyhorn/Awards";
+import Publications from "../ResumeSections/Rhyhorn/Publications";
+import Volunteer from "../ResumeSections/Rhyhorn/Volunteer";
+import References from "../ResumeSections/Rhyhorn/References";
 
-// Components
-import ResumeHeader from "../ResumeSections/Azurill/ResumeHeader.jsx";
-
-// [Background, Text, Accent]
 const DEFAULT_THEME = ['#ffffff', '#000000', '#059669']
+
+const components = {
+    profiles: Profiles,
+    summary: Summary,
+    experience: Experience,
+    education: Education,
+    skills: Skills,
+    projects: Projects,
+    languages: Languages,
+    interests: Interests,
+    certifications: Certifications,
+    awards: Awards,
+    publications: Publications,
+    volunteer: Volunteer,
+    references: References,
+};
+
+const mapSectionToComponent = (key, section, reactKey, themeColors) => {
+    if (!section?.visible) return null;
+
+    const usesItems = ['profiles', 'experience', 'education', 'awards', 'certifications', 'skills', 'interests', 'publications', 'volunteer', 'languages', 'projects', 'references'];
+
+    if (usesItems.includes(key) && !section.items?.length) return null;
+
+    const Component = components[key];
+    return Component ? (
+        <div key={reactKey}>
+            <Component section={section} themeColors={themeColors} />
+        </div>
+    ) : null;
+};
 
 const Rhyhorn = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false, containerWidth, colorPalette }) => {
 
@@ -28,7 +68,7 @@ const Rhyhorn = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
     return (
         <div
             ref={resumeRef}
-            className="py-5 px-1 space-y-3 min-h-[800px]"
+            className="p-5 space-y-4"
             style={{
                 backgroundColor: themeColors[0],
                 color: themeColors[1],
@@ -42,22 +82,13 @@ const Rhyhorn = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
                 <ResumeHeader basics={basics} themeColors={themeColors} />
             )}
 
-            <div className="grid grid-cols-3 gap-x-4">
-                <aside className="sidebar group space-y-4">
-                    {sidebarIds.map((key) =>
-                        mapSectionToComponent(key, sections[key], key, themeColors)
-                    )}
-                </aside>
+            {mainIds.map((key) =>
+                mapSectionToComponent(key, sections[key], key, themeColors)
+            )}
 
-                <main
-                    className={`main group space-y-4 ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"
-                        }`}
-                >
-                    {mainIds.map((key) =>
-                        mapSectionToComponent(key, sections[key], key, themeColors)
-                    )}
-                </main>
-            </div>
+            {sidebarIds.map((key) =>
+                mapSectionToComponent(key, sections[key], key, themeColors)
+            )}
         </div>
     );
 };
