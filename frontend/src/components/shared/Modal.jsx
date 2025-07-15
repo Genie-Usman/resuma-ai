@@ -9,18 +9,32 @@ const Modal = ({
   showActionBtn = false,
   actionBtnIcon = null,
   actionBtnText = '',
+  width,
+  height,
+  maxWidth,
+  maxHeight,
+  isPrint = false,
   onActionClick = () => { },
 }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="relative w-full max-w-6xl mx-auto bg-white rounded-lg shadow-xl flex flex-col max-h-[90vh] overflow-hidden">
+      <div
+        className="relative mx-auto bg-white rounded-lg shadow-xl flex flex-col overflow-hidden"
+        style={{
+          width,
+          height,
+          maxWidth,
+          maxHeight,
+        }}
+      >
+
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 cursor-pointer"
+          className="absolute top-5 right-4 text-gray-500 hover:text-gray-800 cursor-pointer z-50"
         >
           <svg
             aria-hidden="true"
@@ -41,12 +55,12 @@ const Modal = ({
 
         {/* Modal Header */}
         {!hideHeader && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between px-6 py-4 mr-10 border-b border-gray-200 bg-white z-10">
             <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
             {showActionBtn && (
               <button
                 onClick={onActionClick}
-                className="flex items-center gap-1 text-sm font-medium text-purple-600 hover:underline"
+                className="btn-small-light"
               >
                 {actionBtnIcon}
                 {actionBtnText}
@@ -56,7 +70,7 @@ const Modal = ({
         )}
 
         {/* Modal Body */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-4">
+        <div className={`flex-1 overflow-auto ${isPrint ? 'px-0' : 'px-6'} py-4 custom-scrollbar bg-gray-50`}>
           {children}
         </div>
       </div>

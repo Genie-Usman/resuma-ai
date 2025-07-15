@@ -28,6 +28,7 @@ import RenderResume from "../../components/ResumeTemplates/RenderResume";
 import uploadImage from "../../utils/uploadImage.js";
 import ThemeSelector from "./ThemeSelector.jsx";
 import Modal from "../../components/shared/Modal.jsx";
+import { RESUME_TEMPLATES } from "../../utils/data.js";
 
 const EditResume = () => {
   const { resumeId } = useParams();
@@ -45,6 +46,7 @@ const EditResume = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [newProfileImageFile, setNewProfileImageFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [printResume, setPrintResume] = useState(false);
 
   // Next Step Function
   const goToNextStep = () => {
@@ -586,7 +588,15 @@ const EditResume = () => {
   const handleDeleteResume = async () => { };
 
   // Download Resume
-  const reactToPrintFn = useReactToPrint({ contentRef: resumeDownloadRef });
+  const reactToPrintFn = useReactToPrint({
+    contentRef: resumeDownloadRef,
+    onBeforeGetContent: () => {
+      setPrintResume(true)
+      return Promise.resolve();
+    }, onAfterPrint: () => {
+      setPrintResume(false);
+    }
+  });
 
   // Function to update baseWidth based on the resume container size
   const updateBaseWidth = () => {
@@ -704,7 +714,7 @@ const EditResume = () => {
             {resumeData?.data?.basics && (
               <RenderResume
                 templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
-                resumeData={resumeData?.data || DUMMY_RESUME_DATA}
+                resumeData={resumeData?.data}
                 containerWidth={baseWidth}
                 colorPalette={[
                   resumeData?.data?.metadata?.theme?.background,
@@ -721,8 +731,10 @@ const EditResume = () => {
         isOpen={openThemeSelector}
         onClose={() => setOpenThemeSelector(false)}
         title="Change Theme"
+        width="85vw"
+        height="80vh"
       >
-        <div className="w-full h-[80vh]">
+        <div className="">
           <ThemeSelector
             selectedTheme={resumeData?.template}
             setSelectedTheme={(value) => {
@@ -745,6 +757,31 @@ const EditResume = () => {
             resumeData={resumeData}
             setResumeData={setResumeData}
             onClose={() => setOpenThemeSelector(false)}
+          />
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={openPreviewModal}
+        onClose={() => setOpenPreviewModal(false)}
+        title={resumeData?.title}
+        showActionBtn
+        actionBtnText="Download"
+        actionBtnIcon={<LuDownload className="text-base" />}
+        onActionClick={() => reactToPrintFn()}
+        width="100vw"
+        height="90vh"
+        isPrint={true}
+      >
+        <div ref={resumeDownloadRef} className={`mx-auto w-[98vw] h-[90vh]`}>
+          <RenderResume
+            templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
+            resumeData={resumeData?.data}
+            colorPalette={[
+              resumeData?.data?.metadata?.theme?.background,
+              resumeData?.data?.metadata?.theme?.text,
+              resumeData?.data?.metadata?.theme?.primary,
+            ]}
           />
         </div>
       </Modal>
