@@ -13,7 +13,7 @@ const Header = () => {
     const { user } = useContext(UserContext);
 
     return (
-        <header className='flex justify-between items-center mb-16'>
+        <header className='flex justify-between items-center mb-16 mx-0 pr-2 md:pr-0 md:mx-4'>
             <div>
                 {/* Image */}
                 <img src={LOGO} alt="logo" className='w-[150px] cursor-pointer' onClick={() => navigate('/')} />

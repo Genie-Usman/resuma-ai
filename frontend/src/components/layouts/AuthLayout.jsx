@@ -20,15 +20,6 @@ const AuthLayout = ({ children }) => {
                 <div>
                     {children}
                 </div>
-
-                {/* Divider */}
-                <div className="flex items-center gap-x-4">
-                    <hr className="flex-1" />
-                    <span className="text-xs font-medium text-gray-500">
-                        or continue with
-                    </span>
-                    <hr className="flex-1" />
-                </div>
             </div>
 
             {/* Right panel (Image) */}

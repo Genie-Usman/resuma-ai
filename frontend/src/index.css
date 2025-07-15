@@ -21,27 +21,6 @@
 
 }
 
-/* Custom Scrollbar */
-.custom-scrollbar {
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: rgba(100, 100, 100, 0.4) transparent; /* Firefox */
-  overflow-y: auto; /* Enable vertical scrolling */
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(100, 100, 100, 0.4);
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-
 @layer utilities {
 
   /* Animate text with a shine effect */
@@ -58,6 +37,29 @@
   .animate-text-shine {
     animation: text-shine 3s ease-in-out infinite alternate;
   }
+
+  /* Move Up Button Animation */
+  @keyframes move-up-alternate {
+    0% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(80%);
+    }
+
+    51% {
+      transform: translateY(-80%);
+    }
+
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-move-up-alternate {
+    animation: move-up-alternate 0.3s forwards;
+  }
 }
 
 .input-box {
@@ -65,7 +67,7 @@
 }
 
 .btn-primary {
-  @apply w-full text-sm font-medium text-white bg-black shadow-lg shadow-purple-600/5 p-[10px] rounded-md my-1 hover:bg-purple-600/15 hover:text-black cursor-pointer; 
+  @apply w-full text-sm font-medium text-white bg-black shadow-lg shadow-purple-600/5 p-[10px] rounded-md my-1 hover:bg-purple-600/15 hover:text-black cursor-pointer;
 }
 
 .btn-small {
@@ -82,4 +84,106 @@
 
 .wysiwyg {
   @apply prose max-w-none prose-headings:mb-2 prose-headings:mt-0 prose-p:mb-2 prose-p:mt-0 prose-p:leading-normal prose-a:break-all prose-ol:mb-2 prose-ol:mt-0 prose-ul:mb-2 prose-ul:mt-0 prose-li:mb-2 prose-li:mt-0 prose-li:leading-normal prose-img:mb-2 prose-img:mt-0 prose-hr:mb-2 prose-hr:mt-0;
+}
+
+/* Get Started Button */
+.btn-get-started,
+.btn-get-started *,
+.btn-get-started :after,
+.btn-get-started :before,
+.btn-get-started:after,
+.btn-get-started:before {
+  border: 0 solid;
+  box-sizing: border-box;
+}
+
+.btn-get-started {
+  background-color: #000;
+  color: #fff;
+  cursor: pointer;
+  font-size: 70%;
+  font-weight: 900;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  text-transform: uppercase;
+  border-radius: 10px;
+  border-width: 1px;
+  border-color: black;
+  padding: 0.8rem 2rem;
+  z-index: 0;
+}
+
+.btn-get-started,
+.btn-get-started .text-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.btn-get-started .text-container {
+  display: block;
+  mix-blend-mode: difference;
+}
+
+.btn-get-started .text {
+  display: block;
+  position: relative;
+}
+
+.btn-get-started:hover .text {
+  animation: move-up-alternate 0.3s forwards;
+}
+
+.btn-get-started:after,
+.btn-get-started:before {
+  --skew: 0.2;
+  background: #fff;
+  content: "";
+  display: block;
+  height: 102%;
+  left: calc(-50% - 50% * var(--skew));
+  pointer-events: none;
+  position: absolute;
+  top: -104%;
+  transform: skew(calc(150deg * var(--skew))) translateY(var(--progress, 0));
+  transition: transform 0.2s ease;
+  width: 100%;
+}
+
+.btn-get-started:after {
+  --progress: 0%;
+  left: calc(50% + 50% * var(--skew));
+  top: 102%;
+  z-index: -1;
+}
+
+.btn-get-started:hover:before {
+  --progress: 100%;
+}
+
+.btn-get-started:hover:after {
+  --progress: -102%;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  /* Firefox */
+  scrollbar-color: rgba(100, 100, 100, 0.4) transparent;
+  /* Firefox */
+  overflow-y: auto;
+  /* Enable vertical scrolling */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.4);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
 }

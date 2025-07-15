@@ -34,16 +34,23 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-7 pt-1 pb-6 px-4 md:px-0">
+      <div className="grid grid-cols-1 md:grid-cols-5 md:gap-7 2xl:gap-0 pt-1 pb-6 px-4 md:px-0 gap-4">
 
         {/* New Resume */}
         <div
-          className="h-[300px] flex flex-col gap-5 items-center justify-center bg-white rounded-lg border border-purple-100 hover:border-purple-300 hover:bg-purple-50/5 cursor-pointer"
-          onClick={() => setOpenCreateModal(true)}>
-          <div className="w-12 h-12 flex items-center justify-center bg-purple-200/60 rounded-2xl">
-            <LuCirclePlus className="text-xl text-purple-500" />
+          className="relative w-full max-w-[240px] aspect-[2/3] flex items-center justify-center bg-white rounded-lg border border-purple-100 hover:border-purple-300 hover:bg-purple-50/40 cursor-pointer group transition-all duration-300 mx-auto md:mx-0"
+          onClick={() => setOpenCreateModal(true)}
+        >
+          {/* Hover background overlay (optional) */}
+          <div className="absolute inset-0 bg-purple-50/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+
+          {/* Icon and text */}
+          <div className="relative z-10 flex flex-col items-center gap-3">
+            <div className="w-12 h-12 flex items-center justify-center bg-purple-200/60 rounded-2xl">
+              <LuCirclePlus className="text-2xl text-purple-500 group-hover:rotate-90 transition-transform duration-300" />
+            </div>
+            <h3 className="text-sm font-bold text-gray-700">Add New Resume</h3>
           </div>
-          <h3 className="font-medium text-gray-800">Add New Resume</h3>
         </div>
 
         {/* All Resumes */}
@@ -63,15 +70,15 @@ const Dashboard = () => {
 
       </div>
 
-        <Modal
+      <Modal
         isOpen={openCreateModal}
-        onClose={()=> setOpenCreateModal(false)}
+        onClose={() => setOpenCreateModal(false)}
         hideHeader
-        >
-          <div className="">
-            <CreateResumeForm />
-          </div>
-        </Modal>
+      >
+        <div className="">
+          <CreateResumeForm />
+        </div>
+      </Modal>
 
     </DashboardLayout>
   )

@@ -1,49 +1,39 @@
-import { useEffect, useState } from 'react'
-
-// Utils
-// import { getLightColorFromImage } from '../../utils/helper.jsx';
+import { useState } from 'react';
 
 const ResumeSummaryCard = ({ imgUrl, title, lastUpdated, onSelect }) => {
-    const [bgColor, setBgColor] = useState('#FFFFFF');
+  const [bgColor, setBgColor] = useState('#FFFFFF');
 
-    // useEffect(() => {
-    //     if (imgUrl) {
-    //         getLightColorFromImage(imgUrl)
-    //             .then((color) => {
-    //                 setBgColor(color)
-    //             })
-    //             .catch(() => {
-    //                 setBgColor('#FFFFFF')
-    //             })
-    //     }
-    // }, [imgUrl])
+  return (
+    <div
+      className="relative group w-full max-w-[240px] bg-white rounded-lg border border-gray-200 hover:border-purple-300 overflow-hidden cursor-pointer mx-auto md:mx-0"
+      style={{ backgroundColor: bgColor }}
+      onClick={onSelect}
+    >
+      {/* Image wrapper with aspect ratio */}
+      <div className="relative w-full aspect-[2/3]">
+        {imgUrl ? (
+          <img
+            src={imgUrl}
+            alt=""
+            className="absolute inset-0 w-full h-full object-contain rounded"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gray-100 rounded" />
+        )}
 
-    return (
-        <div
-            className='h-[300px] flex flex-col items-center justify-between bg-white rounded-lg border border-gray-200 hover:border-purple-300 overflow-hidden cursor-pointer'
-            style={{ backgroundColor: bgColor }}
-            onClick={onSelect}
-        >
-            <div className='p-4'>
-                {imgUrl ? (
-                    <img
-                        src={imgUrl}
-                        alt=""
-                        className='w-[100%] h-[200px] rounded'
-                    />
-                ) : (
-                    <div></div>
-                )}
-            </div>
-
-            <div className='w-full bg-white px-4 py-3'>
-                <h5 className='text-sm font-medium truncate overflow-hidden whitespace-nowrap'>{title}</h5>
-                <p className='text-xs font-medium text-gray-500 mt-0.5'>
-                    Last Updated: {lastUpdated}
-                </p>
-            </div>
+        {/* Overlay info on hover */}
+        <div className="absolute inset-0 flex flex-col justify-end p-4 rounded group">
+          {/* Gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-t from-purple-500 to-white opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded" />
+          {/* Text content */}
+          <div className="relative z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <h5 className="text-base font-bold shadow-sm text-black truncate">{title}</h5>
+            <p className="text-sm font-semibold shadow-sm text-black mt-1">Last Updated: {lastUpdated}</p>
+          </div>
         </div>
-    )
-}
+      </div>
+    </div>
+  );
+};
 
-export default ResumeSummaryCard
+export default ResumeSummaryCard;

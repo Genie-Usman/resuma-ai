@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { RESUME_TEMPLATES, THEME_COLOR_PALETTE } from "../../utils/data";
+import { RESUME_TEMPLATES, THEME_COLOR_PALETTE } from "../../constants";
 import { LuCircleCheckBig } from "react-icons/lu";
 import Tabs from "../../components/shared/Tabs";
 import TemplateCard from "../../components/Cards/TemplateCard";

@@ -28,7 +28,7 @@ import RenderResume from "../../components/ResumeTemplates/RenderResume";
 import uploadImage from "../../utils/uploadImage.js";
 import ThemeSelector from "./ThemeSelector.jsx";
 import Modal from "../../components/shared/Modal.jsx";
-import { RESUME_TEMPLATES } from "../../utils/data.js";
+import { RESUME_TEMPLATES } from "../../constants";
 
 const EditResume = () => {
   const { resumeId } = useParams();
@@ -670,7 +670,7 @@ const EditResume = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="bg-white rounded-lg border border-purple-100 overflow-hidden">
 
-            <StepProgress progress={30} />
+            <StepProgress progress={progess} />
 
             {renderForm()}
 
