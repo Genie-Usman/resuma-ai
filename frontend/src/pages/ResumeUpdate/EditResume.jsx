@@ -585,7 +585,18 @@ const EditResume = () => {
   };
 
   // Delete Resume 
-  const handleDeleteResume = async () => { };
+  const handleDeleteResume = async () => {
+    try {
+      setIsLoading(true);
+      await axiosInstance.delete(API_PATHS.RESUME.DELETE(resumeId));
+      toast.success('Resume Deleted Successfully');
+      navigate('/dashboard');
+    } catch (error) {
+      console.log('Failed to delete the resume: ', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Download Resume
   const reactToPrintFn = useReactToPrint({
@@ -671,6 +682,7 @@ const EditResume = () => {
               )}
 
               <div className="flex items-center justify-end gap-3 mt-3 mb-5">
+                {/* Go Back Button */}
                 <button
                   className="btn-small-light"
                   onClick={goBack}
@@ -680,6 +692,7 @@ const EditResume = () => {
                   Back
                 </button>
 
+                {/* Save Button */}
                 <button
                   className="btn-small-light"
                   onClick={uploadResumeImages}
@@ -689,6 +702,7 @@ const EditResume = () => {
                   {isLoading ? "Updating..." : "Save & Exit"}
                 </button>
 
+                {/* Validate And Next Button */}
                 <button
                   className="btn-small"
                   onClick={validateAndNext}
@@ -708,8 +722,8 @@ const EditResume = () => {
             </div>
           </div>
 
+          {/* Resume Template */}
           <div ref={resumeRef} className="h-[100vh]">
-            {/* Resume Template */}
 
             {resumeData?.data?.basics && (
               <RenderResume
@@ -727,6 +741,7 @@ const EditResume = () => {
         </div>
       </div>
 
+      {/* Theme Selector Modal */}
       <Modal
         isOpen={openThemeSelector}
         onClose={() => setOpenThemeSelector(false)}
@@ -761,6 +776,7 @@ const EditResume = () => {
         </div>
       </Modal>
 
+      {/* Print & Preview Modal */}
       <Modal
         isOpen={openPreviewModal}
         onClose={() => setOpenPreviewModal(false)}
