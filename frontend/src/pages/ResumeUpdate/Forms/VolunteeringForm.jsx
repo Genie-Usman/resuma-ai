@@ -6,7 +6,7 @@ const VolunteeringForm = ({ volunteer, updateArrayItem, addArrayItem, removeArra
 
     return (
         <div className="px-5 pt-5">
-            <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Volunteering 
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Volunteering
                 <span className="ml-2 text-sm text-gray-400">(Optional)</span>
             </h2>
 
@@ -82,6 +82,13 @@ const VolunteeringForm = ({ volunteer, updateArrayItem, addArrayItem, removeArra
                             {/* Summary */}
                             <div className="flex flex-col md:col-span-2">
                                 <SummarySectionForm
+                                    sectionId="volunteering"
+                                    item={{
+                                        organization: item.organization || "",
+                                        position: item.position || "",
+                                        date: item.date || "",
+                                        location: item.location || "",
+                                    }}
                                     content={item.summary}
                                     updateContent={(newSummary) =>
                                         updateArrayItem(index, "summary", newSummary)

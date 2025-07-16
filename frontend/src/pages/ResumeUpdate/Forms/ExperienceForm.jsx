@@ -30,7 +30,9 @@ const ExperienceForm = ({ experience, updateArrayItem, addArrayItem, removeArray
 
     return (
         <div className="px-5 pt-5">
-            <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Work Experience</h2>
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-900">Work Experience
+                <span className="ml-2 text-sm text-gray-400">(Recommended)</span>
+            </h2>
 
             <div className="mt-4 flex flex-col gap-4 mb-3">
                 {experience.map((item, index) => (
@@ -104,6 +106,13 @@ const ExperienceForm = ({ experience, updateArrayItem, addArrayItem, removeArray
                             {/* Summary */}
                             <div className="flex flex-col md:col-span-2">
                                 <SummarySectionForm
+                                    sectionId="experience"
+                                    item={{
+                                        company: item.company || "",
+                                        position: item.position || "",
+                                        location: item.location || "",
+                                        date: item.date || "",
+                                    }}
                                     content={item.summary}
                                     updateContent={(newSummary) =>
                                         updateArrayItem(index, "summary", newSummary)

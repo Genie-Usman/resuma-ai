@@ -1,6 +1,5 @@
 import { LuPlus, LuTrash2 } from "react-icons/lu";
 import { defaultReferenceItem } from "../../../constants";
-import SummarySectionForm from "./SummarySectionForm";
 
 const ReferenceForm = ({ references, updateArrayItem, addArrayItem, removeArrayItem }) => {
 
@@ -49,17 +48,8 @@ const ReferenceForm = ({ references, updateArrayItem, addArrayItem, removeArrayI
                                     onChange={({ target }) =>
                                         updateArrayItem(index, "description", target.value)
                                     }
-                                    placeholder=""
+                                    placeholder="Available on demand"
                                     className="border border-gray-300 rounded px-3 py-2 w-full capitalize"
-                                />
-                            </div>
-                            {/* Summary */}
-                            <div className="flex flex-col md:col-span-2">
-                                <SummarySectionForm
-                                    content={item.summary}
-                                    updateContent={(newSummary) =>
-                                        updateArrayItem(index, "summary", newSummary)
-                                    }
                                 />
                             </div>
 

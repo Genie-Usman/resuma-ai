@@ -6,6 +6,7 @@ const path = require("path");
 
 const authRoutes = require("./routes/authRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
+const geminiRoutes = require("./routes/geminiRoutes.js");
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/resume", resumeRoutes);
+app.use("/api/gemini", geminiRoutes);
 
 // Serve Uploads Folder
 app.use(

@@ -9,7 +9,7 @@ const Section = ({
   summaryKey,
   keywordsKey,
   themeColors,
-  isSidebar = false // ✅ NEW: flag passed from parent
+  isSidebar = false
 }) => {
   if (!section.visible || section.items.length === 0) return null;
 
@@ -74,7 +74,7 @@ const Section = ({
                   <div
                     dangerouslySetInnerHTML={{ __html: summary }}
                     className="wysiwyg"
-                    style={{ color: isSidebar ? themeColors[0] : themeColors[1] }}
+                    style={{ color: isSidebar ? themeColors[0] : themeColors[1], paddingRight: isSidebar ? "8px" : "0px" }}
                   />
                 )}
 

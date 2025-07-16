@@ -1,7 +1,8 @@
 import ProfilePhotoSelector from "../../../components/Inputs/ProfilePhotoSelector";
 import SummarySectionForm from "./SummarySectionForm";
 
-const PersonalInfoForm = ({ profileData, updateSection, resumeData, setResumeData, onNext }) => {
+const PersonalInfoForm = ({ profileData, updateSection, resumeData, setResumeData }) => {
+
 
     return (
         <div className="px-5 pt-5">
@@ -113,6 +114,12 @@ const PersonalInfoForm = ({ profileData, updateSection, resumeData, setResumeDat
                     {/* Summary */}
                     <div className="flex flex-col md:col-span-2">
                         <SummarySectionForm
+                            sectionId="personal-info"
+                            item={{
+                                name: profileData.name || "",
+                                headline: profileData.headline || "",
+                                location: profileData.location || "",
+                            }}
                             content={resumeData.data.sections?.summary?.content || ""}
                             updateContent={(newContent) =>
                                 setResumeData((prev) => ({

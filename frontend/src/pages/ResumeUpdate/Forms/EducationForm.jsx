@@ -117,9 +117,17 @@ const EducationForm = ({ education, updateArrayItem, addArrayItem, removeArrayIt
                             {/* Summary */}
                             <div className="flex flex-col md:col-span-2">
                                 <SummarySectionForm
+                                    sectionId="education"
+                                    item={{
+                                        institution: item.institution || "",
+                                        degree: item.studyType || "",
+                                        location: item.area || "",
+                                        score: item.score || "",
+                                        date: item.date || "",
+                                    }}
                                     content={item.summary}
                                     updateContent={(newSummary) =>
-                                        updateArrayItem( index, "summary", newSummary)
+                                        updateArrayItem(index, "summary", newSummary)
                                     }
                                 />
                             </div>

@@ -82,6 +82,12 @@ const CertificationsForm = ({ certifications, updateArrayItem, addArrayItem, rem
                             {/* Summary */}
                             <div className="flex flex-col md:col-span-2">
                                 <SummarySectionForm
+                                sectionId="certifications"
+                                    item={{
+                                        name: item.name || "",
+                                        issuer: item.issuer || "",
+                                        date: item.date || "",
+                                    }}
                                     content={item.summary}
                                     updateContent={(newSummary) =>
                                         updateArrayItem(index, "summary", newSummary)

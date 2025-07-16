@@ -117,6 +117,13 @@ const ProjectsForm = ({ projects, updateArrayItem, addArrayItem, removeArrayItem
                             {/* Summary */}
                             <div className="flex flex-col md:col-span-2">
                                 <SummarySectionForm
+                                    sectionId="projects"
+                                    item={{
+                                        name: item.name || "",
+                                        description: item.description || "",
+                                        date: item.date || "",
+                                        keywords: item.keywords || "",
+                                    }}
                                     content={item.summary}
                                     updateContent={(newSummary) =>
                                         updateArrayItem(index, "summary", newSummary)

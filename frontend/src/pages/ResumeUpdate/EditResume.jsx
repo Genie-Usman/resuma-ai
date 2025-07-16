@@ -121,25 +121,6 @@ const EditResume = () => {
         break;
       }
 
-      case 'experience-info': {
-        const experienceItems = sections.experience?.items || [];
-
-        if (experienceItems.length === 0) {
-          errors.push("At least one experience entry is required.");
-        } else {
-          experienceItems.forEach((item, i) => {
-            if (!item.company?.trim()) errors.push(`Experience #${i + 1}: Company is required.`);
-            if (!item.position?.trim()) errors.push(`Experience #${i + 1}: Position is required.`);
-            if (!item.location?.trim()) errors.push(`Experience #${i + 1}: Location is required.`);
-            if (!item.date?.trim()) errors.push(`Experience #${i + 1}: Date is required.`);
-            if (!stripHtml(item.summary)?.trim()) {
-              errors.push(`Experience #${i + 1}: Summary cannot be empty.`);
-            }
-          });
-        }
-        break;
-      }
-
       case 'education-info': {
         const educationItems = sections.education?.items || [];
         if (educationItems.length === 0) {

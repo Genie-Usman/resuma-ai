@@ -33,6 +33,10 @@ import {
     RxDividerVertical,
     RxEnter
 } from 'react-icons/rx';
+import Button from '../../../components/shared/Button';
+import { useState } from 'react';
+import { API_PATHS } from '../../../utils/apiPaths';
+import axiosInstance from '../../../utils/axiosInstance';
 
 const MenuBar = ({ editor }) => {
     if (!editor) return null;
@@ -222,7 +226,42 @@ const MenuBar = ({ editor }) => {
     );
 };
 
-const SummarySectionForm = ({ content, updateContent }) => {
+const SummarySectionForm = ({ content, updateContent, sectionId, item }) => {
+
+    const fetchGeneratedItemSummary = async (section, item) => {
+        const res = await axiosInstance.post(API_PATHS.GEMINI.GENERATE_ITEM_SUMMARY, { section, item });
+        return res.data.summary;
+    };
+
+    const [suggestions, setSuggestions] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const handleGenerateSummary = async () => {
+        setLoading(true);
+        try {
+            const summaries = await fetchGeneratedItemSummary(sectionId, item); 
+            const levels = Object.entries(summaries).map(([level, summary]) => ({
+                level,
+                summary,
+            }));
+
+            setSuggestions(levels);
+
+        } catch (err) {
+            console.error("Failed to generate summary:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSuggestionClick = (summary) => {
+        if (editor) {
+            editor.commands.setContent(summary);
+            updateContent(summary);
+        }
+    };
+
+
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -257,13 +296,38 @@ const SummarySectionForm = ({ content, updateContent }) => {
     });
 
     return (
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div className="col-span-2 mt-3">
-                    <h2 className="mb-1 font-semibold text-lg">Summary</h2>
-                    <MenuBar editor={editor} />
-                    <EditorContent editor={editor} />
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div className="col-span-2 mt-3">
+                {/* heading & Generate Summary Button */}
+                <div className='flex flex-row justify-between'>
+                    <h2 className="mb-1 font-semibold text-xl">Summary</h2>
+                    <Button onClick={handleGenerateSummary} disabled={loading} >
+                        {!loading ? "Generate from AI" : "Generating..."}
+                    </Button>
                 </div>
+
+                {/* Suggestions */}
+                {suggestions.length > 0 && (
+                    <div className="flex flex-col gap-3 mb-3">
+                        {suggestions.map(({ level, summary }) => (
+                            <div
+                                key={level}
+                                onClick={() => handleSuggestionClick(summary)}
+                                className="flex-1 border border-purple-300 rounded-md p-3 cursor-pointer hover:bg-purple-50 transition"
+                            >
+                                <h3 className="font-semibold capitalize text-sm mb-1 text-purple-600">
+                                    {level}
+                                </h3>
+                                <p className="text-sm 2xl:text-base text-gray-700">{summary}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                <MenuBar editor={editor} />
+                <EditorContent editor={editor} />
             </div>
+        </div>
     );
 };
 
