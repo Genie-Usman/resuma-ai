@@ -29,6 +29,7 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
+    document.title = "Dashboard - Resuma AI"
     fetchAllResumes();
   }, [])
 

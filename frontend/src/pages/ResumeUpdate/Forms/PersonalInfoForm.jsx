@@ -1,8 +1,12 @@
+import { useEffect } from "react";
 import ProfilePhotoSelector from "../../../components/Inputs/ProfilePhotoSelector";
 import SummarySectionForm from "./SummarySectionForm";
 
 const PersonalInfoForm = ({ profileData, updateSection, resumeData, setResumeData }) => {
 
+    useEffect(() => {
+        document.title = "Resuma AI - Personal Info"
+    }, [])
 
     return (
         <div className="px-5 pt-5">

@@ -7,6 +7,7 @@ const SkillsForm = ({ skills, updateArrayItem, addArrayItem, removeArrayItem, se
 
     // Ensure at least one skills item exists
     useEffect(() => {
+        document.title = "Resuma AI - Skills Info";
         setResumeData((prev) => {
             const skillsItems = prev.data.sections.skills.items || [];
             if (skillsItems.length === 0) {

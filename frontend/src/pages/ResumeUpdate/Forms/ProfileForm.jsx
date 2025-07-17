@@ -9,6 +9,7 @@ const ProfileForm = ({ profiles, updateArrayItem, addArrayItem, removeArrayItem,
 
     // Ensure at least one profiles item exists
     useEffect(() => {
+        document.title = "Resuma AI - Profile Info";
         setResumeData((prev) => {
             const profileItems = prev.data.sections.profiles.items || [];
             if (profileItems.length === 0) {

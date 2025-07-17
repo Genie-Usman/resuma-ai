@@ -7,6 +7,7 @@ const ProjectsForm = ({ projects, updateArrayItem, addArrayItem, removeArrayItem
 
     // Ensure at least one projects item exists
     useEffect(() => {
+        document.title = "Resuma AI - Projects Info";
         setResumeData((prev) => {
             const projectsItems = prev.data.sections.projects.items || [];
             if (projectsItems.length === 0) {

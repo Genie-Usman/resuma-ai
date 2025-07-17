@@ -7,6 +7,7 @@ const ExperienceForm = ({ experience, updateArrayItem, addArrayItem, removeArray
 
     // Ensure at least one experience item exists
     useEffect(() => {
+        document.title = "Resuma AI - Experience Info";
         setResumeData((prev) => {
             const experienceItems = prev.data.sections.experience.items || [];
             if (experienceItems.length === 0) {

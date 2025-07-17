@@ -1,8 +1,13 @@
 import { LuPlus, LuTrash2 } from "react-icons/lu";
 import { defaultCertificationsItem } from "../../../constants";
 import SummarySectionForm from "./SummarySectionForm";
+import { useEffect } from "react";
 
 const CertificationsForm = ({ certifications, updateArrayItem, addArrayItem, removeArrayItem }) => {
+
+    useEffect(()=> {
+        document.title = "Resuma AI - Additional Info";
+    }, [])
 
     return (
         <div className="px-5 pt-5">

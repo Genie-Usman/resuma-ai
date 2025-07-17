@@ -7,6 +7,7 @@ const LanguageForm = ({ languages, updateArrayItem, addArrayItem, removeArrayIte
 
     // Ensure at least one language item exists
     useEffect(() => {
+        document.title = "Resuma AI - Languages & Interests Info";
         setResumeData((prev) => {
             const languageItems = prev.data.sections.languages.items || [];
             if (languageItems.length === 0) {

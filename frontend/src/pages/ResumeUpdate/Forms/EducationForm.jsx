@@ -7,6 +7,7 @@ const EducationForm = ({ education, updateArrayItem, addArrayItem, removeArrayIt
 
     // Ensure at least one education item exists
     useEffect(() => {
+        document.title = "Resuma AI - Education Info";
         setResumeData((prev) => {
             const educationItems = prev.data.sections.education.items || [];
             if (educationItems.length === 0) {
