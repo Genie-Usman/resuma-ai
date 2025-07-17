@@ -11,21 +11,12 @@ const geminiRoutes = require("./routes/geminiRoutes.js");
 const app = express();
 
 // Middleware to handle CORS
-const allowedOrigins = [
-  "http://localhost:5173", 
-  "https://resuma-ai.vercel.app/", 
-];
-
 app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
-      }
-    },
+    cors({
+        origin: [
+            "http://localhost:5173",
+            "https://resuma-ai.vercel.app"
+        ],
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
     })
@@ -47,7 +38,7 @@ app.use(
     "/uploads",
     express.static(path.join(__dirname, "uploads"), {
         setHeaders: (res, path) => {
-            res.set("Access-Control-Allow-Origin", "http://localhost:5173")
+            res.set("Access-Control-Allow-Origin", "https://resuma-ai.vercel.app/")
             res.set("Cross-Origin-Resource-Policy", "cross-origin");
         },
     })
