@@ -1,5 +1,5 @@
 // Function to generate Slugs
-export const slugify = (text) => {
+const slugify = (text) => {
   return text
     .toString()
     .toLowerCase()
@@ -8,3 +8,5 @@ export const slugify = (text) => {
     .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
     .replace(/\-\-+/g, '-');        // Replace multiple - with single -
 };
+
+module.exports = { slugify };

@@ -1,4 +1,4 @@
-export const getDefaultResumeData = (user = {}) => ({
+const getDefaultResumeData = (user = {}) => ({
   basics: {
     name: user.name || '',
     headline: '',
@@ -169,3 +169,5 @@ export const getDefaultResumeData = (user = {}) => ({
     notes: ''
   }
 });
+
+module.exports = { getDefaultResumeData };
