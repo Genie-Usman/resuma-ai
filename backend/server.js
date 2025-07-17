@@ -13,7 +13,10 @@ const app = express();
 // Middleware to handle CORS
 app.use(
     cors({
-        origin: process.env.CLIENT_URL || "*",
+        origin: [
+            "http://localhost:5173",
+            "https://resuma-ai.vercel.app/"
+        ],
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
     })
