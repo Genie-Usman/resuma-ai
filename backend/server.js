@@ -38,7 +38,7 @@ app.use(
     "/uploads",
     express.static(path.join(__dirname, "uploads"), {
         setHeaders: (res, path) => {
-            res.set("Access-Control-Allow-Origin", "https://resuma-ai.vercel.app/")
+            res.set("Access-Control-Allow-Origin", "https://resuma-ai.vercel.app")
             res.set("Cross-Origin-Resource-Policy", "cross-origin");
         },
     })
