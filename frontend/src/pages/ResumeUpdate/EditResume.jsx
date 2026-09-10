@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   LuPalette,
@@ -23,7 +23,6 @@ import { useResumeData } from "./hooks/useResumeData";
 import { useResumeExport } from "./hooks/useResumeExport";
 
 // Layout & UI
-import DashboardLayout from "../../components/layouts/DashboardLayout";
 import TitleInput from "../../components/Inputs/TitleInput";
 import Modal from "../../components/shared/Modal.jsx";
 import EditorSidebar from "./components/EditorSidebar.jsx";
@@ -106,6 +105,17 @@ const EditResume = () => {
     setOpenPreviewModal,
     handlePrint,
   } = useResumeExport(resumeDownloadRef, resumeData?.title);
+
+  // Memoized Theme Colors to prevent unneeded child canvas re-renders
+  const themeColorPalette = useMemo(() => [
+    resumeData?.data?.metadata?.theme?.background,
+    resumeData?.data?.metadata?.theme?.text,
+    resumeData?.data?.metadata?.theme?.primary,
+  ], [
+    resumeData?.data?.metadata?.theme?.background,
+    resumeData?.data?.metadata?.theme?.text,
+    resumeData?.data?.metadata?.theme?.primary,
+  ]);
 
   // Quick-add missing skill from Job Match analysis
   const handleAddMissingSkill = (skillName) => {
@@ -386,246 +396,231 @@ const EditResume = () => {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent"></div>
+      <div className="h-screen w-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin rounded-full h-10 w-10 border-3 border-purple-600 border-t-transparent"></div>
+          <span className="text-xs font-medium text-slate-500">Loading Resume Studio...</span>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
   return (
-    <DashboardLayout>
-      <div className="w-full">
-        {/* Top Studio Header Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white rounded-2xl border border-slate-200/90 py-2 px-3 sm:px-4 mb-4 shadow-xs">
-          {/* Left: Back + Title + Save Status */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="p-2 text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-colors cursor-pointer"
-              title="Back to Dashboard"
-            >
-              <LuArrowLeft className="text-lg" />
-            </button>
+    <div className="h-screen w-screen overflow-hidden flex flex-col bg-slate-100 font-sans">
+      {/* 1. Studio Top Navigation Bar (Single Sleek 56px Bar - Never Wraps!) */}
+      <header className="h-14 shrink-0 bg-white border-b border-slate-200/80 px-3 sm:px-5 flex items-center justify-between z-30 shadow-2xs">
+        {/* Left: Back + Title + Real-time Save Status */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="p-1.5 text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-colors cursor-pointer shrink-0"
+            title="Back to Dashboard"
+          >
+            <LuArrowLeft className="text-lg" />
+          </button>
 
-            <div className="flex items-center gap-2 min-w-0">
-              <TitleInput
-                title={resumeData.title}
-                setTitle={(value) => setResumeData((prev) => ({ ...prev, title: value }))}
-              />
+          <div className="h-4 w-px bg-slate-200 hidden sm:block shrink-0" />
 
-              {/* Real-time Save Status Badge */}
-              <div className="hidden sm:flex items-center text-[11px] px-2 py-0.5 rounded-full font-medium shrink-0">
-                {isSaving ? (
-                  <span className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60">
-                    <LuRefreshCw className="animate-spin text-xs" /> Saving...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
-                    <LuCheck className="text-xs" /> Saved
-                  </span>
-                )}
-              </div>
-            </div>
+          {/* Title with hover edit */}
+          <div className="flex items-center gap-2 min-w-0 max-w-[200px] sm:max-w-[300px] lg:max-w-[380px]">
+            <TitleInput
+              title={resumeData.title}
+              setTitle={(value) => setResumeData((prev) => ({ ...prev, title: value }))}
+            />
           </div>
 
-          {/* Center: Studio View Mode Switcher */}
-          <div className="hidden md:flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200 text-xs font-medium text-slate-600">
-            <button
-              type="button"
-              onClick={() => setViewMode("split")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                viewMode === "split"
-                  ? "bg-white text-purple-700 shadow-xs font-semibold"
-                  : "hover:text-slate-900"
-              }`}
-              title="Balanced side-by-side editing and live preview"
-            >
-              <LuColumns2 className="text-sm" />
-              <span>Split View</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setViewMode("edit")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                viewMode === "edit"
-                  ? "bg-white text-purple-700 shadow-xs font-semibold"
-                  : "hover:text-slate-900"
-              }`}
-              title="Expansive form writing without canvas distractions"
-            >
-              <LuPencil className="text-sm" />
-              <span>Editor Focus</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setViewMode("preview")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                viewMode === "preview"
-                  ? "bg-white text-purple-700 shadow-xs font-semibold"
-                  : "hover:text-slate-900"
-              }`}
-              title="Full-screen A4 document review and export"
-            >
-              <LuEye className="text-sm" />
-              <span>A4 Preview</span>
-            </button>
-          </div>
-
-          {/* Right: Studio Action Buttons */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Job Match */}
-            <button
-              type="button"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-xl shadow-xs transition-all cursor-pointer"
-              onClick={() => setOpenJobMatchModal(true)}
-              title="Analyze ATS match with a target job description"
-            >
-              <LuSparkles className="text-sm" />
-              <span className="hidden sm:inline">Job Match</span>
-            </button>
-
-            {/* Share */}
-            <button
-              type="button"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors cursor-pointer border border-purple-200/70"
-              onClick={() => setOpenShareModal(true)}
-              title="Share public link & view analytics"
-            >
-              <LuShare2 className="text-sm" />
-              <span className="hidden sm:inline">Share</span>
-            </button>
-
-            {/* Theme */}
-            <button
-              type="button"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200/80 rounded-xl transition-colors cursor-pointer"
-              onClick={() => setOpenThemeSelector(true)}
-              title="Change resume template and color palette"
-            >
-              <LuPalette className="text-sm" />
-              <span className="hidden sm:inline">Theme</span>
-            </button>
-
-            {/* Export PDF */}
-            <button
-              type="button"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors cursor-pointer border border-emerald-200/80"
-              onClick={() => setOpenPreviewModal(true)}
-              title="Open high-def ATS vector PDF export dialog"
-            >
-              <LuDownload className="text-sm" />
-              <span className="hidden sm:inline">Export PDF</span>
-            </button>
-
-            {/* Delete */}
-            <button
-              type="button"
-              className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
-              onClick={handleDeleteResume}
-              title="Delete this resume"
-            >
-              <LuTrash2 className="text-base" />
-            </button>
-
-            {/* Save */}
-            <button
-              type="button"
-              disabled={isSaving}
-              className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 text-xs md:text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-xl transition-colors shadow-xs cursor-pointer disabled:opacity-50"
-              onClick={handleQuickSave}
-            >
-              <LuSave className="text-sm" />
-              <span>{isSaving ? "Saving..." : "Save"}</span>
-            </button>
+          {/* Real-time Save Status Pill */}
+          <div className="hidden md:flex items-center text-[11px] font-medium shrink-0">
+            {isSaving ? (
+              <span className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/70">
+                <LuRefreshCw className="animate-spin text-xs" /> Saving...
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/70">
+                <LuCheck className="text-xs" /> Saved
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Studio Workspace by View Mode */}
-        <div className="w-full">
-          {viewMode === "split" && (
-            <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[calc(100vh-175px)]">
-              {/* Left Column: Section Navigation Sidebar */}
-              <div className="w-full lg:w-60 shrink-0 h-[280px] lg:h-full">
-                <EditorSidebar
-                  activePage={activePage}
-                  setActivePage={setActivePage}
-                  sections={resumeData.data?.sections || {}}
-                  layout={resumeData.data?.metadata?.layout || [[], []]}
-                  onToggleVisibility={toggleSectionVisibility}
-                  onReorderSections={reorderSections}
-                  onExportJson={handleExportJson}
-                  isSaving={isSaving}
-                />
-              </div>
+        {/* Center: View Switcher (Split | Form | Preview) */}
+        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/70 text-xs font-medium text-slate-600 shrink-0">
+          <button
+            type="button"
+            onClick={() => setViewMode("split")}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${
+              viewMode === "split"
+                ? "bg-white text-purple-700 shadow-xs font-semibold"
+                : "hover:text-slate-900"
+            }`}
+            title="Split: Side-by-side Form and Live Preview"
+          >
+            <LuColumns2 className="text-sm" />
+            <span className="hidden sm:inline">Split</span>
+          </button>
 
-              {/* Middle Column: Active Form Panel (Roomy 490px - 530px so text never clips!) */}
-              <div className="w-full lg:w-[490px] xl:w-[530px] shrink-0 h-[550px] lg:h-full bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 overflow-y-auto custom-scrollbar">
-                {renderForm()}
-              </div>
+          <button
+            type="button"
+            onClick={() => setViewMode("edit")}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${
+              viewMode === "edit"
+                ? "bg-white text-purple-700 shadow-xs font-semibold"
+                : "hover:text-slate-900"
+            }`}
+            title="Form: Focused editing panel"
+          >
+            <LuPencil className="text-sm" />
+            <span className="hidden sm:inline">Form</span>
+          </button>
 
-              {/* Right Column: Live A4 Resume Canvas with Page Break Guides & Height Calculation */}
-              <div className="flex-1 min-w-[360px] h-[600px] lg:h-full rounded-2xl overflow-hidden shadow-xs">
-                {resumeData?.data?.basics && (
-                  <ResumeCanvas
-                    resumeData={resumeData?.data}
-                    templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
-                    colorPalette={[
-                      resumeData?.data?.metadata?.theme?.background,
-                      resumeData?.data?.metadata?.theme?.text,
-                      resumeData?.data?.metadata?.theme?.primary,
-                    ]}
-                    canvasRef={resumeRef}
-                  />
-                )}
-              </div>
+          <button
+            type="button"
+            onClick={() => setViewMode("preview")}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${
+              viewMode === "preview"
+                ? "bg-white text-purple-700 shadow-xs font-semibold"
+                : "hover:text-slate-900"
+            }`}
+            title="Preview: Full A4 Canvas"
+          >
+            <LuEye className="text-sm" />
+            <span className="hidden sm:inline">Preview</span>
+          </button>
+        </div>
+
+        {/* Right: Studio Action Buttons (Single Row) */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* AI Job Match */}
+          <button
+            type="button"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-xl shadow-xs transition-all cursor-pointer"
+            onClick={() => setOpenJobMatchModal(true)}
+            title="Analyze ATS match with a target job description"
+          >
+            <LuSparkles className="text-xs" />
+            <span className="hidden lg:inline">Job Match</span>
+          </button>
+
+          {/* Theme */}
+          <button
+            type="button"
+            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 rounded-xl border border-slate-200/90 shadow-2xs transition-colors cursor-pointer"
+            onClick={() => setOpenThemeSelector(true)}
+            title="Change resume template and color palette"
+          >
+            <LuPalette className="text-xs text-slate-500" />
+            <span className="hidden xl:inline">Theme</span>
+          </button>
+
+          {/* Share */}
+          <button
+            type="button"
+            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100/70 rounded-xl border border-purple-200/70 transition-colors cursor-pointer"
+            onClick={() => setOpenShareModal(true)}
+            title="Share public link & track recruiter views"
+          >
+            <LuShare2 className="text-xs" />
+            <span className="hidden xl:inline">Share</span>
+          </button>
+
+          {/* Export PDF (Primary Action) */}
+          <button
+            type="button"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors cursor-pointer"
+            onClick={() => setOpenPreviewModal(true)}
+            title="Download high-definition ATS vector PDF"
+          >
+            <LuDownload className="text-xs" />
+            <span>Export PDF</span>
+          </button>
+
+          {/* Delete */}
+          <button
+            type="button"
+            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+            onClick={handleDeleteResume}
+            title="Delete this resume"
+          >
+            <LuTrash2 className="text-sm" />
+          </button>
+        </div>
+      </header>
+
+      {/* 2. Studio Workspace Body (Full Height: calc(100vh - 56px)) */}
+      <main className="flex-1 h-[calc(100vh-56px)] flex overflow-hidden">
+        {viewMode === "split" && (
+          <div className="w-full h-full flex overflow-hidden">
+            {/* Left: Section Navigation Sidebar */}
+            <div className="h-full shrink-0">
+              <EditorSidebar
+                activePage={activePage}
+                setActivePage={setActivePage}
+                sections={resumeData.data?.sections || {}}
+                layout={resumeData.data?.metadata?.layout || [[], []]}
+                onToggleVisibility={toggleSectionVisibility}
+                onReorderSections={reorderSections}
+                onExportJson={handleExportJson}
+                isSaving={isSaving}
+              />
             </div>
-          )}
 
-          {viewMode === "edit" && (
-            <div className="flex flex-col lg:flex-row gap-5 h-auto lg:h-[calc(100vh-175px)]">
-              {/* Left Column: Section Navigation Sidebar */}
-              <div className="w-full lg:w-64 shrink-0 h-[280px] lg:h-full">
-                <EditorSidebar
-                  activePage={activePage}
-                  setActivePage={setActivePage}
-                  sections={resumeData.data?.sections || {}}
-                  layout={resumeData.data?.metadata?.layout || [[], []]}
-                  onToggleVisibility={toggleSectionVisibility}
-                  onReorderSections={reorderSections}
-                  onExportJson={handleExportJson}
-                  isSaving={isSaving}
-                />
-              </div>
-
-              {/* Expansive Form Focus Panel */}
-              <div className="flex-1 h-full max-w-4xl bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 overflow-y-auto custom-scrollbar">
-                {renderForm()}
-              </div>
+            {/* Middle: Active Form Panel */}
+            <div className="w-[460px] lg:w-[490px] xl:w-[520px] shrink-0 h-full overflow-y-auto bg-white border-r border-slate-200/80 p-5 lg:p-6 custom-scrollbar">
+              {renderForm()}
             </div>
-          )}
 
-          {viewMode === "preview" && (
-            <div className="w-full max-w-5xl mx-auto h-[calc(100vh-175px)] rounded-2xl overflow-hidden shadow-xs">
+            {/* Right: Live A4 Resume Canvas (fills entire remaining space!) */}
+            <div className="flex-1 min-w-0 h-full overflow-hidden bg-slate-100 flex flex-col">
               {resumeData?.data?.basics && (
                 <ResumeCanvas
                   resumeData={resumeData?.data}
                   templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
-                  colorPalette={[
-                    resumeData?.data?.metadata?.theme?.background,
-                    resumeData?.data?.metadata?.theme?.text,
-                    resumeData?.data?.metadata?.theme?.primary,
-                  ]}
+                  colorPalette={themeColorPalette}
                   canvasRef={resumeRef}
                 />
               )}
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+        )}
+
+        {viewMode === "edit" && (
+          <div className="w-full h-full flex overflow-hidden">
+            {/* Left Sidebar */}
+            <div className="h-full shrink-0">
+              <EditorSidebar
+                activePage={activePage}
+                setActivePage={setActivePage}
+                sections={resumeData.data?.sections || {}}
+                layout={resumeData.data?.metadata?.layout || [[], []]}
+                onToggleVisibility={toggleSectionVisibility}
+                onReorderSections={reorderSections}
+                onExportJson={handleExportJson}
+                isSaving={isSaving}
+              />
+            </div>
+
+            {/* Expansive Form View */}
+            <div className="flex-1 h-full overflow-y-auto bg-slate-50/60 p-6 sm:p-10 flex justify-center custom-scrollbar">
+              <div className="w-full max-w-3xl bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8">
+                {renderForm()}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {viewMode === "preview" && (
+          <div className="w-full h-full overflow-hidden bg-slate-100 flex flex-col">
+            {resumeData?.data?.basics && (
+              <ResumeCanvas
+                resumeData={resumeData?.data}
+                templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
+                colorPalette={themeColorPalette}
+                canvasRef={resumeRef}
+              />
+            )}
+          </div>
+        )}
+      </main>
 
       {/* Theme Selector Modal */}
       <Modal
@@ -712,7 +707,7 @@ const EditResume = () => {
         onClose={() => setOpenShareModal(false)}
         resume={resumeData}
       />
-    </DashboardLayout>
+    </div>
   );
 };
 

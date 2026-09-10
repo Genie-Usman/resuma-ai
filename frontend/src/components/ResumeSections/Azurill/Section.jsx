@@ -5,7 +5,7 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
   if (!section.visible || section.items.length === 0) return null;
 
   return (
-    <section id={section.id} className="grid">
+    <section id={section.id} className="grid min-w-0 break-words">
 
       {/* Main Name */}
       <div className="mb-2 hidden font-bold group-[.main]:block" style={{ color: themeColors[2] }}>
@@ -24,8 +24,8 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
 
       {/* Sidebar & Main Section */}
       <div
-        className="grid gap-x-6 gap-y-3 group-[.sidebar]:mx-auto group-[.sidebar]:text-center"
-        style={{ gridTemplateColumns: `repeat(${section.columns}, 1fr)` }}
+        className="grid gap-x-6 gap-y-3 min-w-0 group-[.sidebar]:mx-auto group-[.sidebar]:text-center"
+        style={{ gridTemplateColumns: `repeat(${section.columns || 1}, minmax(0, 1fr))` }}
       >
         {section.items
           .filter((item) => item.visible !== false)
@@ -54,7 +54,7 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
             return (
               <div
                 key={item.id || `${section.id}-${index}`}
-                className={`relative space-y-2 group-[.main]:border-l group-[.main]:pl-4 ${className || ''}`}
+                className={`relative space-y-2 min-w-0 break-words group-[.main]:border-l group-[.main]:pl-4 ${className || ''}`}
                 style={{ color: themeColors[2] }}
               >
                 <div>{children?.(item)}</div>

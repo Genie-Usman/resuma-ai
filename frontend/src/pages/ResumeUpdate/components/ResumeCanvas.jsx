@@ -208,25 +208,29 @@ const ResumeCanvas = ({
 
       {/* Main Canvas Scroll Area with Studio Pattern Backdrop */}
       <div className="flex-1 overflow-auto p-4 sm:p-6 flex justify-center items-start custom-scrollbar studio-canvas-pattern">
-        {/* Scaled Layout Wrapper (ensures correct scrollable dimensions) */}
-        <div
-          style={{
-            width: `${A4_WIDTH_PX * zoom}px`,
-            minHeight: `${Math.max(A4_HEIGHT_PX, totalHeight) * zoom}px`,
-            transition: "width 0.15s ease-out, min-height 0.15s ease-out",
-          }}
-          className="relative flex justify-center"
-        >
-          {/* Continuous View: Single A4 Sheet with Overlaid Page Break Guides */}
-          {viewMode === "continuous" && (
+        {/* Continuous View: Single Scaled Document Sheet */}
+        {viewMode === "continuous" && (
+          <div
+            style={{
+              width: `${Math.round(A4_WIDTH_PX * zoom)}px`,
+              height: `${Math.round(pageCount * A4_HEIGHT_PX * zoom)}px`,
+              position: "relative",
+              transition: "width 0.15s ease-out, height 0.15s ease-out",
+            }}
+            className="shrink-0 mb-12 shadow-2xl ring-1 ring-black/10 rounded-xs bg-white overflow-hidden"
+          >
             <div
               ref={canvasRef}
               style={{
-                transform: `scale(${zoom})`,
-                transformOrigin: "top center",
+                position: "absolute",
+                top: 0,
+                left: 0,
                 width: `${A4_WIDTH_PX}px`,
+                minHeight: `${pageCount * A4_HEIGHT_PX}px`,
+                transform: `scale(${zoom})`,
+                transformOrigin: "top left",
               }}
-              className="a4-paper-sheet relative shadow-2xl ring-1 ring-black/5 rounded-xs transition-transform duration-150 origin-top bg-white"
+              className="a4-paper-sheet bg-white"
             >
               {/* Overlaid Visual Page Break Lines */}
               {showGuides &&
@@ -256,17 +260,30 @@ const ResumeCanvas = ({
                 )}
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Paginated Cards View: Visually Demarcated Page Sheets */}
-          {viewMode === "cards" && (
+        {/* Paginated Cards View: Visually Demarcated Page Sheets */}
+        {viewMode === "cards" && (
+          <div
+            style={{
+              width: `${Math.round(A4_WIDTH_PX * zoom)}px`,
+              height: `${Math.round((pageCount * A4_HEIGHT_PX + (pageCount - 1) * 24) * zoom)}px`,
+              position: "relative",
+              transition: "width 0.15s ease-out, height 0.15s ease-out",
+            }}
+            className="shrink-0 mb-12"
+          >
             <div
               style={{
-                transform: `scale(${zoom})`,
-                transformOrigin: "top center",
+                position: "absolute",
+                top: 0,
+                left: 0,
                 width: `${A4_WIDTH_PX}px`,
+                transform: `scale(${zoom})`,
+                transformOrigin: "top left",
               }}
-              className="flex flex-col gap-6 origin-top"
+              className="flex flex-col gap-6"
             >
               {Array.from({ length: pageCount }).map((_, pageIdx) => (
                 <div
@@ -301,8 +318,8 @@ const ResumeCanvas = ({
                 </div>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

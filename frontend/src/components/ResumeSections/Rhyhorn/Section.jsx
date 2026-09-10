@@ -8,8 +8,8 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
             <h4 className="mb-2 border-b pb-0.5 text-sm font-bold" style={{ color: themeColors[1] }}>{section.name}</h4>
 
             <div
-                className="grid gap-x-6 gap-y-3"
-                style={{ gridTemplateColumns: `repeat(${section.columns}, 1fr)` }}
+                className="grid gap-x-6 gap-y-3 min-w-0"
+                style={{ gridTemplateColumns: `repeat(${section.columns || 1}, minmax(0, 1fr))` }}
             >
                 {section.items
                     .filter((item) => item.visible !== false)

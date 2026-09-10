@@ -1,4 +1,5 @@
-import Azurill from './Azurill'
+import { useMemo } from 'react';
+import Azurill from './Azurill';
 import Bronzor from './Bronzor';
 import Chikorita from './Chikorita';
 import Ditto from './Ditto';
@@ -10,6 +11,7 @@ import Nosepass from './Nosepass';
 import Onyx from './Onyx';
 import Pikachu from './Pikachu';
 import Rhyhorn from './Rhyhorn';
+import { normalizeLayout } from '../../utils/layoutUtils';
 
 const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) => {
   const data = resumeData?.data || resumeData || {};
@@ -19,14 +21,22 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
     return <div>No resume data found</div>;
   }
 
-  const themeColors = colorPalette?.length
-    ? colorPalette
-    : [metadata.theme?.background, metadata.theme?.text, metadata.theme?.primary];
+  const themeColors = useMemo(() => {
+    return colorPalette?.length
+      ? colorPalette
+      : [metadata.theme?.background, metadata.theme?.text, metadata.theme?.primary];
+  }, [colorPalette, metadata.theme?.background, metadata.theme?.text, metadata.theme?.primary]);
+
+  // Self-healing layout normalization: guarantees [ [ col0, col1 ] ] for all templates
+  const safeMetadata = useMemo(() => ({
+    ...metadata,
+    layout: normalizeLayout(metadata?.layout, sections),
+  }), [metadata, sections]);
 
   const sharedProps = {
     basics,
     sections,
-    metadata,
+    metadata: safeMetadata,
     isFirstPage: true,
     containerWidth,
     colorPalette: themeColors

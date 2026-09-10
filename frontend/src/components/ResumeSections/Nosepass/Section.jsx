@@ -88,8 +88,8 @@ const Section = ({ section, children, urlKey, dateKey, summaryKey, keywordsKey, 
             ) : (
                 <div className="grid grid-cols-4 gap-x-6 mt-2">
                     <div
-                        className="col-span-3 col-start-2 grid gap-x-6 gap-y-3"
-                        style={{ gridTemplateColumns: `repeat(${section.columns}, 1fr)` }}
+                        className="col-span-3 col-start-2 grid gap-x-6 gap-y-3 min-w-0"
+                        style={{ gridTemplateColumns: `repeat(${section.columns || 1}, minmax(0, 1fr))` }}
                     >
                         {section.items
                             .filter(item => item.visible !== false)

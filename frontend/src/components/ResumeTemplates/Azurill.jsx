@@ -87,15 +87,15 @@ const Azurill = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
                 <ResumeHeader basics={basics} themeColors={themeColors} />
             )}
 
-            <div className="grid grid-cols-3 gap-x-4">
-                <aside className="sidebar group space-y-4">
+            <div className="grid grid-cols-3 gap-x-5 min-w-0">
+                <aside className="sidebar group space-y-4 col-span-1 min-w-0 break-words">
                     {sidebarIds.map((key) =>
                         mapSectionToComponent(key, sections[key], key, themeColors)
                     )}
                 </aside>
 
                 <main
-                    className={`main group space-y-4 ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"
+                    className={`main group space-y-4 min-w-0 break-words ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"
                         }`}
                 >
                     {mainIds.map((key) =>

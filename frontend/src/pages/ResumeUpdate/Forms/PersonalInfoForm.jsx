@@ -19,33 +19,28 @@ const PersonalInfoForm = ({ profileData, updateSection }) => {
       </div>
 
       {/* Profile Photo */}
-      <div className="flex flex-col items-center justify-center p-3.5 bg-slate-50/70 border border-slate-200/80 rounded-2xl">
-        <ProfilePhotoSelector
-          image={profileData?.picture?.url || ""}
-          setImage={(value) =>
-            updateSection("picture", {
-              ...profileData?.picture,
-              url: value,
-            })
-          }
-          preview={profileData?.picture?.url || ""}
-          setPreview={(value) =>
-            updateSection("picture", {
-              ...profileData?.picture,
-              url: value,
-            })
-          }
-          onImageUploaded={(url) =>
-            updateSection("picture", {
-              ...profileData?.picture,
-              url,
-            })
-          }
-        />
-        <span className="text-[11px] text-slate-400 mt-2">
-          Recommended: square JPG or PNG, under 5 MB
-        </span>
-      </div>
+      <ProfilePhotoSelector
+        image={profileData?.picture?.url || ""}
+        setImage={(value) =>
+          updateSection("picture", {
+            ...profileData?.picture,
+            url: value,
+          })
+        }
+        preview={profileData?.picture?.url || ""}
+        setPreview={(value) =>
+          updateSection("picture", {
+            ...profileData?.picture,
+            url: value,
+          })
+        }
+        onImageUploaded={(url) =>
+          updateSection("picture", {
+            ...profileData?.picture,
+            url,
+          })
+        }
+      />
 
       {/* Main Details Form */}
       <div className="space-y-4">

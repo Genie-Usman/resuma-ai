@@ -5,6 +5,7 @@ import { getDefaultResumeData } from "../../../utils/DefaultResume";
 import { captureElementAsImage, dataURLToFile, fixTailwindColors, waitForImageToLoad } from "../../../utils/helper";
 import uploadImage from "../../../utils/uploadImage";
 import toast from "react-hot-toast";
+import { reorderLayoutColumns } from "../../../utils/layoutUtils";
 
 export const useResumeData = (resumeId) => {
   const [resumeData, setResumeData] = useState(getDefaultResumeData());
@@ -161,13 +162,13 @@ export const useResumeData = (resumeId) => {
   }, []);
 
   // Reorder Sections in metadata.layout (Drag-and-Drop)
-  const reorderSections = useCallback((newSectionOrder, columnIndex = 0) => {
+  const reorderSections = useCallback((newSectionOrder) => {
     setResumeData((prev) => {
-      const currentLayout = Array.isArray(prev.data.metadata.layout)
-        ? [...prev.data.metadata.layout]
-        : [[], []];
-
-      currentLayout[columnIndex] = newSectionOrder;
+      const updatedLayout = reorderLayoutColumns(
+        prev.data?.metadata?.layout,
+        newSectionOrder,
+        prev.data?.sections
+      );
 
       return {
         ...prev,
@@ -175,7 +176,7 @@ export const useResumeData = (resumeId) => {
           ...prev.data,
           metadata: {
             ...prev.data.metadata,
-            layout: currentLayout,
+            layout: updatedLayout,
           },
         },
       };

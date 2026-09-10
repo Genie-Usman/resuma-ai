@@ -4,14 +4,14 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
     if (!section.visible || section.items.length === 0) return null;
 
     return (
-        <section id={section.id} className="grid">
+        <section id={section.id} className="grid min-w-0 break-words">
             <h4 className="mb-2 text-base font-bold" style={{ color: themeColors[1] }}>
                 {section.name}
             </h4>
 
             <div
-                className="grid gap-x-6 gap-y-3"
-                style={{ gridTemplateColumns: `repeat(${section.columns}, 1fr)` }}
+                className="grid gap-x-6 gap-y-3 min-w-0"
+                style={{ gridTemplateColumns: `repeat(${section.columns || 1}, minmax(0, 1fr))` }}
             >
                 {section.items
                     .filter((item) => item.visible !== false)

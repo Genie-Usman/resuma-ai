@@ -23,8 +23,8 @@ const SortableSectionItem = ({
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
+    transition: isDragging ? "none" : transition,
+    opacity: isDragging ? 0.6 : 1,
     zIndex: isDragging ? 50 : 1,
   };
 
@@ -34,7 +34,7 @@ const SortableSectionItem = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group flex items-center justify-between px-3 py-2 rounded-xl border text-sm transition-all select-none cursor-pointer ${
+      className={`group flex items-center justify-between px-3 py-2 rounded-xl border text-sm transition-colors select-none cursor-pointer ${
         isActive
           ? "bg-purple-50/80 border-purple-500 text-purple-950 font-semibold shadow-xs ring-1 ring-purple-500/20"
           : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70 text-slate-700"
@@ -42,24 +42,35 @@ const SortableSectionItem = ({
       onClick={onSelect}
     >
       {/* Left: Drag Handle + Icon + Label */}
-      <div className="flex items-center gap-2.5 min-w-0">
+      <div className="flex items-center gap-2 flex-1 min-w-0">
         {/* Drag handle */}
         <button
           type="button"
           {...attributes}
           {...listeners}
-          className="text-gray-400 hover:text-purple-600 cursor-grab active:cursor-grabbing p-0.5 rounded touch-none"
+          className="text-slate-400 hover:text-purple-600 cursor-grab active:cursor-grabbing p-0.5 rounded touch-none shrink-0"
           onClick={(e) => e.stopPropagation()}
           title="Drag to reorder"
         >
-          <LuGripVertical className="text-base" />
+          <LuGripVertical className="text-sm" />
         </button>
 
         {/* Section Icon */}
-        {Icon && <Icon className={`text-base flex-shrink-0 ${isActive ? "text-purple-600" : "text-gray-500"}`} />}
+        {Icon && (
+          <Icon
+            className={`text-sm shrink-0 ${
+              isActive ? "text-purple-600" : "text-slate-500"
+            }`}
+          />
+        )}
 
         {/* Section Name */}
-        <span className="text-sm font-medium truncate capitalize">
+        <span
+          className={`text-xs font-medium truncate capitalize ${
+            isActive ? "text-purple-950 font-semibold" : "text-slate-700"
+          }`}
+          title={section?.name || id}
+        >
           {section?.name || id}
         </span>
       </div>
