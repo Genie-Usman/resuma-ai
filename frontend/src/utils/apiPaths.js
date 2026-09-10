@@ -23,5 +23,7 @@ export const API_PATHS = {
 
     GEMINI: {
         GENERATE_ITEM_SUMMARY: "/api/gemini/generate-item-summary",
+        JOB_MATCH: "/api/gemini/job-match",
+        IMPROVE_BULLET: "/api/gemini/improve-bullet-point",
     },
 };

@@ -29,6 +29,7 @@ import {
   LuDownload,
   LuSave,
   LuEye,
+  LuTarget,
 } from "react-icons/lu";
 import SortableSectionItem from "./SortableSectionItem";
 
@@ -73,6 +74,7 @@ const EditorSidebar = ({
   onSave,
   onOpenTheme,
   onOpenPreview,
+  onOpenJobMatch,
   onDownload,
   isSaving,
 }) => {
@@ -168,6 +170,16 @@ const EditorSidebar = ({
 
       {/* Bottom Actions */}
       <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
+        <button
+          type="button"
+          onClick={onOpenJobMatch}
+          className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-white bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-lg transition-all shadow-xs cursor-pointer"
+          title="Analyze ATS match against a job description"
+        >
+          <LuTarget className="text-sm" />
+          <span>ATS Job Match Analyzer</span>
+        </button>
+
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"

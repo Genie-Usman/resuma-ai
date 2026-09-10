@@ -7,6 +7,22 @@ const generateSummarySchema = z.object({
     })
 });
 
+const jobMatchSchema = z.object({
+    jobDescription: z.string().min(20, "Job description must be at least 20 characters long"),
+    resumeData: z.record(z.any()).refine((val) => typeof val === "object" && val !== null, {
+        message: "Resume data is required"
+    })
+});
+
+const improveBulletSchema = z.object({
+    text: z.string().min(3, "Text must be at least 3 characters long"),
+    tone: z.enum(["formal", "impactful", "concise", "technical"]).default("impactful"),
+    context: z.record(z.any()).optional()
+});
+
 module.exports = {
-    generateSummarySchema
+    generateSummarySchema,
+    jobMatchSchema,
+    improveBulletSchema
 };
+

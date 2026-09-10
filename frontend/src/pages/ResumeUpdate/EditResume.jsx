@@ -8,6 +8,7 @@ import {
   LuDownload,
   LuArrowLeft,
   LuInfo,
+  LuTarget,
 } from "react-icons/lu";
 import toast from "react-hot-toast";
 
@@ -21,6 +22,7 @@ import TitleInput from "../../components/Inputs/TitleInput";
 import Modal from "../../components/shared/Modal.jsx";
 import EditorSidebar from "./components/EditorSidebar.jsx";
 import ResumeCanvas from "./components/ResumeCanvas.jsx";
+import JobMatchModal from "./components/JobMatchModal.jsx";
 import ThemeSelector from "./ThemeSelector.jsx";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
 import { RESUME_TEMPLATES } from "../../constants";
@@ -67,6 +69,7 @@ const EditResume = () => {
 
   const [activePage, setActivePage] = useState("personal-info");
   const [newProfileImageFile, setNewProfileImageFile] = useState(null);
+  const [openJobMatchModal, setOpenJobMatchModal] = useState(false);
 
   // Modular Hooks
   const {
@@ -92,6 +95,59 @@ const EditResume = () => {
     setOpenPreviewModal,
     handlePrint,
   } = useResumeExport(resumeDownloadRef, resumeData?.title);
+
+  // Quick-add missing skill from Job Match analysis
+  const handleAddMissingSkill = (skillName) => {
+    setResumeData((prev) => {
+      const skillsSection = prev.data?.sections?.skills || { items: [] };
+      const currentItems = skillsSection.items || [];
+
+      if (currentItems.length > 0) {
+        const firstCategory = currentItems[0];
+        const existingKeywords = firstCategory.keywords || "";
+        const updatedKeywords = existingKeywords
+          ? `${existingKeywords}, ${skillName}`
+          : skillName;
+
+        const updatedItems = [...currentItems];
+        updatedItems[0] = { ...firstCategory, keywords: updatedKeywords };
+
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            sections: {
+              ...prev.data.sections,
+              skills: {
+                ...skillsSection,
+                items: updatedItems,
+              },
+            },
+          },
+        };
+      } else {
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            sections: {
+              ...prev.data.sections,
+              skills: {
+                ...skillsSection,
+                items: [
+                  {
+                    name: "Core Skills",
+                    keywords: skillName,
+                    level: 4,
+                  },
+                ],
+              },
+            },
+          },
+        };
+      }
+    });
+  };
 
   // Delete Resume
   const handleDeleteResume = async () => {
@@ -311,6 +367,16 @@ const EditResume = () => {
           <div className="flex items-center gap-2">
             <button
               type="button"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs md:text-sm font-semibold text-white bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-lg shadow-sm transition-all cursor-pointer"
+              onClick={() => setOpenJobMatchModal(true)}
+              title="Analyze ATS match with a target job description"
+            >
+              <LuTarget className="text-base" />
+              <span className="hidden sm:inline">Job Match</span>
+            </button>
+
+            <button
+              type="button"
               className="flex items-center gap-1.5 px-3 py-2 text-xs md:text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors cursor-pointer"
               onClick={() => setOpenThemeSelector(true)}
             >
@@ -362,6 +428,7 @@ const EditResume = () => {
               onSave={handleQuickSave}
               onOpenTheme={() => setOpenThemeSelector(true)}
               onOpenPreview={() => setOpenPreviewModal(true)}
+              onOpenJobMatch={() => setOpenJobMatchModal(true)}
               onDownload={handlePrint}
               isSaving={isSaving}
             />
@@ -460,6 +527,14 @@ const EditResume = () => {
           </div>
         </div>
       </Modal>
+
+      {/* ATS Job Match Analyzer Modal */}
+      <JobMatchModal
+        isOpen={openJobMatchModal}
+        onClose={() => setOpenJobMatchModal(false)}
+        resumeData={resumeData}
+        onAddSkill={handleAddMissingSkill}
+      />
     </DashboardLayout>
   );
 };
