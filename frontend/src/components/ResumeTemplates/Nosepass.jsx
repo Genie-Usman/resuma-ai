@@ -57,9 +57,11 @@ const Nosepass = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fal
     const [scale, setScale] = useState(1);
 
     useEffect(() => {
-        const actualBaseWidth = resumeRef.current.offsetWidth;
-        setBaseWidth(actualBaseWidth);
-        setScale(containerWidth / actualBaseWidth);
+        if (resumeRef.current) {
+            const actualBaseWidth = resumeRef.current.offsetWidth;
+            setBaseWidth(actualBaseWidth);
+            setScale(containerWidth / actualBaseWidth);
+        }
     }, [containerWidth]);
 
     const [layout] = Array.isArray(metadata.layout) ? metadata.layout : [[]];

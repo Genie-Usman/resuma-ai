@@ -25,6 +25,7 @@ import { useResumeExport } from "./hooks/useResumeExport";
 // Layout & UI
 import TitleInput from "../../components/Inputs/TitleInput";
 import Modal from "../../components/shared/Modal.jsx";
+import ConfirmModal from "../../components/shared/ConfirmModal.jsx";
 import EditorSidebar from "./components/EditorSidebar.jsx";
 import ResumeCanvas from "./components/ResumeCanvas.jsx";
 import JobMatchModal from "./components/JobMatchModal.jsx";
@@ -79,6 +80,8 @@ const EditResume = () => {
   const [newProfileImageFile, setNewProfileImageFile] = useState(null);
   const [openJobMatchModal, setOpenJobMatchModal] = useState(false);
   const [openShareModal, setOpenShareModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [viewMode, setViewMode] = useState("split"); // "split" | "edit" | "preview"
 
   // Modular Hooks
@@ -171,12 +174,12 @@ const EditResume = () => {
   };
 
   // Delete Resume
-  const handleDeleteResume = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this resume? This action cannot be undone."
-    );
-    if (!confirmDelete) return;
+  const handleDeleteResume = () => {
+    setOpenDeleteModal(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
     try {
       await axiosInstance.delete(API_PATHS.RESUME.DELETE(resumeId));
       toast.success("Resume deleted successfully");
@@ -184,6 +187,9 @@ const EditResume = () => {
     } catch (error) {
       console.error("Delete resume error:", error);
       toast.error(error.response?.data?.message || "Failed to delete resume");
+    } finally {
+      setIsDeleting(false);
+      setOpenDeleteModal(false);
     }
   };
 
@@ -706,6 +712,19 @@ const EditResume = () => {
         isOpen={openShareModal}
         onClose={() => setOpenShareModal(false)}
         resume={resumeData}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={openDeleteModal}
+        onClose={() => !isDeleting && setOpenDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Resume"
+        message={`Are you sure you want to delete "${resumeData?.title || "this resume"}"? This action is permanent and cannot be undone.`}
+        confirmText="Delete Resume"
+        cancelText="Cancel"
+        isLoading={isDeleting}
+        isDestructive={true}
       />
     </div>
   );

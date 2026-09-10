@@ -14,6 +14,7 @@ import DashboardLayout from "../../components/layouts/DashboardLayout";
 import ResumeSummaryCard from "../../components/Cards/ResumeSummaryCard";
 import CreateResumeForm from "./CreateResumeForm";
 import Modal from "../../components/shared/Modal";
+import ConfirmModal from "../../components/shared/ConfirmModal";
 import ShareModal from "../ResumeUpdate/components/ShareModal";
 
 const Dashboard = () => {
@@ -22,6 +23,8 @@ const Dashboard = () => {
 
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [selectedShareResume, setSelectedShareResume] = useState(null);
+  const [resumeToDelete, setResumeToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [allResumes, setAllResumes] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isImporting, setIsImporting] = useState(false);
@@ -59,18 +62,25 @@ const Dashboard = () => {
     }
   };
 
-  // Delete Resume Handler
-  const handleDeleteResume = async (resumeId, title) => {
-    const confirm = window.confirm(`Are you sure you want to delete "${title || "this resume"}"?`);
-    if (!confirm) return;
+  // Delete Resume Trigger
+  const handleDeleteResume = (resumeId, title) => {
+    setResumeToDelete({ id: resumeId, title });
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!resumeToDelete) return;
+
+    setIsDeleting(true);
     try {
-      await axiosInstance.delete(API_PATHS.RESUME.DELETE(resumeId));
+      await axiosInstance.delete(API_PATHS.RESUME.DELETE(resumeToDelete.id));
       toast.success("Resume deleted");
       fetchAllResumes();
     } catch (error) {
       console.error("Failed to delete resume:", error);
       toast.error(error.response?.data?.message || "Failed to delete resume");
+    } finally {
+      setIsDeleting(false);
+      setResumeToDelete(null);
     }
   };
 
@@ -182,6 +192,19 @@ const Dashboard = () => {
         isOpen={!!selectedShareResume}
         onClose={() => setSelectedShareResume(null)}
         resume={selectedShareResume}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!resumeToDelete}
+        onClose={() => !isDeleting && setResumeToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Resume"
+        message={`Are you sure you want to delete "${resumeToDelete?.title || "this resume"}"? This action cannot be undone.`}
+        confirmText="Delete Resume"
+        cancelText="Cancel"
+        isLoading={isDeleting}
+        isDestructive={true}
       />
     </DashboardLayout>
   );

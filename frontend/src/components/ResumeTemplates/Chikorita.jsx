@@ -60,9 +60,11 @@ const Chikorita = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fa
     const [scale, setScale] = useState(1);
 
     useEffect(() => {
-        const actualBaseWidth = resumeRef.current.offsetWidth;
-        setBaseWidth(actualBaseWidth);
-        setScale(containerWidth / actualBaseWidth);
+        if (resumeRef.current) {
+            const actualBaseWidth = resumeRef.current.offsetWidth;
+            setBaseWidth(actualBaseWidth);
+            setScale(containerWidth / actualBaseWidth);
+        }
     }, [containerWidth]);
 
     const [layout] = Array.isArray(metadata.layout) ? metadata.layout : [[]];
@@ -72,7 +74,7 @@ const Chikorita = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fa
     return (
         <div
             ref={resumeRef}
-            className="grid min-h-[inherit] grid-cols-3"
+            className="grid min-h-0 print:min-h-0 grid-cols-3"
             style={{
                 backgroundColor: themeColors[0],
                 color: themeColors[1],

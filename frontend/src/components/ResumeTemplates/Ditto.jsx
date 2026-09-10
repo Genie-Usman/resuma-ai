@@ -59,9 +59,11 @@ const Ditto = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false,
     const [scale, setScale] = useState(1);
 
     useEffect(() => {
-        const actualBaseWidth = resumeRef.current.offsetWidth;
-        setBaseWidth(actualBaseWidth);
-        setScale(containerWidth / actualBaseWidth);
+        if (resumeRef.current) {
+            const actualBaseWidth = resumeRef.current.offsetWidth;
+            setBaseWidth(actualBaseWidth);
+            setScale(containerWidth / actualBaseWidth);
+        }
     }, [containerWidth]);
 
     const [layout] = Array.isArray(metadata.layout) ? metadata.layout : [[]];
@@ -71,7 +73,7 @@ const Ditto = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false,
     return (
         <div
             ref={resumeRef}
-            className="space-y-3 min-h-[800px]"
+            className="space-y-3 min-h-0 print:min-h-0"
             style={{
                 backgroundColor: themeColors[0],
                 color: themeColors[1],

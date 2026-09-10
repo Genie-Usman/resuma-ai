@@ -73,7 +73,7 @@ const Azurill = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
     return (
         <div
             ref={resumeRef}
-            className="p-5 space-y-3 min-h-[800px]"
+            className="p-5 space-y-3 min-h-0 print:min-h-0"
             style={{
                 backgroundColor: themeColors[0],
                 color: themeColors[1],

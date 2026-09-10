@@ -4,13 +4,13 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
     if (!section.visible || section.items.length === 0) return null;
 
     return (
-        <section id={section.id} className="grid grid-cols-5 border-t pt-2.5">
-            <div>
+        <section id={section.id} className="grid grid-cols-5 border-t pt-2.5 bronzor-section">
+            <div className="bronzor-section-title">
                 <h4 className="text-base font-bold" style={{ color: themeColors[1] }}>{section.name}</h4>
             </div>
 
             <div
-                className="col-span-4 grid gap-x-6 gap-y-3 min-w-0"
+                className="col-span-4 grid gap-x-6 gap-y-3 min-w-0 bronzor-section-content"
                 style={{ gridTemplateColumns: `repeat(${section.columns || 1}, minmax(0, 1fr))` }}
             >
                 {section.items

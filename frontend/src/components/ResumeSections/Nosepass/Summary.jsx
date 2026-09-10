@@ -6,12 +6,12 @@ const Summary = ({ section, themeColors }) => {
     }
 
     return (
-        <section id={section.id} className="grid grid-cols-4 gap-x-6">
-            <div className="text-right">
+        <section id={section.id} className="grid grid-cols-4 gap-x-6 nosepass-summary-section">
+            <div className="text-right nosepass-summary-title">
                 <h4 className="font-medium" style={{ color: themeColors[2] }}>{section.name}</h4>
             </div>
 
-            <div className="col-span-3">
+            <div className="col-span-3 nosepass-summary-content">
                 <div className="relative">
                     <hr className="mt-3 pb-3" style={{ borderColor: themeColors[2] }} />
                     <div

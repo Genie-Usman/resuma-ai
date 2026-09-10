@@ -30,9 +30,9 @@ const Section = ({ section, children, urlKey, dateKey, summaryKey, keywordsKey, 
     );
 
     return (
-        <section id={section.id} className={`grid${dateKey ? " gap-y-6" : ""}`}>
+        <section id={section.id} className={`grid${dateKey ? " gap-y-6" : ""} nosepass-section`}>
             {/* Section Title Row */}
-            <div className="grid grid-cols-4 gap-x-6 items-start">
+            <div className="grid grid-cols-4 gap-x-6 items-start nosepass-title-row">
                 <div className="text-right pt-1">
                     <h4 className="font-medium" style={{ color: themeColors[2] }}>
                         {section.name}
@@ -71,7 +71,7 @@ const Section = ({ section, children, urlKey, dateKey, summaryKey, keywordsKey, 
                             return (
                                 <div
                                     key={item.id || `${section.id}-${index}`}
-                                    className="col-span-4 grid grid-cols-4 gap-x-6"
+                                    className="col-span-4 grid grid-cols-4 gap-x-6 nosepass-item"
                                     style={{ color: themeColors[1] }}
                                 >
                                     <div className="text-right font-medium" style={{ color: themeColors[2] }}>
@@ -107,7 +107,7 @@ const Section = ({ section, children, urlKey, dateKey, summaryKey, keywordsKey, 
                                 return (
                                     <div
                                         key={item.id || `${section.id}-${index}`}
-                                        className="space-y-1"
+                                        className="space-y-1 nosepass-item"
                                         style={{ color: themeColors[1] }}
                                     >
                                         {children?.(item)}

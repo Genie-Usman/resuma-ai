@@ -13,7 +13,7 @@ const Summary = ({ section, themeColors }) => {
       </div>
 
       {/* Main Content */}
-      <main className="relative space-y-2 border-l pl-4" style={{ color: themeColors[2] }}>
+      <div className="relative space-y-2 border-l pl-4" style={{ color: themeColors[2] }}>
         {/* Decorative dot on left */}
         <div
           className="absolute left-[-4.5px] top-[8px] size-[8px] rounded-full"
@@ -25,7 +25,7 @@ const Summary = ({ section, themeColors }) => {
           style={{ columns: section.columns || 1, color: themeColors[1] }}
           className="wysiwyg"
         />
-      </main>
+      </div>
     </section>
   );
 };
