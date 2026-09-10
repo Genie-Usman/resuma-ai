@@ -4,7 +4,8 @@ const {
   getUserResumes,
   getResumeById,
   updateResume,
-  deleteResume
+  deleteResume,
+  duplicateResume
 } = require("../controllers/resumeController");
 
 const { uploadResumeImages } = require("../controllers/uploadImages");
@@ -20,6 +21,7 @@ const router = express.Router();
 router.post("/", protect, validateRequest(createResumeSchema), createResume);
 router.get("/", protect, getUserResumes);
 router.get("/:id", protect, getResumeById);
+router.post("/:id/duplicate", protect, duplicateResume);
 router.put("/:id", protect, validateRequest(updateResumeSchema), updateResume);
 router.delete("/:id", protect, deleteResume);
 

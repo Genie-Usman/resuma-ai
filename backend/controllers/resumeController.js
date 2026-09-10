@@ -137,4 +137,44 @@ const deleteResume = async (req, res) => {
   }
 };
 
-module.exports = { createResume, getUserResumes, getResumeById, updateResume, deleteResume };
+// @desc    Duplicate an existing Resume
+// @route   POST /api/resumes/:id/duplicate
+// @access  Private
+const duplicateResume = async (req, res) => {
+  try {
+    const originalResume = await Resume.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+    });
+
+    if (!originalResume) {
+      return res.status(404).json({ message: "Resume not found or unauthorized" });
+    }
+
+    const newTitle = `${originalResume.title} (Copy)`;
+    const baseSlug = slugify(newTitle);
+    let slug = baseSlug;
+    let count = 1;
+    while (await Resume.findOne({ userId: req.user._id, slug })) {
+      slug = `${baseSlug}-${count++}`;
+    }
+
+    // Deep clone data
+    const clonedData = JSON.parse(JSON.stringify(originalResume.data || {}));
+
+    const duplicatedResume = await Resume.create({
+      userId: req.user._id,
+      title: newTitle,
+      slug,
+      thumbnailLink: originalResume.thumbnailLink,
+      data: clonedData,
+    });
+
+    res.status(201).json(duplicatedResume);
+  } catch (error) {
+    console.error("Duplicate resume error:", error);
+    res.status(500).json({ message: "Failed to duplicate resume", error: error.message });
+  }
+};
+
+module.exports = { createResume, getUserResumes, getResumeById, updateResume, deleteResume, duplicateResume };

@@ -1,14 +1,54 @@
 import { useState } from 'react';
+import { LuCopy, LuPencil, LuTrash2 } from 'react-icons/lu';
 
-const ResumeSummaryCard = ({ imgUrl, title, lastUpdated, onSelect }) => {
+const ResumeSummaryCard = ({ imgUrl, title, lastUpdated, onSelect, onDuplicate, onDelete }) => {
   const [bgColor, setBgColor] = useState('#FFFFFF');
 
   return (
     <div
-      className="relative group w-full max-w-[240px] bg-white rounded-lg border border-gray-200 hover:border-purple-300 overflow-hidden cursor-pointer mx-auto md:mx-0"
+      className="relative group w-full max-w-[240px] bg-white rounded-lg border border-gray-200 hover:border-purple-300 overflow-hidden cursor-pointer mx-auto md:mx-0 shadow-sm hover:shadow-md transition-all"
       style={{ backgroundColor: bgColor }}
       onClick={onSelect}
     >
+      {/* Action Buttons (Visible on hover) */}
+      <div className="absolute top-2 right-2 z-20 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDuplicate?.();
+          }}
+          className="p-1.5 bg-white/95 hover:bg-purple-600 hover:text-white text-gray-700 rounded-md shadow transition-colors"
+          title="Duplicate Resume"
+        >
+          <LuCopy className="text-sm" />
+        </button>
+
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect?.();
+          }}
+          className="p-1.5 bg-white/95 hover:bg-purple-600 hover:text-white text-gray-700 rounded-md shadow transition-colors"
+          title="Edit Resume"
+        >
+          <LuPencil className="text-sm" />
+        </button>
+
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete?.();
+          }}
+          className="p-1.5 bg-white/95 hover:bg-red-600 hover:text-white text-red-600 rounded-md shadow transition-colors"
+          title="Delete Resume"
+        >
+          <LuTrash2 className="text-sm" />
+        </button>
+      </div>
+
       {/* Image wrapper with aspect ratio */}
       <div className="relative w-full aspect-[2/3]">
         {imgUrl ? (

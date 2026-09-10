@@ -1,34 +1,60 @@
 import { useEffect, useRef, useState } from "react";
-import { getDefaultResumeData } from "../../utils/DefaultResume";
 import { useNavigate, useParams } from "react-router-dom";
-import { LuArrowLeft, LuCircleAlert, LuDownload, LuPalette, LuSave, LuTrash2 } from "react-icons/lu"
+import {
+  LuPalette,
+  LuSave,
+  LuTrash2,
+  LuEye,
+  LuDownload,
+  LuArrowLeft,
+} from "react-icons/lu";
 import toast from "react-hot-toast";
+
+// Hooks
+import { useResumeData } from "./hooks/useResumeData";
+import { useResumeExport } from "./hooks/useResumeExport";
+
+// Layout & UI
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import TitleInput from "../../components/Inputs/TitleInput";
-import { useReactToPrint } from "react-to-print";
+import Modal from "../../components/shared/Modal.jsx";
+import EditorSidebar from "./components/EditorSidebar.jsx";
+import ThemeSelector from "./ThemeSelector.jsx";
+import RenderResume from "../../components/ResumeTemplates/RenderResume";
+import { RESUME_TEMPLATES } from "../../constants";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
-import StepProgress from "../../components/shared/StepProgress";
+
+// Section Forms
 import PersonalInfoForm from "./Forms/PersonalInfoForm";
 import ProfileForm from "./Forms/ProfileForm";
 import ExperienceForm from "./Forms/ExperienceForm";
-import { defaultAwardItem, defaultEducationItem, defaultExperienceItem, defaultInterestItem, defaultLanguageItem, defaultProfileItem, defaultPublicationItem, defaultReferenceItem, defaultSkillsItem, defaultVolunteerItem } from "../../constants";
 import EducationForm from "./Forms/EducationForm";
 import SkillsForm from "./Forms/SkillsForm";
 import ProjectsForm from "./Forms/ProjectsForm";
 import CertificationsForm from "./Forms/CertificationsForm";
-import InterestForm from "./Forms/InterestForm";
-import LanguageForm from "./Forms/LanguageForm";
-import PublicationsForm from "./Forms/PublicationsForm";
 import AwardsForm from "./Forms/AwardsForm";
 import VolunteeringForm from "./Forms/VolunteeringForm";
 import ReferenceForm from "./Forms/ReferenceForm";
-import { captureElementAsImage, dataURLToFile, fixTailwindColors, stripHtml, waitForImageToLoad } from "../../utils/helper.jsx";
-import RenderResume from "../../components/ResumeTemplates/RenderResume";
-import uploadImage from "../../utils/uploadImage.js";
-import ThemeSelector from "./ThemeSelector.jsx";
-import Modal from "../../components/shared/Modal.jsx";
-import { RESUME_TEMPLATES } from "../../constants";
+import LanguageForm from "./Forms/LanguageForm";
+import InterestForm from "./Forms/InterestForm";
+import PublicationsForm from "./Forms/PublicationsForm";
+
+// Defaults
+import {
+  defaultProfileItem,
+  defaultExperienceItem,
+  defaultEducationItem,
+  defaultSkillsItem,
+  defaultProjectsItem,
+  defaultCertificationsItem,
+  defaultAwardItem,
+  defaultLanguageItem,
+  defaultInterestItem,
+  defaultPublicationItem,
+  defaultVolunteerItem,
+  defaultReferenceItem,
+} from "../../constants";
 
 const EditResume = () => {
   const { resumeId } = useParams();
@@ -37,483 +63,36 @@ const EditResume = () => {
   const resumeRef = useRef(null);
   const resumeDownloadRef = useRef(null);
 
+  const [activePage, setActivePage] = useState("personal-info");
   const [baseWidth, setBaseWidth] = useState(800);
-  const [openThemeSelector, setOpenThemeSelector] = useState(false);
-  const [openPreviewModal, setOpenPreviewModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState("personal-info");
-  const [progess, setProgress] = useState(0);
-  const [resumeData, setResumeData] = useState(getDefaultResumeData());
-  const [errorMsg, setErrorMsg] = useState("");
   const [newProfileImageFile, setNewProfileImageFile] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [printResume, setPrintResume] = useState(false);
 
-  // Next Step Function
-  const goToNextStep = () => {
-    const pages = [
-      "personal-info",
-      "profile-info",
-      "experience-info",
-      "education-info",
-      "skills-info",
-      "projects-info",
-      "interests-and-languages-info",
-      "additional-info",
-    ]
+  // Modular Hooks
+  const {
+    resumeData,
+    setResumeData,
+    isLoading,
+    isSaving,
+    errorMsg,
+    updateSection,
+    updateArrayItem,
+    addArrayItem,
+    removeArrayItem,
+    toggleSectionVisibility,
+    reorderSections,
+    saveResume,
+    uploadImagesAndSave,
+  } = useResumeData(resumeId);
 
-    if (currentPage === "additional-info") { setOpenPreviewModal(true) }
+  const {
+    openThemeSelector,
+    setOpenThemeSelector,
+    openPreviewModal,
+    setOpenPreviewModal,
+    handlePrint,
+  } = useResumeExport(resumeDownloadRef);
 
-    const currentIndex = pages.indexOf(currentPage);
-
-    if (currentIndex !== -1 && currentIndex < pages.length - 1) {
-      const nextIndex = currentIndex + 1;
-      setCurrentPage(pages[nextIndex]);
-
-      // Set Progress as Percentage
-      const percent = Math.round((nextIndex / (pages.length - 1)) * 100);
-      setProgress(percent);
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-
-  };
-
-  // Validate Inputs
-  const validateAndNext = (e) => {
-    e.preventDefault();
-    const errors = [];
-
-    const basics = resumeData?.data?.basics || {};
-
-    switch (currentPage) {
-      case 'personal-info': {
-        const name = basics.name || '';
-        if (!name.trim()) {
-          errors.push("Full Name is required.");
-        }
-        break;
-      }
-
-      // All other sections (Profiles, Education, Skills, Projects, Languages, Interests, etc.) are completely optional!
-      default:
-        break;
-    }
-
-    // Handle the result
-    if (errors.length > 0) {
-      setErrorMsg(errors.join(", "));
-      return;
-    }
-
-    // Proceed to the next step
-    setErrorMsg('');
-    goToNextStep();
-  };
-
-  // Previous Step Navigation Function
-  const goBack = () => {
-    const pages = [
-      "personal-info",
-      "profile-info",
-      "experience-info",
-      "education-info",
-      "skills-info",
-      "projects-info",
-      "interests-and-languages-info",
-      "additional-info",
-    ];
-
-    if (currentPage === "personal-info") {
-      navigate("/dashboard");
-      return;
-    }
-
-    const currentIndex = pages.indexOf(currentPage);
-
-    if (currentIndex > 0) {
-      const prevIndex = currentIndex - 1;
-      const prevPage = pages[prevIndex];
-      setCurrentPage(prevPage);
-
-      // Update Progress
-      const percent = Math.round((prevIndex / (pages.length - 1)) * 100);
-      setProgress(percent);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
-
-  const renderForm = () => {
-    if (!resumeData?.data || !resumeData.data.basics) return null;
-    switch (currentPage) {
-      case "personal-info":
-        return (
-          <PersonalInfoForm
-            profileData={resumeData.data.basics}
-            updateSection={(key, value) => updateSection("basics", key, value)}
-            resumeData={resumeData}
-            setResumeData={setResumeData}
-            onNext={validateAndNext}
-          />
-        )
-
-      case 'profile-info':
-        return (
-          <ProfileForm
-            profiles={resumeData.data.sections.profiles.items || []}
-            updateArrayItem={(index, key, value) => updateArrayItem('profiles', index, key, value)}
-            addArrayItem={() => addArrayItem('profiles', defaultProfileItem)}
-            removeArrayItem={(index) => removeArrayItem('profiles', index)}
-            setResumeData={setResumeData}
-          />
-        )
-
-      case 'experience-info':
-        return (
-          <ExperienceForm
-            experience={resumeData.data.sections.experience.items || []}
-            updateArrayItem={(index, key, value) => updateArrayItem('experience', index, key, value)}
-            addArrayItem={() => addArrayItem('experience', defaultExperienceItem)}
-            removeArrayItem={(index) => removeArrayItem('experience', index)}
-            setResumeData={setResumeData}
-          />
-        )
-
-      case 'education-info':
-        return (
-          <EducationForm
-            education={resumeData.data.sections.education.items || []}
-            updateArrayItem={(index, key, value) => updateArrayItem('education', index, key, value)}
-            addArrayItem={() => addArrayItem('education', defaultEducationItem)}
-            removeArrayItem={(index) => removeArrayItem('education', index)}
-            setResumeData={setResumeData}
-          />
-        )
-
-      case 'skills-info':
-        return (
-          <SkillsForm
-            skills={resumeData.data.sections.skills.items || []}
-            updateArrayItem={(index, key, value) => updateArrayItem('skills', index, key, value)}
-            addArrayItem={() => addArrayItem('skills', defaultSkillsItem)}
-            removeArrayItem={(index) => removeArrayItem('skills', index)}
-            setResumeData={setResumeData}
-          />
-        )
-
-      case 'projects-info':
-        return (
-          <ProjectsForm
-            projects={resumeData.data.sections.projects.items || []}
-            updateArrayItem={(index, key, value) => updateArrayItem('projects', index, key, value)}
-            addArrayItem={() => addArrayItem('projects', defaultSkillsItem)}
-            removeArrayItem={(index) => removeArrayItem('projects', index)}
-            setResumeData={setResumeData}
-          />
-        )
-
-      case 'interests-and-languages-info':
-        return (
-          <>
-            <LanguageForm
-              languages={resumeData.data.sections.languages.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('languages', index, key, value)}
-              addArrayItem={() => addArrayItem('languages', defaultLanguageItem)}
-              removeArrayItem={(index) => removeArrayItem('languages', index)}
-              setResumeData={setResumeData}
-            />
-
-            <InterestForm
-              interests={resumeData.data.sections.interests.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('interests', index, key, value)}
-              addArrayItem={() => addArrayItem('interests', defaultInterestItem)}
-              removeArrayItem={(index) => removeArrayItem('interests', index)}
-              setResumeData={setResumeData}
-            />
-          </>
-        )
-
-      case 'additional-info':
-        return (
-          <>
-            <CertificationsForm
-              certifications={resumeData.data.sections.certifications.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('certifications', index, key, value)}
-              addArrayItem={() => addArrayItem('certifications', defaultSkillsItem)}
-              removeArrayItem={(index) => removeArrayItem('certifications', index)}
-            />
-
-            <PublicationsForm
-              publications={resumeData.data.sections.publications.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('publications', index, key, value)}
-              addArrayItem={() => addArrayItem('publications', defaultPublicationItem)}
-              removeArrayItem={(index) => removeArrayItem('publications', index)}
-            />
-
-            <AwardsForm
-              awards={resumeData.data.sections.awards.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('awards', index, key, value)}
-              addArrayItem={() => addArrayItem('awards', defaultAwardItem)}
-              removeArrayItem={(index) => removeArrayItem('awards', index)}
-            />
-
-            <VolunteeringForm
-              volunteer={resumeData.data.sections.volunteer.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('volunteer', index, key, value)}
-              addArrayItem={() => addArrayItem('volunteer', defaultVolunteerItem)}
-              removeArrayItem={(index) => removeArrayItem('volunteer', index)}
-            />
-
-            <ReferenceForm
-              references={resumeData.data.sections.references.items || []}
-              updateArrayItem={(index, key, value) => updateArrayItem('references', index, key, value)}
-              addArrayItem={() => addArrayItem('references', defaultReferenceItem)}
-              removeArrayItem={(index) => removeArrayItem('references', index)}
-            />
-          </>
-        )
-
-      default:
-        return null;
-    }
-  };
-
-  // Update Simple Nested Object
-  const updateSection = (section, key, value) => {
-    setResumeData((prev) => ({
-      ...prev,
-      data: {
-        ...prev.data,
-        [section]: {
-          ...prev.data[section],
-          [key]: value,
-        },
-      },
-    }));
-  };
-
-  // Update Array Items
-  const updateArrayItem = (section, index, key, value) => {
-    setResumeData((prev) => {
-      const items = [...prev.data.sections[section].items];
-      const item = { ...items[index] };
-
-      if (!key) {
-        // Replace the whole item if key is null
-        items[index] = value;
-      } else {
-        const keys = key.split(".");
-        let target = item;
-
-        for (let i = 0; i < keys.length - 1; i++) {
-          const key = keys[i];
-          // Ensure nested object exists
-          target[key] = target[key] || {};
-          target = target[key];
-        }
-
-        target[keys[keys.length - 1]] = value;
-        items[index] = item;
-      }
-
-      return {
-        ...prev,
-        data: {
-          ...prev.data,
-          sections: {
-            ...prev.data.sections,
-            [section]: {
-              ...prev.data.sections[section],
-              items,
-            },
-          },
-        },
-      };
-    });
-  };
-
-  // Add new item to Array
-  const addArrayItem = (section, newItem) => {
-    setResumeData((prev) => {
-      const items = prev.data.sections[section]?.items || [];
-
-      return {
-        ...prev,
-        data: {
-          ...prev.data,
-          sections: {
-            ...prev.data.sections,
-            [section]: {
-              ...prev.data.sections[section],
-              items: [...items, newItem],
-            },
-          },
-        },
-      };
-    });
-  };
-
-  // Remove item from Array
-  const removeArrayItem = (section, index) => {
-    setResumeData((prev) => {
-      const items = [...(prev.data.sections[section]?.items || [])];
-      items.splice(index, 1);
-
-      return {
-        ...prev,
-        data: {
-          ...prev.data,
-          sections: {
-            ...prev.data.sections,
-            [section]: {
-              ...prev.data.sections[section],
-              items,
-            },
-          },
-        },
-      };
-    });
-  };
-
-  // Fetch Resume Info by ID
-  const fetchResumeDetailsByID = async () => {
-    try {
-      const response = await axiosInstance.get(API_PATHS.RESUME.GET_BY_ID(resumeId));
-
-      if (response.data && response.data.data) {
-        const resumeInfo = response.data;
-
-        setResumeData((prevState) => ({
-          ...prevState,
-          title: resumeInfo.title || "Untitled",
-          template: resumeInfo.template || prevState.template,
-          data: resumeInfo.data || prevState.data,
-        }));
-      }
-    } catch (error) {
-      console.error("Error fetching resumes: ", error);
-    }
-  };
-
-  // Upload thumbnail and Resume Profile Image
-  const uploadResumeImages = async () => {
-    try {
-      setIsLoading(true);
-
-      let uploadedProfileImageUrl = resumeData.data.basics.picture.url || '';
-
-      if (newProfileImageFile) {
-        const imgUploadRes = await uploadImage(newProfileImageFile);
-        if (imgUploadRes.imageUrl) {
-          uploadedProfileImageUrl = imgUploadRes.imageUrl;
-
-          setResumeData((prev) => ({
-            ...prev,
-            data: {
-              ...prev.data,
-              basics: {
-                ...prev.data.basics,
-                picture: {
-                  ...prev.data.basics.picture,
-                  url: uploadedProfileImageUrl,
-                  file: undefined,
-                },
-              },
-            },
-          }));
-
-          await new Promise((resolve) => setTimeout(resolve, 300));
-        } else {
-          console.warn('No imageUrl returned from uploadImage');
-        }
-      }
-
-      const profileImgUrl = resumeData.data.basics?.picture?.url;
-      if (profileImgUrl) {
-        try {
-          await waitForImageToLoad(profileImgUrl);
-        } catch (e) {
-          console.warn("Profile image failed to preload. It may be missing from the thumbnail.");
-        }
-      }
-
-      fixTailwindColors(resumeRef.current);
-      await new Promise((r) => setTimeout(r, 1000));
-      const imageDataUrl = await captureElementAsImage(resumeRef.current);
-      const thumbnailFile = dataURLToFile(imageDataUrl, `resume-${resumeId}.png`);
-
-      const formData = new FormData();
-      if (thumbnailFile) formData.append('thumbnail', thumbnailFile);
-
-      const uploadResponse = await axiosInstance.put(
-        API_PATHS.RESUME.UPLOAD_IMAGES(resumeId),
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
-
-      const { thumbnailLink } = uploadResponse.data;
-
-      const updatedResumeData = {
-        ...resumeData,
-        thumbnailLink: thumbnailLink || '',
-        data: {
-          ...resumeData.data,
-          basics: {
-            ...resumeData.data.basics,
-            picture: {
-              ...resumeData.data.basics.picture,
-              url: uploadedProfileImageUrl,
-              file: undefined,
-            },
-          },
-        },
-      };
-
-      setResumeData(updatedResumeData);
-      await updateResumeDetails(updatedResumeData);
-
-      toast.success('Resume Updated Successfully!');
-      navigate('/dashboard');
-    } catch (error) {
-      toast.error('Failed to upload images');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateResumeDetails = async (updatedResume) => {
-    try {
-      await axiosInstance.put(API_PATHS.RESUME.UPDATE(resumeId), updatedResume);
-    } catch (error) {
-      console.error('Error updating resume details:', error);
-    }
-  };
-
-  // Delete Resume 
-  const handleDeleteResume = async () => {
-    try {
-      setIsLoading(true);
-      await axiosInstance.delete(API_PATHS.RESUME.DELETE(resumeId));
-      toast.success('Resume Deleted Successfully');
-      navigate('/dashboard');
-    } catch (error) {
-      console.log('Failed to delete the resume: ', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Download Resume
-  const reactToPrintFn = useReactToPrint({
-    contentRef: resumeDownloadRef,
-    onBeforeGetContent: () => {
-      setPrintResume(true)
-      return Promise.resolve();
-    }, onAfterPrint: () => {
-      setPrintResume(false);
-    }
-  });
-
-  // Function to update baseWidth based on the resume container size
+  // Resize handling for preview container
   const updateBaseWidth = () => {
     if (resumeRef.current) {
       setBaseWidth(resumeRef.current.offsetWidth);
@@ -523,112 +102,293 @@ const EditResume = () => {
   useEffect(() => {
     updateBaseWidth();
     window.addEventListener("resize", updateBaseWidth);
+    return () => window.removeEventListener("resize", updateBaseWidth);
+  }, []);
 
-    if (resumeId) {
-      fetchResumeDetailsByID();
+  // Delete Resume
+  const handleDeleteResume = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this resume? This action cannot be undone."
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await axiosInstance.delete(API_PATHS.RESUME.DELETE(resumeId));
+      toast.success("Resume deleted successfully");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Delete resume error:", error);
+      toast.error(error.response?.data?.message || "Failed to delete resume");
     }
+  };
 
-    return () => {
-      window.removeEventListener("resize", updateBaseWidth);
+  // Quick Save Handler
+  const handleQuickSave = async () => {
+    try {
+      await uploadImagesAndSave(newProfileImageFile, resumeRef.current);
+    } catch {
+      // Error handled inside hook
     }
+  };
 
-  }, [])
+  // Section Form Renderer
+  const renderForm = () => {
+    if (!resumeData?.data || !resumeData.data.basics) return null;
+    const sections = resumeData.data.sections || {};
+
+    switch (activePage) {
+      case "personal-info":
+        return (
+          <PersonalInfoForm
+            profileData={resumeData.data.basics}
+            updateSection={(key, value) => updateSection("basics", key, value)}
+            resumeData={resumeData}
+            setResumeData={setResumeData}
+          />
+        );
+
+      case "profiles":
+        return (
+          <ProfileForm
+            profiles={sections.profiles?.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem("profiles", index, key, value)}
+            addArrayItem={() => addArrayItem("profiles", defaultProfileItem)}
+            removeArrayItem={(index) => removeArrayItem("profiles", index)}
+            setResumeData={setResumeData}
+          />
+        );
+
+      case "experience":
+        return (
+          <ExperienceForm
+            experience={sections.experience?.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem("experience", index, key, value)}
+            addArrayItem={() => addArrayItem("experience", defaultExperienceItem)}
+            removeArrayItem={(index) => removeArrayItem("experience", index)}
+            setResumeData={setResumeData}
+          />
+        );
+
+      case "education":
+        return (
+          <EducationForm
+            education={sections.education?.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem("education", index, key, value)}
+            addArrayItem={() => addArrayItem("education", defaultEducationItem)}
+            removeArrayItem={(index) => removeArrayItem("education", index)}
+            setResumeData={setResumeData}
+          />
+        );
+
+      case "skills":
+        return (
+          <SkillsForm
+            skills={sections.skills?.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem("skills", index, key, value)}
+            addArrayItem={() => addArrayItem("skills", defaultSkillsItem)}
+            removeArrayItem={(index) => removeArrayItem("skills", index)}
+            setResumeData={setResumeData}
+          />
+        );
+
+      case "projects":
+        return (
+          <ProjectsForm
+            projects={sections.projects?.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem("projects", index, key, value)}
+            addArrayItem={() => addArrayItem("projects", defaultProjectsItem)}
+            removeArrayItem={(index) => removeArrayItem("projects", index)}
+            setResumeData={setResumeData}
+          />
+        );
+
+      case "certifications":
+        return (
+          <CertificationsForm
+            certifications={sections.certifications?.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem("certifications", index, key, value)}
+            addArrayItem={() => addArrayItem("certifications", defaultCertificationsItem)}
+            removeArrayItem={(index) => removeArrayItem("certifications", index)}
+            setResumeData={setResumeData}
+          />
+        );
+
+      case "awards":
+        return (
+          <AwardsForm
+            awards={sections.awards?.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem("awards", index, key, value)}
+            addArrayItem={() => addArrayItem("awards", defaultAwardItem)}
+            removeArrayItem={(index) => removeArrayItem("awards", index)}
+            setResumeData={setResumeData}
+          />
+        );
+
+      case "languages":
+        return (
+          <LanguageForm
+            languages={sections.languages?.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem("languages", index, key, value)}
+            addArrayItem={() => addArrayItem("languages", defaultLanguageItem)}
+            removeArrayItem={(index) => removeArrayItem("languages", index)}
+            setResumeData={setResumeData}
+          />
+        );
+
+      case "interests":
+        return (
+          <InterestForm
+            interests={sections.interests?.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem("interests", index, key, value)}
+            addArrayItem={() => addArrayItem("interests", defaultInterestItem)}
+            removeArrayItem={(index) => removeArrayItem("interests", index)}
+            setResumeData={setResumeData}
+          />
+        );
+
+      case "publications":
+        return (
+          <PublicationsForm
+            publications={sections.publications?.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem("publications", index, key, value)}
+            addArrayItem={() => addArrayItem("publications", defaultPublicationItem)}
+            removeArrayItem={(index) => removeArrayItem("publications", index)}
+            setResumeData={setResumeData}
+          />
+        );
+
+      case "volunteer":
+        return (
+          <VolunteeringForm
+            volunteer={sections.volunteer?.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem("volunteer", index, key, value)}
+            addArrayItem={() => addArrayItem("volunteer", defaultVolunteerItem)}
+            removeArrayItem={(index) => removeArrayItem("volunteer", index)}
+            setResumeData={setResumeData}
+          />
+        );
+
+      case "references":
+        return (
+          <ReferenceForm
+            references={sections.references?.items || []}
+            updateArrayItem={(index, key, value) => updateArrayItem("references", index, key, value)}
+            addArrayItem={() => addArrayItem("references", defaultReferenceItem)}
+            removeArrayItem={(index) => removeArrayItem("references", index)}
+            setResumeData={setResumeData}
+          />
+        );
+
+      default:
+        return (
+          <PersonalInfoForm
+            profileData={resumeData.data.basics}
+            updateSection={(key, value) => updateSection("basics", key, value)}
+            resumeData={resumeData}
+            setResumeData={setResumeData}
+          />
+        );
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
       <div className="container mx-auto">
-        <div className="flex items-center justify-between gap-5 bg-white rounded-lg border border-purple-100 py-3 px-4 mb-4">
-          <TitleInput
-            title={resumeData.title}
-            setTitle={(value) => setResumeData((prev) => ({ ...prev, title: value }))}
-          />
-
-          <div className="flex items-center gap-4">
+        {/* Top Header Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-white rounded-xl border border-gray-200 py-3 px-4 mb-4 shadow-sm">
+          <div className="flex items-center gap-3">
             <button
-              className="btn-small-light"
+              onClick={() => navigate("/dashboard")}
+              className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+              title="Back to Dashboard"
+            >
+              <LuArrowLeft className="text-xl" />
+            </button>
+            <TitleInput
+              title={resumeData.title}
+              setTitle={(value) => setResumeData((prev) => ({ ...prev, title: value }))}
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs md:text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors cursor-pointer"
               onClick={() => setOpenThemeSelector(true)}
             >
-              <LuPalette className="text-[16px]" />
-              <span className="hidden md:block">Change Theme</span>
+              <LuPalette className="text-base" />
+              <span className="hidden sm:inline">Theme</span>
             </button>
 
             <button
-              className="btn-small-light"
+              type="button"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs md:text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer"
               onClick={handleDeleteResume}
             >
-              <LuTrash2 className="text-[16px]" />
-              <span className="hidden md:block">Delete</span>
+              <LuTrash2 className="text-base" />
+              <span className="hidden sm:inline">Delete</span>
             </button>
 
             <button
-              className="btn-small-light"
+              type="button"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs md:text-sm font-semibold text-purple-700 bg-purple-100 hover:bg-purple-200 rounded-lg transition-colors cursor-pointer"
               onClick={() => setOpenPreviewModal(true)}
             >
-              <LuDownload className="text-[16px]" />
-              <span className="hidden md:block">Preview & Download</span>
+              <LuEye className="text-base" />
+              <span className="hidden sm:inline">Preview</span>
+            </button>
+
+            <button
+              type="button"
+              disabled={isSaving}
+              className="flex items-center gap-1.5 px-4 py-2 text-xs md:text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+              onClick={handleQuickSave}
+            >
+              <LuSave className="text-base" />
+              <span>{isSaving ? "Saving..." : "Save"}</span>
             </button>
           </div>
-
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="bg-white rounded-lg border border-purple-100 overflow-hidden">
-
-            <StepProgress progress={progess} />
-
-            {renderForm()}
-
-            <div className="mx-5">
-              {errorMsg && (
-                <div className="flex items-center gap-2 text-[11px] font-medium text-amber-600 bg-amber-100 px-2 py-0.5 my-1 rounded">
-                  <LuCircleAlert className="text-base" /> {errorMsg}
-                </div>
-              )}
-
-              <div className="flex items-center justify-end gap-3 mt-3 mb-5">
-                {/* Go Back Button */}
-                <button
-                  className="btn-small-light"
-                  onClick={goBack}
-                  disabled={isLoading}
-                >
-                  <LuArrowLeft className="text-[16px]" />
-                  Back
-                </button>
-
-                {/* Save Button */}
-                <button
-                  className="btn-small-light"
-                  onClick={uploadResumeImages}
-                  disabled={isLoading}
-                >
-                  <LuSave className="text-[16px]" />
-                  {isLoading ? "Updating..." : "Save & Exit"}
-                </button>
-
-                {/* Validate And Next Button */}
-                <button
-                  className="btn-small"
-                  onClick={validateAndNext}
-                  disabled={isLoading}
-                >
-                  {currentPage === 'additional-info' && (
-                    <LuDownload className="text-[16px]" />
-                  )}
-
-                  {currentPage === 'additional-info' ? "Preview & Download" : "Next"}
-
-                  {currentPage !== 'additional-info' && (
-                    <LuArrowLeft className="text-[16px] rotate-180" />
-                  )}
-                </button>
-              </div>
-            </div>
+        {/* Main Work Area: 3-column Layout (Sidebar, Active Form, Live Canvas) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          {/* Left Column: Section Sidebar (Col 1-3 on Desktop) */}
+          <div className="lg:col-span-3">
+            <EditorSidebar
+              activePage={activePage}
+              setActivePage={setActivePage}
+              sections={resumeData.data?.sections || {}}
+              layout={resumeData.data?.metadata?.layout || [[], []]}
+              onToggleVisibility={toggleSectionVisibility}
+              onReorderSections={reorderSections}
+              onSave={handleQuickSave}
+              onOpenTheme={() => setOpenThemeSelector(true)}
+              onOpenPreview={() => setOpenPreviewModal(true)}
+              onDownload={handlePrint}
+              isSaving={isSaving}
+            />
           </div>
 
-          {/* Resume Template */}
-          <div ref={resumeRef} className="h-[100vh]">
+          {/* Middle Column: Active Form Editor (Col 4-7 on Desktop) */}
+          <div className="lg:col-span-4 bg-white rounded-xl border border-gray-200 shadow-sm p-4 overflow-y-auto max-h-[85vh] custom-scrollbar">
+            {renderForm()}
+          </div>
 
+          {/* Right Column: Live Resume Canvas (Col 8-12 on Desktop) */}
+          <div
+            ref={resumeRef}
+            className="lg:col-span-5 bg-gray-50 rounded-xl border border-gray-200 shadow-inner p-2 overflow-auto max-h-[85vh] custom-scrollbar"
+          >
             {resumeData?.data?.basics && (
               <RenderResume
                 templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
@@ -653,31 +413,29 @@ const EditResume = () => {
         width="85vw"
         height="80vh"
       >
-        <div className="">
-          <ThemeSelector
-            selectedTheme={resumeData?.template}
-            setSelectedTheme={(value) => {
-              setResumeData((prev) => ({
-                ...prev,
-                data: {
-                  ...prev.data,
-                  metadata: {
-                    ...prev.data.metadata,
-                    template: value?.template || prev.data.metadata.template,
-                    theme: {
-                      background: value?.colorPalette?.[0] || prev.data.metadata.theme.background,
-                      text: value?.colorPalette?.[1] || prev.data.metadata.theme.text,
-                      primary: value?.colorPalette?.[2] || prev.data.metadata.theme.primary
-                    }
-                  }
-                }
-              }));
-            }}
-            resumeData={resumeData}
-            setResumeData={setResumeData}
-            onClose={() => setOpenThemeSelector(false)}
-          />
-        </div>
+        <ThemeSelector
+          selectedTheme={resumeData?.template}
+          setSelectedTheme={(value) => {
+            setResumeData((prev) => ({
+              ...prev,
+              data: {
+                ...prev.data,
+                metadata: {
+                  ...prev.data.metadata,
+                  template: value?.template || prev.data.metadata.template,
+                  theme: {
+                    background: value?.colorPalette?.[0] || prev.data.metadata.theme.background,
+                    text: value?.colorPalette?.[1] || prev.data.metadata.theme.text,
+                    primary: value?.colorPalette?.[2] || prev.data.metadata.theme.primary,
+                  },
+                },
+              },
+            }));
+          }}
+          resumeData={resumeData}
+          setResumeData={setResumeData}
+          onClose={() => setOpenThemeSelector(false)}
+        />
       </Modal>
 
       {/* Print & Preview Modal */}
@@ -686,14 +444,14 @@ const EditResume = () => {
         onClose={() => setOpenPreviewModal(false)}
         title={resumeData?.title}
         showActionBtn
-        actionBtnText="Download"
+        actionBtnText="Download PDF"
         actionBtnIcon={<LuDownload className="text-base" />}
-        onActionClick={() => reactToPrintFn()}
-        width="100vw"
+        onActionClick={handlePrint}
+        width="95vw"
         height="90vh"
         isPrint={true}
       >
-        <div ref={resumeDownloadRef} className={`mx-auto w-[98vw] h-[90vh]`}>
+        <div ref={resumeDownloadRef} className="mx-auto w-full p-4">
           <RenderResume
             templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
             resumeData={resumeData?.data}
@@ -706,7 +464,7 @@ const EditResume = () => {
         </div>
       </Modal>
     </DashboardLayout>
-  )
-}
+  );
+};
 
-export default EditResume
+export default EditResume;
