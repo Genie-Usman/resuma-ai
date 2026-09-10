@@ -21,9 +21,17 @@ const improveBulletSchema = z.object({
     context: z.record(z.any()).optional()
 });
 
+const resumeAuditSchema = z.object({
+    resumeData: z.record(z.any()).refine((val) => typeof val === "object" && val !== null, {
+        message: "Resume data is required"
+    }),
+    targetRole: z.string().optional()
+});
+
 module.exports = {
     generateSummarySchema,
     jobMatchSchema,
-    improveBulletSchema
+    improveBulletSchema,
+    resumeAuditSchema
 };
 

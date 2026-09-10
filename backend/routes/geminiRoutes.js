@@ -3,6 +3,7 @@ const {
   generateItemSummary,
   analyzeJobMatch,
   improveBulletPoint,
+  auditResume,
 } = require("../services/Gemini");
 const { geminiLimiter } = require("../middlewares/rateLimiter");
 const { validateRequest } = require("../middlewares/validateMiddleware");
@@ -10,6 +11,7 @@ const {
   generateSummarySchema,
   jobMatchSchema,
   improveBulletSchema,
+  resumeAuditSchema,
 } = require("../validators/geminiValidator");
 
 const router = express.Router();
@@ -64,6 +66,24 @@ router.post(
     } catch (err) {
       console.error("Improve bullet point error:", err.message);
       res.status(500).json({ error: "Failed to improve bullet point. Please try again." });
+    }
+  }
+);
+
+// Comprehensive Resume & ATS Audit
+router.post(
+  "/resume-audit",
+  geminiLimiter,
+  validateRequest(resumeAuditSchema),
+  async (req, res) => {
+    const { resumeData, targetRole } = req.body;
+
+    try {
+      const audit = await auditResume({ resumeData, targetRole });
+      res.json(audit);
+    } catch (err) {
+      console.error("Resume audit error:", err.message);
+      res.status(500).json({ error: "Failed to audit resume. Please try again." });
     }
   }
 );

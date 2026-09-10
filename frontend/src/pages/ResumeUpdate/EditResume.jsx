@@ -29,11 +29,13 @@ import ConfirmModal from "../../components/shared/ConfirmModal.jsx";
 import EditorSidebar from "./components/EditorSidebar.jsx";
 import ResumeCanvas from "./components/ResumeCanvas.jsx";
 import JobMatchModal from "./components/JobMatchModal.jsx";
+import ResumeAuditModal from "./components/ResumeAuditModal.jsx";
 import ShareModal from "./components/ShareModal.jsx";
 import ThemeSelector from "./ThemeSelector.jsx";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
 import { RESUME_TEMPLATES } from "../../constants";
 import { exportToJsonResume } from "../../utils/jsonResumeAdapter";
+import { runResumeAudit } from "../../utils/resumeAuditEngine";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 
@@ -83,6 +85,7 @@ const EditResume = () => {
   const [activePage, setActivePage] = useState("personal-info");
   const [newProfileImageFile, setNewProfileImageFile] = useState(null);
   const [openJobMatchModal, setOpenJobMatchModal] = useState(false);
+  const [openAuditModal, setOpenAuditModal] = useState(false);
   const [openShareModal, setOpenShareModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -106,6 +109,49 @@ const EditResume = () => {
     saveResume,
     uploadImagesAndSave,
   } = useResumeData(resumeId);
+
+  // Real-time deterministic audit score for studio header
+  const liveAudit = useMemo(() => {
+    return runResumeAudit(resumeData?.data || resumeData || {});
+  }, [resumeData]);
+
+  const handleApplyBulletRewrite = (original, improved) => {
+    const currentExp = resumeData?.data?.sections?.experience?.items || [];
+    let updated = false;
+
+    const newExp = currentExp.map((exp) => {
+      if (!updated && exp.summary && exp.summary.includes(original)) {
+        updated = true;
+        return {
+          ...exp,
+          summary: exp.summary.replace(original, improved),
+        };
+      }
+      return exp;
+    });
+
+    if (updated) {
+      updateSection("experience", { items: newExp });
+      return;
+    }
+
+    const currentProj = resumeData?.data?.sections?.projects?.items || [];
+    const newProj = currentProj.map((proj) => {
+      if (!updated && (proj.summary || proj.description) && (proj.summary?.includes(original) || proj.description?.includes(original))) {
+        updated = true;
+        return {
+          ...proj,
+          summary: (proj.summary || "").replace(original, improved),
+          description: (proj.description || "").replace(original, improved),
+        };
+      }
+      return proj;
+    });
+
+    if (updated) {
+      updateSection("projects", { items: newProj });
+    }
+  };
 
   const {
     openThemeSelector,
@@ -588,6 +634,29 @@ const EditResume = () => {
 
         {/* Right: Studio Action Buttons (Single Row) */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Resume Audit Score Button */}
+          <button
+            type="button"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-800 shadow-2xs transition-all cursor-pointer group"
+            onClick={() => setOpenAuditModal(true)}
+            title="Inspect Resume Quality & ATS Audit Score"
+          >
+            <span
+              className={`flex items-center justify-center w-5 h-5 rounded-lg text-[10px] font-black ${
+                liveAudit.overallScore >= 80
+                  ? "bg-emerald-100 text-emerald-700"
+                  : liveAudit.overallScore >= 65
+                  ? "bg-amber-100 text-amber-700"
+                  : "bg-rose-100 text-rose-700"
+              }`}
+            >
+              {liveAudit.overallScore}
+            </span>
+            <span className="hidden sm:inline font-semibold text-slate-700 group-hover:text-purple-700 transition-colors">
+              Audit
+            </span>
+          </button>
+
           {/* AI Job Match */}
           <button
             type="button"
@@ -810,6 +879,18 @@ const EditResume = () => {
           </div>
         </div>
       </Modal>
+
+      {/* Comprehensive Resume Quality & ATS Audit Modal */}
+      <ResumeAuditModal
+        isOpen={openAuditModal}
+        onClose={() => setOpenAuditModal(false)}
+        resumeData={resumeData?.data || resumeData || {}}
+        onNavigateSection={(sectionKey) => {
+          setActivePage(sectionKey);
+          if (viewMode === "preview") setViewMode("split");
+        }}
+        onApplyBulletRewrite={handleApplyBulletRewrite}
+      />
 
       {/* ATS Job Match Analyzer Modal */}
       <JobMatchModal

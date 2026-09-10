@@ -396,8 +396,102 @@ Instructions:
     return await generateWithFallback(prompt);
 };
 
+/**
+ * Comprehensive Deep Resume & ATS Audit
+ */
+const auditResume = async ({ resumeData, targetRole = "" }) => {
+    const basics = resumeData?.basics || {};
+    const sections = resumeData?.sections || {};
+
+    const cleanResume = {
+        name: basics.name,
+        headline: basics.headline,
+        summary: basics.summary ? basics.summary.replace(/<[^>]*>?/gm, ' ').trim() : '',
+        email: basics.email,
+        phone: basics.phone,
+        location: basics.location,
+        url: basics.url,
+        skills: (sections.skills?.items || []).map((s) => ({
+            name: s.name,
+            keywords: s.keywords,
+        })),
+        experience: (sections.experience?.items || []).map((e) => ({
+            company: e.company,
+            position: e.position,
+            date: e.date,
+            summary: e.summary ? e.summary.replace(/<[^>]*>?/gm, ' ').trim() : '',
+        })),
+        projects: (sections.projects?.items || []).map((p) => ({
+            name: p.name,
+            description: p.description ? p.description.replace(/<[^>]*>?/gm, ' ').trim() : '',
+            keywords: p.keywords,
+        })),
+        education: (sections.education?.items || []).map((ed) => ({
+            institution: ed.institution,
+            studyType: ed.studyType,
+            area: ed.area,
+            date: ed.date,
+        })),
+        certifications: (sections.certifications?.items || []).map((c) => ({
+            name: c.name,
+            issuer: c.issuer,
+        })),
+    };
+
+    const rolePrompt = targetRole ? ` TARGET ROLE / DOMAIN: "${targetRole}".` : "";
+
+    const prompt = `
+You are an elite executive recruiter and ATS resume audit specialist.${rolePrompt}
+Perform a comprehensive diagnostic evaluation of the following candidate's resume.
+
+CANDIDATE RESUME:
+${JSON.stringify(cleanResume, null, 2)}
+
+Provide an objective, in-depth audit covering:
+1. Executive summary of candidate standing (strengths and areas needing polish).
+2. Category score evaluations (integers 0-100) for:
+   - contentImpact (quantifiable metrics, Google XYZ impact, action verbs)
+   - sectionsStructure (organization, contact completeness, flow)
+   - documentStandards (formatting, professionalism, link/date consistency)
+   - professionalPolish (absence of first-person pronouns, strong vocabulary, elimination of buzzwords)
+   - careerSignals (career trajectory, evidence of skills, leadership)
+3. Overall score (0-100 integer) weighted by recruiting importance.
+4. Top 3 highest-leverage recommendations to boost hiring callbacks.
+5. Specific bullet point rewrites (1-3 bullets from the resume that currently lack metrics or strong verbs, rewritten using Google's XYZ formula: "Accomplished [X], as measured by [Y], by doing [Z]").
+
+Return strictly valid JSON with the following structure (no extra text, no markdown fences):
+{
+  "overallScore": 84,
+  "scoreGrade": "Executive Ready",
+  "executiveSummary": "2-3 sentence executive assessment of resume quality and hiring potential.",
+  "categoryScores": {
+    "contentImpact": 80,
+    "sectionsStructure": 95,
+    "documentStandards": 85,
+    "professionalPolish": 78,
+    "careerSignals": 82
+  },
+  "topRecommendations": [
+    "Incorporate revenue or efficiency percentages in your lead role.",
+    "Eliminate passive verbs in project descriptions.",
+    "Add certification details to substantiate cloud expertise."
+  ],
+  "bulletRewrites": [
+    {
+      "original": "Worked on client applications and assisted with deployments.",
+      "improved": "Architected high-throughput client applications, reducing deployment latencies by 35% across 500K+ monthly active users.",
+      "reason": "Replaced weak passive verb with active architectural leadership and measurable performance metrics."
+    }
+  ]
+}
+`;
+
+    return await generateWithFallback(prompt);
+};
+
 module.exports = {
     generateItemSummary,
     analyzeJobMatch,
     improveBulletPoint,
+    auditResume,
 };
