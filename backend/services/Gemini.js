@@ -225,24 +225,37 @@ Return the result as strict JSON like this (no markdown, no extra text):
             prompt = `Return summaries in JSON format for the section "${section}" based on this item: ${JSON.stringify(item)}`;
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const result = await model.generateContent(prompt);
-    let responseText = await result.response.text();
+    const candidateModels = [
+        process.env.GEMINI_MODEL,
+        "gemini-3.5-flash-lite",
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+    ].filter(Boolean);
 
-    // Strip out markdown code fences if they exist
-    responseText = responseText.trim()
-        .replace(/^```json\s*/i, '')
-        .replace(/^```/, '')
-        .replace(/```$/, '')
-        .trim();
+    let lastError = null;
+    for (const modelName of candidateModels) {
+        try {
+            const model = genAI.getGenerativeModel({ model: modelName });
+            const result = await model.generateContent(prompt);
+            let responseText = await result.response.text();
 
-    try {
-        const parsed = JSON.parse(responseText);
-        return parsed;
-    } catch (err) {
-        console.error("Failed to parse Gemini JSON:", err, "\nRaw response:", responseText);
-        throw new Error("Invalid AI response. Please try again.");
+            // Strip out markdown code fences if they exist
+            responseText = responseText.trim()
+                .replace(/^```json\s*/i, '')
+                .replace(/^```/, '')
+                .replace(/```$/, '')
+                .trim();
+
+            const parsed = JSON.parse(responseText);
+            return parsed;
+        } catch (err) {
+            console.warn(`Model ${modelName} failed, trying fallback...`, err.message);
+            lastError = err;
+        }
     }
+
+    console.error("All Gemini candidate models failed. Last error:", lastError);
+    throw new Error("Invalid AI response. Please try again.");
 };
 
 

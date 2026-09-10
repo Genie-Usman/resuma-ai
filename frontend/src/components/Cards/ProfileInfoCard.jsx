@@ -17,11 +17,17 @@ const ProfileInfoCard = () => {
         <div className="flex items-center">
 
             {/* Image */}
-            <img 
-            src={user.profileImageURL} 
-            alt="" 
-            className="w-11 h-11 bg-gray-300 rounded-full mr-3"
-            />
+            {user.profileImageURL ? (
+                <img 
+                    src={user.profileImageURL} 
+                    alt={user.name || "User"} 
+                    className="w-11 h-11 bg-gray-300 rounded-full mr-3 object-cover"
+                />
+            ) : (
+                <div className="w-11 h-11 bg-purple-100 text-purple-700 font-bold rounded-full mr-3 flex items-center justify-center text-sm select-none">
+                    {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                </div>
+            )}
 
             <div>
                 {/* User Name */}

@@ -35,6 +35,7 @@ import {
 } from 'react-icons/rx';
 import Button from '../../../components/shared/Button';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { API_PATHS } from '../../../utils/apiPaths';
 import axiosInstance from '../../../utils/axiosInstance';
 
@@ -246,9 +247,10 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item }) => {
             }));
 
             setSuggestions(levels);
-
+            toast.success("AI summaries generated!");
         } catch (err) {
             console.error("Failed to generate summary:", err);
+            toast.error(err.response?.data?.message || err.response?.data?.error || "Failed to generate summary. Please try again.");
         } finally {
             setLoading(false);
         }
