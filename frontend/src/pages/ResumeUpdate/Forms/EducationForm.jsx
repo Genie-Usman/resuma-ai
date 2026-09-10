@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { LuPlus, LuTrash2 } from "react-icons/lu";
+import { LuGraduationCap, LuPlus, LuTrash2 } from "react-icons/lu";
 import SummarySectionForm from "./SummarySectionForm";
 import { defaultEducationItem } from "../../../constants";
 
@@ -37,8 +37,8 @@ const EducationForm = ({
   return (
     <div className="p-1 sm:p-2 space-y-6">
       {/* Header */}
-      <div className="pb-3 border-b border-slate-100 flex items-center justify-between">
-        <div>
+      <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
           <h2 className="text-lg font-bold text-slate-900 tracking-tight">
             Education
           </h2>
@@ -46,7 +46,8 @@ const EducationForm = ({
             Academic degrees, institutions, GPA/honors, and notable coursework.
           </p>
         </div>
-        <span className="text-[11px] font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200/60">
+        <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
+          <LuGraduationCap className="w-3.5 h-3.5 text-purple-600" />
           Core Section
         </span>
       </div>
@@ -83,8 +84,19 @@ const EducationForm = ({
               )}
             </div>
 
-            {/* Inputs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Inputs */}
+            <div className="space-y-3">
+              <div>
+                <label className="studio-label">Degree / Field of Study</label>
+                <input
+                  type="text"
+                  value={item.studyType || ""}
+                  onChange={({ target }) => updateArrayItem(index, "studyType", target.value)}
+                  placeholder="e.g. B.S. in Computer Science & Artificial Intelligence"
+                  className="studio-input"
+                />
+              </div>
+
               <div>
                 <label className="studio-label">Institution / University</label>
                 <input
@@ -96,26 +108,28 @@ const EducationForm = ({
                 />
               </div>
 
-              <div>
-                <label className="studio-label">Degree / Field of Study</label>
-                <input
-                  type="text"
-                  value={item.studyType || ""}
-                  onChange={({ target }) => updateArrayItem(index, "studyType", target.value)}
-                  placeholder="e.g. B.S. in Computer Science"
-                  className="studio-input"
-                />
-              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="studio-label">Location / City</label>
+                  <input
+                    type="text"
+                    value={item.area || ""}
+                    onChange={({ target }) => updateArrayItem(index, "area", target.value)}
+                    placeholder="e.g. Stanford, CA"
+                    className="studio-input"
+                  />
+                </div>
 
-              <div>
-                <label className="studio-label">Location / City</label>
-                <input
-                  type="text"
-                  value={item.area || ""}
-                  onChange={({ target }) => updateArrayItem(index, "area", target.value)}
-                  placeholder="e.g. Stanford, CA"
-                  className="studio-input"
-                />
+                <div>
+                  <label className="studio-label">Graduation Dates / Period</label>
+                  <input
+                    type="text"
+                    value={item.date || ""}
+                    onChange={({ target }) => updateArrayItem(index, "date", target.value)}
+                    placeholder="e.g. Sep 2018 - Jun 2022"
+                    className="studio-input"
+                  />
+                </div>
               </div>
 
               <div>
@@ -128,24 +142,13 @@ const EducationForm = ({
                   className="studio-input"
                 />
               </div>
-
-              <div className="sm:col-span-2">
-                <label className="studio-label">Graduation Dates / Period</label>
-                <input
-                  type="text"
-                  value={item.date || ""}
-                  onChange={({ target }) => updateArrayItem(index, "date", target.value)}
-                  placeholder="e.g. Sep 2018 - Jun 2022"
-                  className="studio-input"
-                />
-              </div>
             </div>
 
             {/* Summary */}
             <div className="pt-1">
-              <label className="studio-label mb-1.5">Academic Highlights & Relevant Coursework</label>
               <SummarySectionForm
                 sectionId="education"
+                label="Academic Highlights & Coursework"
                 item={{
                   institution: item.institution || "",
                   degree: item.studyType || "",

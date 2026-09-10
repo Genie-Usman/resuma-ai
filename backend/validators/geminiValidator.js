@@ -4,7 +4,8 @@ const generateSummarySchema = z.object({
     section: z.string().min(1, "Section identifier is required"),
     item: z.record(z.any()).refine((val) => typeof val === "object" && val !== null, {
         message: "Item details must be an object"
-    })
+    }),
+    tone: z.enum(["formal", "impactful", "concise", "technical"]).default("impactful").optional()
 });
 
 const jobMatchSchema = z.object({

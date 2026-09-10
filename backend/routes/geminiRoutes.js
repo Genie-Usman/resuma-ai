@@ -20,10 +20,10 @@ router.post(
   geminiLimiter,
   validateRequest(generateSummarySchema),
   async (req, res) => {
-    const { section, item } = req.body;
+    const { section, item, tone } = req.body;
 
     try {
-      const summary = await generateItemSummary({ section, item });
+      const summary = await generateItemSummary({ section, item, tone });
       res.json({ summary });
     } catch (err) {
       console.error("Item summary generation error:", err.message);

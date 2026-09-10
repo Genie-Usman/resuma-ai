@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { LuPlus, LuTrash2 } from "react-icons/lu";
+import { LuBriefcase, LuPlus, LuTrash2 } from "react-icons/lu";
 import SummarySectionForm from "./SummarySectionForm";
 import { defaultExperienceItem } from "../../../constants";
 
@@ -37,8 +37,8 @@ const ExperienceForm = ({
   return (
     <div className="p-1 sm:p-2 space-y-6">
       {/* Header */}
-      <div className="pb-3 border-b border-slate-100 flex items-center justify-between">
-        <div>
+      <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
           <h2 className="text-lg font-bold text-slate-900 tracking-tight">
             Work Experience
           </h2>
@@ -46,7 +46,8 @@ const ExperienceForm = ({
             Highlight your career trajectory, achievements, and quantifiable business impact.
           </p>
         </div>
-        <span className="text-[11px] font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200/60">
+        <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
+          <LuBriefcase className="w-3.5 h-3.5 text-purple-600" />
           Core Section
         </span>
       </div>
@@ -83,58 +84,60 @@ const ExperienceForm = ({
               )}
             </div>
 
-            {/* Inputs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label className="studio-label">Company / Organization</label>
-                <input
-                  type="text"
-                  value={item.company || ""}
-                  onChange={({ target }) => updateArrayItem(index, "company", target.value)}
-                  placeholder="e.g. Google, Stripe, OpenAI"
-                  className="studio-input"
-                />
-              </div>
-
+            {/* Inputs */}
+            <div className="space-y-3">
               <div>
                 <label className="studio-label">Job Title / Position</label>
                 <input
                   type="text"
                   value={item.position || ""}
                   onChange={({ target }) => updateArrayItem(index, "position", target.value)}
-                  placeholder="e.g. Senior Software Engineer"
+                  placeholder="e.g. Staff AI Solutions Architect"
                   className="studio-input"
                 />
               </div>
 
               <div>
-                <label className="studio-label">Location / City</label>
+                <label className="studio-label">Company / Organization</label>
                 <input
                   type="text"
-                  value={item.location || ""}
-                  onChange={({ target }) => updateArrayItem(index, "location", target.value)}
-                  placeholder="e.g. San Francisco, CA (Remote)"
+                  value={item.company || ""}
+                  onChange={({ target }) => updateArrayItem(index, "company", target.value)}
+                  placeholder="e.g. HyperScale AI Technologies"
                   className="studio-input"
                 />
               </div>
 
-              <div>
-                <label className="studio-label">Employment Dates</label>
-                <input
-                  type="text"
-                  value={item.date || ""}
-                  onChange={({ target }) => updateArrayItem(index, "date", target.value)}
-                  placeholder="e.g. Jan 2022 - Present"
-                  className="studio-input"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="studio-label">Location / City</label>
+                  <input
+                    type="text"
+                    value={item.location || ""}
+                    onChange={({ target }) => updateArrayItem(index, "location", target.value)}
+                    placeholder="e.g. San Francisco, CA"
+                    className="studio-input"
+                  />
+                </div>
+
+                <div>
+                  <label className="studio-label">Employment Dates</label>
+                  <input
+                    type="text"
+                    value={item.date || ""}
+                    onChange={({ target }) => updateArrayItem(index, "date", target.value)}
+                    placeholder="e.g. 2023 - Present"
+                    className="studio-input"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Summary / Bullet Points */}
             <div className="pt-1">
-              <label className="studio-label mb-1.5">Responsibilities & Key Accomplishments</label>
               <SummarySectionForm
                 sectionId="experience"
+                label="Responsibilities & Key Accomplishments"
                 item={{
                   company: item.company || "",
                   position: item.position || "",

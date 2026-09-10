@@ -565,7 +565,7 @@ const EditResume = () => {
             </div>
 
             {/* Middle: Active Form Panel */}
-            <div className="w-[460px] lg:w-[490px] xl:w-[520px] shrink-0 h-full overflow-y-auto bg-white border-r border-slate-200/80 p-5 lg:p-6 custom-scrollbar">
+            <div className="w-[490px] lg:w-[540px] xl:w-[580px] shrink-0 h-full overflow-y-auto bg-white border-r border-slate-200/80 p-5 lg:p-6 custom-scrollbar">
               {renderForm()}
             </div>
 

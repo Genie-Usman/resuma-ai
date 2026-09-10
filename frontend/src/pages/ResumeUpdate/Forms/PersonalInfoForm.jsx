@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { LuUser } from "react-icons/lu";
 import ProfilePhotoSelector from "../../../components/Inputs/ProfilePhotoSelector";
 
 const PersonalInfoForm = ({ profileData, updateSection }) => {
@@ -9,13 +10,19 @@ const PersonalInfoForm = ({ profileData, updateSection }) => {
   return (
     <div className="p-1 sm:p-2 space-y-6">
       {/* Header */}
-      <div className="pb-3 border-b border-slate-100">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-          Personal Information
-        </h2>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Core biographical and contact details displayed prominently at the top of your resume.
-        </p>
+      <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+            Personal Information
+          </h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Core biographical and contact details displayed prominently at the top of your resume.
+          </p>
+        </div>
+        <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
+          <LuUser className="w-3.5 h-3.5 text-purple-600" />
+          Core Section
+        </span>
       </div>
 
       {/* Profile Photo */}

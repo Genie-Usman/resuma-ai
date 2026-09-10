@@ -27,34 +27,45 @@ export const useResumeExport = (resumeDownloadRef, documentTitle = "Resume") => 
       }
       .no-print,
       .page-break-guide-line,
-      .page-break-guide-pill,
-      header,
-      nav,
-      aside,
-      button {
+      .page-break-guide-pill {
         display: none !important;
       }
       .a4-paper-sheet,
       .a4-print-sheet {
         width: 210mm !important;
-        min-height: 297mm !important;
+        min-height: 0 !important;
+        height: auto !important;
         margin: 0 auto !important;
         padding: 0 !important;
         box-shadow: none !important;
         border: none !important;
         transform: none !important;
       }
-      .page-break-avoid,
-      .resume-section,
-      .resume-item,
+      /* Allow sections, grids, and WYSIWYG containers to break across pages */
       section,
       article,
-      header,
-      h1, h2, h3, h4, h5, h6,
-      .wysiwyg > p,
-      .wysiwyg > ul {
+      .resume-section,
+      .wysiwyg {
+        break-inside: auto !important;
+        page-break-inside: auto !important;
+      }
+      /* Prevent individual resume entries and list items from being sliced awkwardly */
+      section > div > div,
+      .resume-item,
+      .page-break-avoid,
+      li {
         break-inside: avoid !important;
         page-break-inside: avoid !important;
+      }
+      /* Keep section headings attached to their following content (no orphan headings) */
+      h1, h2, h3, h4, h5, h6 {
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+      }
+      /* Prevent trailing margins from spawning phantom blank pages */
+      .a4-paper-sheet > *:last-child,
+      .a4-paper-sheet *:last-child {
+        margin-bottom: 0 !important;
       }
       a {
         color: inherit !important;

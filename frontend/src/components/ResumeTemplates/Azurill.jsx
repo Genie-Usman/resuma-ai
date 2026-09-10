@@ -88,20 +88,20 @@ const Azurill = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
             )}
 
             <div className="grid grid-cols-3 gap-x-5 min-w-0">
-                <aside className="sidebar group space-y-4 col-span-1 min-w-0 break-words">
+                <div className="sidebar group space-y-4 col-span-1 min-w-0 break-words">
                     {sidebarIds.map((key) =>
                         mapSectionToComponent(key, sections[key], key, themeColors)
                     )}
-                </aside>
+                </div>
 
-                <main
+                <div
                     className={`main group space-y-4 min-w-0 break-words ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"
                         }`}
                 >
                     {mainIds.map((key) =>
                         mapSectionToComponent(key, sections[key], key, themeColors)
                     )}
-                </main>
+                </div>
             </div>
         </div>
     );

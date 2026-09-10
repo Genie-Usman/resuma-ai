@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { LuPlus, LuTrash2 } from "react-icons/lu";
+import { LuGlobe, LuPlus, LuTrash2 } from "react-icons/lu";
 import { defaultProfileItem } from "../../../constants";
 import BrandIcon from "../../../components/shared/BrandIcon";
 
@@ -37,8 +37,8 @@ const ProfileForm = ({
   return (
     <div className="p-1 sm:p-2 space-y-6">
       {/* Header */}
-      <div className="pb-3 border-b border-slate-100 flex items-center justify-between">
-        <div>
+      <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
           <h2 className="text-lg font-bold text-slate-900 tracking-tight">
             Online & Social Profiles
           </h2>
@@ -46,7 +46,8 @@ const ProfileForm = ({
             Connect recruiters to your GitHub, LinkedIn, portfolio, and work samples.
           </p>
         </div>
-        <span className="text-[11px] font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200/60">
+        <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
+          <LuGlobe className="w-3.5 h-3.5 text-purple-600" />
           Links
         </span>
       </div>

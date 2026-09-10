@@ -307,12 +307,10 @@ h1, h2, h3, h4, h5, h6,
   .no-print,
   .page-break-guide-line,
   .page-break-guide-pill,
-  header,
-  nav,
-  aside,
-  button,
-  .btn,
-  .modal-backdrop {
+  .modal-backdrop,
+  .app-header,
+  .app-nav,
+  .app-sidebar {
     display: none !important;
   }
 
@@ -320,7 +318,8 @@ h1, h2, h3, h4, h5, h6,
   .a4-print-sheet,
   .a4-paper-sheet {
     width: 210mm !important;
-    min-height: 297mm !important;
+    min-height: 0 !important;
+    height: auto !important;
     margin: 0 auto !important;
     padding: 0 !important;
     box-shadow: none !important;
@@ -328,18 +327,34 @@ h1, h2, h3, h4, h5, h6,
     transform: none !important;
   }
 
-  /* Prevent page slicing through content */
-  .page-break-avoid,
-  .resume-section,
-  .resume-item,
+  /* Allow sections, grids, and WYSIWYG containers to break across pages */
   section,
   article,
-  header,
-  h1, h2, h3, h4, h5, h6,
-  .wysiwyg > p,
-  .wysiwyg > ul {
+  .resume-section,
+  .wysiwyg {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  /* Prevent individual resume entries and list items from being sliced awkwardly */
+  section > div > div,
+  .resume-item,
+  .page-break-avoid,
+  li {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
+  }
+
+  /* Keep section headings attached to their following content (no orphan headings) */
+  h1, h2, h3, h4, h5, h6 {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Prevent trailing margins from spawning phantom blank pages */
+  .a4-paper-sheet > *:last-child,
+  .a4-paper-sheet *:last-child {
+    margin-bottom: 0 !important;
   }
 
   /* Ensure links are active and styled cleanly */
@@ -355,9 +370,9 @@ h1, h2, h3, h4, h5, h6,
   background-color: rgba(248, 250, 252, 0.9);
   border: 1px solid #e2e8f0;
   color: #0f172a;
-  border-radius: 0.75rem;
-  padding: 0.625rem 0.875rem;
-  font-size: 0.875rem;
+  border-radius: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
   line-height: 1.25rem;
   transition: all 0.15s ease-in-out;
   outline: none;

@@ -2,17 +2,45 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const generateItemSummary = async ({ section, item }) => {
+const TONE_DIRECTIVES = {
+    formal: `
+TONE: FORMAL (Executive & Leadership)
+- Authoritative, polished corporate language suitable for director/executive review.
+- Focus: Strategic governance, organizational impact, leadership, and operational excellence.
+- Verbs: "Spearheaded", "Orchestrated", "Oversaw", "Championed", "Facilitated".
+`,
+    impactful: `
+TONE: IMPACTFUL (Google XYZ Formula)
+- Strict Google formula: "Accomplished [X], as measured by [Y], by doing [Z]".
+- MUST include hard quantifiable business impact: revenue, cost reduction, percentage gains, time savings.
+- Verbs: "Accelerated", "Maximized", "Delivered", "Outperformed", "Surpassed".
+`,
+    concise: `
+TONE: CONCISE (Punchy & Direct)
+- Maximum 15-20 words. Zero filler or fluff. High information density.
+- Style: Immediate clarity of action and result in a single clean sentence.
+`,
+    technical: `
+TONE: TECHNICAL (Deep Engineering & Systems Precision)
+- Deep technical specificity: architecture, frameworks, protocols, scale, throughput, and performance benchmarks.
+- Metrics: Latencies (ms), throughput (RPS/QPS), memory/CPU optimization, uptime SLAs.
+`
+};
+
+const generateItemSummary = async ({ section, item, tone = "impactful" }) => {
     let prompt = "";
+    const toneInstruction = TONE_DIRECTIVES[tone] || TONE_DIRECTIVES.impactful;
 
     switch (section) {
         case "personal-info":
             prompt = `
-You are a resume expert. Generate 3 first-person professional summaries for a resume, based on the following data:
+You are an executive resume writer. Generate 3 first-person professional summaries for a resume, based on the following data:
 
 Name: ${item.name || "N/A"}
 Headline: ${item.headline || "N/A"}
 Location: ${item.location || "N/A"}
+
+${toneInstruction}
 
 Write it for 3 experience levels:
 - Fresher
@@ -22,7 +50,7 @@ Write it for 3 experience levels:
 Each summary should be:
 - First-person
 - 2–3 sentences
-- Confident and professional
+- Confident, tailored specifically to the ${tone.toUpperCase()} tone
 - Avoid mentioning the person's name
 
 Return the result as strict JSON like this (no markdown, no extra text):
@@ -36,19 +64,19 @@ Return the result as strict JSON like this (no markdown, no extra text):
 
         case "experience":
             prompt = `
-You are a resume expert. Generate 3 first-person professional experience summaries for a resume, based on the following data:
+You are an executive resume writer. Generate 3 first-person professional experience summaries for a resume, based on the following data:
 
 Company: ${item.company || "N/A"}
 Position: ${item.position || "N/A"}
-Location: ${item.lcation || "N/A"}
+Location: ${item.location || item.lcation || "N/A"}
 Date: ${item.date || "N/A"}
 
+${toneInstruction}
+
 Instructions:
-- Generate 3 different summary suggestions, each with a slightly different writing style or tone
+- Generate 3 distinct summary suggestions strictly in the ${tone.toUpperCase()} tone
 - All should be first-person
 - Each should be 2–3 sentences
-- Maintain a confident and professional voice
-- Highlight relevant coursework, academic achievements, projects, or skills
 - Avoid mentioning the person's name
 - Avoid using labels like "fresher", "junior", or "senior"
 
@@ -337,8 +365,9 @@ Matched keywords and missing keywords should be concise skill/tool/qualification
  * Optimize an Experience Bullet Point using the Google "XYZ" formula and specified tone
  */
 const improveBulletPoint = async ({ text, tone = "impactful", context = {} }) => {
+    const toneInstruction = TONE_DIRECTIVES[tone] || TONE_DIRECTIVES.impactful;
     const prompt = `
-You are an elite executive resume writer specializing in the Google "XYZ" formula ("Accomplished [X], as measured by [Y], by doing [Z]").
+You are an elite executive resume writer. Transform the following draft bullet point into 3 high-caliber resume bullet points.
 
 INPUT TEXT / DRAFT BULLET POINT:
 "${text}"
@@ -347,17 +376,12 @@ CONTEXT:
 Role/Position: ${context.position || "Professional"}
 Company/Organization: ${context.company || "Company"}
 
-DESIRED TONE: "${tone.toUpperCase()}"
-Tone Guidelines:
-- FORMAL: Executive, authoritative corporate vocabulary, polished phrasing, leadership emphasis.
-- IMPACTFUL: Strong action verbs, quantified business impact, metrics, revenue/cost/time savings, Google XYZ formula.
-- CONCISE: Punchy, tight, eliminating filler words, maximizing information density while retaining accomplishments.
-- TECHNICAL: Deep engineering precision, architectural details, specific frameworks/tools, performance metrics, and systems design.
+${toneInstruction}
 
 Instructions:
-1. Generate 3 distinct, high-quality bullet point suggestions adhering strictly to the "${tone.toUpperCase()}" tone.
-2. If the user's input lacks numbers, invent realistic, plausible benchmark metrics (e.g., percentages, latencies, user scale) that sound authentic.
-3. Every suggestion must begin with a strong, active past-tense verb (e.g., "Engineered", "Orchestrated", "Accelerated", "Delivered").
+1. Generate 3 distinct, high-quality bullet point suggestions adhering strictly to the ${tone.toUpperCase()} tone requirements above.
+2. If the user's input lacks numbers, invent realistic, plausible benchmark metrics (e.g., percentages, latencies, user scale) that sound authentic and credible.
+3. Every suggestion must begin with a strong, active past-tense verb (e.g., "Engineered", "Orchestrated", "Accelerated", "Delivered", "Spearheaded").
 4. Return strictly valid JSON (no markdown, no backticks, no extra text):
 {
   "tone": "${tone}",

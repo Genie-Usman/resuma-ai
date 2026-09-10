@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { LuPlus, LuTrash2 } from "react-icons/lu";
+import { LuAward, LuPlus, LuTrash2 } from "react-icons/lu";
 import { defaultCertificationsItem } from "../../../constants";
 import SummarySectionForm from "./SummarySectionForm";
 
@@ -16,8 +16,8 @@ const CertificationsForm = ({
   return (
     <div className="p-1 sm:p-2 space-y-6">
       {/* Header */}
-      <div className="pb-3 border-b border-slate-100 flex items-center justify-between">
-        <div>
+      <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
           <h2 className="text-lg font-bold text-slate-900 tracking-tight">
             Certifications & Licenses
           </h2>
@@ -25,7 +25,8 @@ const CertificationsForm = ({
             Accredited qualifications, professional credentials, and vendor certifications.
           </p>
         </div>
-        <span className="text-[11px] font-semibold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200/60">
+        <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
+          <LuAward className="w-3.5 h-3.5 text-purple-600" />
           Credentials
         </span>
       </div>
@@ -111,9 +112,9 @@ const CertificationsForm = ({
 
             {/* Summary */}
             <div className="pt-1">
-              <label className="studio-label mb-1.5">Key Skills & Competencies Covered</label>
               <SummarySectionForm
                 sectionId="certifications"
+                label="Key Skills & Competencies Covered"
                 item={{
                   name: item.name || "",
                   issuer: item.issuer || "",

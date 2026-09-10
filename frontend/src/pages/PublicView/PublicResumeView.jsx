@@ -89,7 +89,7 @@ const PublicResumeView = () => {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      .no-print, header, nav, button, .public-toolbar {
+      .no-print, .public-toolbar {
         display: none !important;
       }
       .a4-paper-sheet {
