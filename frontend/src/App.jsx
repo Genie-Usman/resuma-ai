@@ -3,6 +3,7 @@ import { Toaster } from "react-hot-toast";
 
 // Components
 import EditResume from './pages/ResumeUpdate/EditResume';
+import PublicResumeView from './pages/PublicView/PublicResumeView';
 import AuthLayout from "./components/layouts/AuthLayout"
 import Dashboard from './pages/Home/Dashboard';
 import LandingPage from "./pages/LandingPage"
@@ -39,6 +40,10 @@ const App = () => {
 
             <Route path='/dashboard' element={<Dashboard />} />
             <Route path='/resume/:resumeId' element={<EditResume />} />
+
+            {/* Public Shareable Recruiter Routes */}
+            <Route path='/view/:slug' element={<PublicResumeView />} />
+            <Route path='/r/:slug' element={<PublicResumeView />} />
           </Routes>
         </Router>
       </div>

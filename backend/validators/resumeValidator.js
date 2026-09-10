@@ -1,8 +1,10 @@
 const { z } = require("zod");
 
 const createResumeSchema = z.object({
-    title: z.string().trim().min(1, "Resume title is required").max(100, "Title cannot exceed 100 characters")
-});
+    title: z.string().trim().min(1, "Resume title is required").max(100, "Title cannot exceed 100 characters"),
+    data: z.record(z.any()).optional(),
+    isPublic: z.boolean().optional()
+}).passthrough();
 
 const updateResumeSchema = z.object({
     title: z.string().trim().min(1).max(100).optional(),

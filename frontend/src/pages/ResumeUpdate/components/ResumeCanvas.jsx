@@ -105,10 +105,10 @@ const ResumeCanvas = ({
   return (
     <div
       ref={containerRef}
-      className="flex flex-col h-full bg-gray-100/80 rounded-xl border border-gray-200 shadow-inner overflow-hidden"
+      className="flex flex-col h-full bg-slate-100/90 rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden"
     >
       {/* Canvas Top Control Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 bg-white/95 backdrop-blur-xs border-b border-gray-200 text-xs text-gray-700 select-none z-10">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 bg-white/95 backdrop-blur-md border-b border-slate-200/80 text-xs text-slate-700 select-none z-10 shrink-0">
         {/* Left: Page Count Badge & Overflow Warning */}
         <div className="flex items-center gap-2 flex-wrap">
           <div
@@ -121,10 +121,10 @@ const ResumeCanvas = ({
 
           {isNearSinglePageLimit && (
             <div
-              className="hidden xl:flex items-center gap-1 text-[11px] text-amber-700 bg-amber-50/80 px-2 py-0.5 rounded border border-amber-200"
+              className="hidden xl:flex items-center gap-1 text-[11px] text-amber-700 bg-amber-50/90 px-2 py-0.5 rounded-lg border border-amber-200"
               title="Only a tiny section spilled to page 2. Trim 1-2 bullets to fit cleanly on 1 page!"
             >
-              <span>💡 Tip: Trim 1–2 lines to keep to 1 page</span>
+              <span>💡 Tip: Trim 1–2 lines to fit 1 page</span>
             </div>
           )}
         </div>
@@ -135,10 +135,10 @@ const ResumeCanvas = ({
           <button
             type="button"
             onClick={() => setShowGuides((prev) => !prev)}
-            className={`flex items-center gap-1 px-2 py-1 rounded-md border font-medium transition-colors ${
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border font-medium transition-colors cursor-pointer ${
               showGuides
                 ? "bg-purple-50 text-purple-700 border-purple-200"
-                : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"
+                : "bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100"
             }`}
             title="Toggle visual A4 page break lines"
           >
@@ -150,10 +150,10 @@ const ResumeCanvas = ({
           <button
             type="button"
             onClick={() => setViewMode((prev) => (prev === "continuous" ? "cards" : "continuous"))}
-            className={`flex items-center gap-1 px-2 py-1 rounded-md border font-medium transition-colors ${
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border font-medium transition-colors cursor-pointer ${
               viewMode === "cards"
                 ? "bg-purple-50 text-purple-700 border-purple-200"
-                : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"
+                : "bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100"
             }`}
             title="Toggle between Continuous view and Visual Page Cards"
           >
@@ -163,20 +163,20 @@ const ResumeCanvas = ({
             </span>
           </button>
 
-          <div className="h-4 w-px bg-gray-200 mx-1" />
+          <div className="h-4 w-px bg-slate-200 mx-1" />
 
           {/* Zoom Out */}
           <button
             type="button"
             onClick={handleZoomOut}
-            className="p-1 rounded-md hover:bg-gray-100 text-gray-600 transition-colors"
+            className="p-1 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
             title="Zoom out"
           >
             <LuZoomOut className="text-sm" />
           </button>
 
           {/* Zoom Percentage */}
-          <span className="min-w-[40px] text-center font-mono text-gray-600 font-medium">
+          <span className="min-w-[40px] text-center font-mono text-slate-600 font-semibold text-xs">
             {Math.round(zoom * 100)}%
           </span>
 
@@ -184,7 +184,7 @@ const ResumeCanvas = ({
           <button
             type="button"
             onClick={handleZoomIn}
-            className="p-1 rounded-md hover:bg-gray-100 text-gray-600 transition-colors"
+            className="p-1 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
             title="Zoom in"
           >
             <LuZoomIn className="text-sm" />
@@ -194,10 +194,10 @@ const ResumeCanvas = ({
           <button
             type="button"
             onClick={handleToggleAutoFit}
-            className={`p-1 rounded-md border transition-colors ${
+            className={`p-1 rounded-lg border transition-colors cursor-pointer ${
               isAutoFit
                 ? "bg-purple-50 text-purple-700 border-purple-200"
-                : "hover:bg-gray-100 text-gray-600 border-transparent"
+                : "hover:bg-slate-100 text-slate-600 border-transparent"
             }`}
             title="Auto fit to column width"
           >
@@ -206,8 +206,8 @@ const ResumeCanvas = ({
         </div>
       </div>
 
-      {/* Main Canvas Scroll Area */}
-      <div className="flex-1 overflow-auto p-4 flex justify-center items-start custom-scrollbar">
+      {/* Main Canvas Scroll Area with Studio Pattern Backdrop */}
+      <div className="flex-1 overflow-auto p-4 sm:p-6 flex justify-center items-start custom-scrollbar studio-canvas-pattern">
         {/* Scaled Layout Wrapper (ensures correct scrollable dimensions) */}
         <div
           style={{
@@ -226,7 +226,7 @@ const ResumeCanvas = ({
                 transformOrigin: "top center",
                 width: `${A4_WIDTH_PX}px`,
               }}
-              className="a4-paper-sheet relative shadow-xl rounded-xs transition-transform duration-150 origin-top bg-white"
+              className="a4-paper-sheet relative shadow-2xl ring-1 ring-black/5 rounded-xs transition-transform duration-150 origin-top bg-white"
             >
               {/* Overlaid Visual Page Break Lines */}
               {showGuides &&

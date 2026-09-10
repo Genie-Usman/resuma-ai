@@ -5,7 +5,8 @@ const {
   getResumeById,
   updateResume,
   deleteResume,
-  duplicateResume
+  duplicateResume,
+  getPublicResume,
 } = require("../controllers/resumeController");
 
 const { uploadResumeImages } = require("../controllers/uploadImages");
@@ -17,7 +18,10 @@ const { createResumeSchema, updateResumeSchema } = require("../validators/resume
 
 const router = express.Router();
 
-// Core Resume Routes
+// Public Resume Route (Unauthenticated Recruiter View)
+router.get("/public/:slug", getPublicResume);
+
+// Core Protected Resume Routes
 router.post("/", protect, validateRequest(createResumeSchema), createResume);
 router.get("/", protect, getUserResumes);
 router.get("/:id", protect, getResumeById);

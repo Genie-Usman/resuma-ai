@@ -42,13 +42,13 @@ import axiosInstance from '../../../utils/axiosInstance';
 const MenuBar = ({ editor }) => {
     if (!editor) return null;
 
-    const baseBtn = `p-1.5 rounded transition`;
+    const baseBtn = `p-1.5 rounded-lg transition-all text-xs font-medium cursor-pointer`;
     const iconBtn = (isActive) =>
-        `${baseBtn} ${isActive ? 'bg-gray-300 text-black' : 'hover:bg-gray-200 text-gray-600'}`;
-    const disabledBtn = `${baseBtn} text-gray-400 cursor-not-allowed`;
+        `${baseBtn} ${isActive ? 'bg-purple-100 text-purple-800 font-semibold shadow-xs' : 'hover:bg-slate-200/80 text-slate-600'}`;
+    const disabledBtn = `${baseBtn} text-slate-300 cursor-not-allowed`;
 
     return (
-        <div className="flex flex-wrap gap-1 border border-gray-300 bg-white rounded px-2 py-1 mb-3">
+        <div className="flex flex-wrap items-center gap-1 border border-slate-200 bg-slate-100/90 rounded-t-xl px-2 py-1.5 border-b-0">
             {/* Bold */}
             <button
                 type="button"
@@ -355,7 +355,7 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item }) => {
         editorProps: {
             attributes: {
                 class:
-                    'min-h-[180px] max-h-[220px] p-3 border overflow-auto custom-scrollbar border-gray-300 rounded-b bg-white focus:outline-none prose prose-sm max-w-none text-gray-900',
+                    'min-h-[160px] max-h-[240px] p-3.5 border overflow-auto custom-scrollbar border-slate-200 rounded-b-xl bg-white focus:outline-none prose prose-sm max-w-none text-slate-800 focus:ring-1 focus:ring-purple-500/30',
             },
         },
         onUpdate: ({ editor }) => {
@@ -364,15 +364,15 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item }) => {
     });
 
     return (
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div className="col-span-2 mt-3">
+        <div className='w-full'>
+            <div className="mt-2">
                 {/* Header with Title & Action Buttons */}
                 <div className='flex flex-wrap items-center justify-between gap-2 mb-2'>
                     <div>
-                        <h2 className="font-bold text-base md:text-lg text-gray-900">
+                        <h2 className="font-bold text-base md:text-lg text-slate-900 tracking-tight">
                             Description & Bullet Points
                         </h2>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-slate-500">
                             Draft achievements or click "Improve with AI" to apply the Google XYZ formula.
                         </p>
                     </div>
@@ -383,7 +383,7 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item }) => {
                             type="button"
                             disabled={improving || loading}
                             onClick={handleImproveText}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg shadow-xs transition-colors cursor-pointer"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 rounded-xl shadow-xs transition-all cursor-pointer"
                             title="Transform draft into Google XYZ high-impact bullet points"
                         >
                             {improving ? (
@@ -399,7 +399,7 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item }) => {
                             type="button"
                             disabled={loading || improving}
                             onClick={handleGenerateSummary}
-                            className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 disabled:opacity-50 rounded-lg border border-purple-200 transition-colors cursor-pointer"
+                            className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 disabled:opacity-50 rounded-xl border border-purple-200 transition-colors cursor-pointer"
                             title="Generate a full professional summary from role information"
                         >
                             {loading ? (
@@ -413,9 +413,9 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item }) => {
                 </div>
 
                 {/* AI Tone Selector Bar */}
-                <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-gray-50 rounded-lg border border-gray-200 mb-3 text-xs">
-                    <span className="font-semibold text-gray-500 px-1 text-[11px] uppercase tracking-wide">
-                        AI Tone:
+                <div className="flex items-center gap-1 p-1 bg-slate-100/90 rounded-xl border border-slate-200 mb-3 text-xs w-fit">
+                    <span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider px-2">
+                        Tone:
                     </span>
                     {AI_TONES.map((t) => (
                         <button
@@ -423,10 +423,10 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item }) => {
                             type="button"
                             onClick={() => setSelectedTone(t.id)}
                             title={t.title}
-                            className={`px-2.5 py-1 rounded-md font-medium transition-all cursor-pointer ${
+                            className={`px-3 py-1 rounded-lg font-medium transition-all cursor-pointer text-xs ${
                                 selectedTone === t.id
-                                    ? "bg-purple-600 text-white shadow-xs"
-                                    : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-100"
+                                    ? "bg-white text-purple-700 shadow-xs font-semibold"
+                                    : "text-slate-600 hover:text-slate-900"
                             }`}
                         >
                             {t.label}

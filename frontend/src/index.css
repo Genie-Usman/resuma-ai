@@ -19,6 +19,31 @@
     overflow-x: hidden;
   }
 
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    border-radius: 0.75rem;
+    border-color: #e2e8f0;
+    transition: all 0.15s ease-in-out;
+  }
+
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="tel"]:focus,
+  input[type="url"]:focus,
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  textarea:focus,
+  select:focus {
+    border-color: #7c3aed;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  }
 }
 
 @layer utilities {
@@ -322,4 +347,54 @@ h1, h2, h3, h4, h5, h6,
     color: inherit !important;
     text-decoration: none !important;
   }
-}
+}
+
+/* Studio Design System Utilities */
+.studio-input {
+  width: 100%;
+  background-color: rgba(248, 250, 252, 0.9);
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+  border-radius: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition: all 0.15s ease-in-out;
+  outline: none;
+}
+.studio-input:hover {
+  border-color: #cbd5e1;
+  background-color: #ffffff;
+}
+.studio-input:focus {
+  background-color: #ffffff;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+.studio-input::placeholder {
+  color: #94a3b8;
+}
+
+.studio-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 0.375rem;
+}
+
+.studio-card {
+  background-color: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+}
+
+.studio-canvas-pattern {
+  background-color: #f1f5f9;
+  background-image: radial-gradient(#cbd5e1 1.25px, transparent 1.25px);
+  background-size: 20px 20px;
+}
+

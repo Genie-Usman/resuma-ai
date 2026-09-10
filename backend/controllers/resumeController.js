@@ -5,12 +5,14 @@ const User = require('../models/User.js');
 const { getDefaultResumeData } = require('../utils/DefaultResume.js');
 const { slugify } = require('../utils/helper.js');
 
+const mongoose = require("mongoose");
+
 // @desc    Create a new Resume
 // @route   POST /api/resumes
 // @access  Private
 const createResume = async (req, res) => {
   try {
-    const { title } = req.body;
+    const { title, data } = req.body;
 
     if (!title || typeof title !== 'string') {
       return res.status(400).json({ message: 'Title is required' });
@@ -24,17 +26,23 @@ const createResume = async (req, res) => {
     const baseSlug = slugify(title);
     let slug = baseSlug;
     let count = 1;
-    while (await Resume.findOne({ userId: user._id, slug })) {
+    // Globally unique slug for clean public sharing (/view/:slug)
+    while (await Resume.findOne({ slug })) {
       slug = `${baseSlug}-${count++}`;
     }
 
-    const resumeData = getDefaultResumeData(user);
+    const resumeData = data && typeof data === 'object' && Object.keys(data).length > 0
+      ? data
+      : getDefaultResumeData(user);
 
     const newResume = await Resume.create({
       userId: user._id,
       title,
       slug,
-      data: resumeData
+      data: resumeData,
+      isPublic: true,
+      viewsCount: 0,
+      lastViewedAt: null,
     });
 
     res.status(201).json(newResume);
@@ -155,7 +163,7 @@ const duplicateResume = async (req, res) => {
     const baseSlug = slugify(newTitle);
     let slug = baseSlug;
     let count = 1;
-    while (await Resume.findOne({ userId: req.user._id, slug })) {
+    while (await Resume.findOne({ slug })) {
       slug = `${baseSlug}-${count++}`;
     }
 
@@ -168,6 +176,9 @@ const duplicateResume = async (req, res) => {
       slug,
       thumbnailLink: originalResume.thumbnailLink,
       data: clonedData,
+      isPublic: true,
+      viewsCount: 0,
+      lastViewedAt: null,
     });
 
     res.status(201).json(duplicatedResume);
@@ -177,4 +188,59 @@ const duplicateResume = async (req, res) => {
   }
 };
 
-module.exports = { createResume, getUserResumes, getResumeById, updateResume, deleteResume, duplicateResume };
+// @desc    Get public Resume by slug or ID & track recruiter views
+// @route   GET /api/resume/public/:slug
+// @access  Public
+const getPublicResume = async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    // Check if query is valid MongoDB ObjectId or text slug
+    const query = mongoose.Types.ObjectId.isValid(slug)
+      ? { $or: [{ _id: slug }, { slug }] }
+      : { slug };
+
+    // Find resume and increment view count atomically
+    const resume = await Resume.findOneAndUpdate(
+      { ...query, isPublic: { $ne: false } },
+      {
+        $inc: { viewsCount: 1 },
+        $set: { lastViewedAt: new Date() },
+      },
+      { new: true }
+    ).populate("userId", "name email profileImageURL");
+
+    if (!resume) {
+      return res.status(404).json({ message: "Resume not found or is set to private." });
+    }
+
+    res.json({
+      _id: resume._id,
+      title: resume.title,
+      slug: resume.slug,
+      thumbnailLink: resume.thumbnailLink,
+      data: resume.data,
+      viewsCount: resume.viewsCount,
+      lastViewedAt: resume.lastViewedAt,
+      author: {
+        name: resume.userId?.name || "Author",
+        email: resume.userId?.email || "",
+        avatar: resume.userId?.profileImageURL || "",
+      },
+      updatedAt: resume.updatedAt,
+    });
+  } catch (error) {
+    console.error("Get public resume error:", error);
+    res.status(500).json({ message: "Failed to load public resume", error: error.message });
+  }
+};
+
+module.exports = {
+  createResume,
+  getUserResumes,
+  getResumeById,
+  updateResume,
+  deleteResume,
+  duplicateResume,
+  getPublicResume,
+};

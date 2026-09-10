@@ -1,152 +1,139 @@
 import { useEffect } from "react";
 import ProfilePhotoSelector from "../../../components/Inputs/ProfilePhotoSelector";
-import SummarySectionForm from "./SummarySectionForm";
 
-const PersonalInfoForm = ({ profileData, updateSection, resumeData, setResumeData }) => {
+const PersonalInfoForm = ({ profileData, updateSection }) => {
+  useEffect(() => {
+    document.title = "Resuma AI - Personal Info";
+  }, []);
 
-    useEffect(() => {
-        document.title = "Resuma AI - Personal Info"
-    }, [])
+  return (
+    <div className="p-1 sm:p-2 space-y-6">
+      {/* Header */}
+      <div className="pb-3 border-b border-slate-100">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+          Personal Information
+        </h2>
+        <p className="text-xs text-slate-500 mt-0.5">
+          Core biographical and contact details displayed prominently at the top of your resume.
+        </p>
+      </div>
 
-    return (
-        <div className="px-5 pt-5">
-            <h2 className="text-lg md:text-xl font-semibold text-gray-900">Personal Information</h2>
+      {/* Profile Photo */}
+      <div className="flex flex-col items-center justify-center p-3.5 bg-slate-50/70 border border-slate-200/80 rounded-2xl">
+        <ProfilePhotoSelector
+          image={profileData?.picture?.url || ""}
+          setImage={(value) =>
+            updateSection("picture", {
+              ...profileData?.picture,
+              url: value,
+            })
+          }
+          preview={profileData?.picture?.url || ""}
+          setPreview={(value) =>
+            updateSection("picture", {
+              ...profileData?.picture,
+              url: value,
+            })
+          }
+          onImageUploaded={(url) =>
+            updateSection("picture", {
+              ...profileData?.picture,
+              url,
+            })
+          }
+        />
+        <span className="text-[11px] text-slate-400 mt-2">
+          Recommended: square JPG or PNG, under 5 MB
+        </span>
+      </div>
 
-            <div className="mt-4">
-                {/* Profile Photo */}
-                <ProfilePhotoSelector
-                    image={profileData?.picture?.url || ''}
-                    setImage={(value) =>
-                        updateSection('picture', {
-                            ...profileData?.picture,
-                            url: value,
-                        })
-                    }
-                    preview={profileData?.picture?.url || ''}
-                    setPreview={(value) =>
-                        updateSection('picture', {
-                            ...profileData?.picture,
-                            url: value,
-                        })
-                    }
-                    onImageUploaded={(url) =>
-                        updateSection('picture', {
-                            ...profileData?.picture,
-                            url,
-                        })
-                    }
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Full Name */}
-                    <div className="flex flex-col">
-                        <label className="mb-1 font-semibold text-sm">Full Name</label>
-                        <input
-                            type="text"
-                            value={profileData?.name || ""}
-                            onChange={({ target }) => updateSection("name", target.value)}
-                            placeholder="John Doe"
-                            className="border border-gray-300 rounded px-3 py-2 w-full"
-                        />
-                    </div>
-
-                    {/* Headline / Designation */}
-                    <div className="flex flex-col">
-                        <label className="mb-1 font-semibold text-sm">Headline</label>
-                        <input
-                            type="text"
-                            value={profileData?.headline || ""}
-                            onChange={({ target }) => updateSection("headline", target.value)}
-                            placeholder="Full Stack Developer"
-                            className="border border-gray-300 rounded px-3 py-2 w-full"
-                        />
-                    </div>
-
-                    {/* Email */}
-                    <div className="flex flex-col">
-                        <label className="mb-1 font-semibold text-sm">Email</label>
-                        <input
-                            type="email"
-                            value={profileData?.email || ""}
-                            onChange={({ target }) => updateSection("email", target.value)}
-                            placeholder="johndoe@gmail.com"
-                            className="border border-gray-300 rounded px-3 py-2 w-full"
-                        />
-                    </div>
-
-                    {/* Phone */}
-                    <div className="flex flex-col">
-                        <label className="mb-1 font-semibold text-sm">Phone</label>
-                        <input
-                            type="tel"
-                            value={profileData?.phone || ""}
-                            onChange={({ target }) => updateSection("phone", target.value)}
-                            placeholder="+1 (234) 567-8901"
-                            className="border border-gray-300 rounded px-3 py-2 w-full"
-                        />
-                    </div>
-
-                    {/* Location */}
-                    <div className="flex flex-col">
-                        <label className="mb-1 font-semibold text-sm">Location</label>
-                        <input
-                            type="text"
-                            value={profileData?.location || ""}
-                            onChange={({ target }) => updateSection("location", target.value)}
-                            placeholder="Sesame Street, New York"
-                            className="border border-gray-300 rounded px-3 py-2 w-full"
-                        />
-                    </div>
-
-                    {/* Website URL */}
-                    <div className="flex flex-col">
-                        <label className="mb-1 font-semibold text-sm">Website</label>
-                        <input
-                            type="url"
-                            value={profileData?.url?.href || ""}
-                            onChange={({ target }) =>
-                                updateSection("url", {
-                                    ...profileData?.url,
-                                    href: target.value,
-                                })
-                            }
-                            placeholder="https://johndoe.me"
-                            className="border border-gray-300 rounded px-3 py-2 w-full"
-                        />
-                    </div>
-
-                    {/* Summary */}
-                    <div className="flex flex-col md:col-span-2">
-                        <SummarySectionForm
-                            sectionId="personal-info"
-                            item={{
-                                name: profileData.name || "",
-                                headline: profileData.headline || "",
-                                location: profileData.location || "",
-                            }}
-                            content={resumeData.data.sections?.summary?.content || ""}
-                            updateContent={(newContent) =>
-                                setResumeData((prev) => ({
-                                    ...prev,
-                                    data: {
-                                        ...prev.data,
-                                        sections: {
-                                            ...prev.data.sections,
-                                            summary: {
-                                                ...prev.data.sections.summary,
-                                                content: newContent,
-                                            },
-                                        },
-                                    },
-                                }))
-                            }
-                        />
-                    </div>
-                </div>
-            </div>
-
+      {/* Main Details Form */}
+      <div className="space-y-4">
+        {/* Full Name */}
+        <div>
+          <label className="studio-label">Full Name</label>
+          <input
+            type="text"
+            value={profileData?.name || ""}
+            onChange={({ target }) => updateSection("name", target.value)}
+            placeholder="e.g. Alex Morgan"
+            className="studio-input"
+          />
         </div>
-    );
+
+        {/* Professional Headline */}
+        <div>
+          <label className="studio-label">Professional Headline</label>
+          <input
+            type="text"
+            value={profileData?.headline || ""}
+            onChange={({ target }) => updateSection("headline", target.value)}
+            placeholder="e.g. Senior Full-Stack AI Engineer & Cloud Architect"
+            className="studio-input"
+          />
+          <p className="text-[11px] text-slate-400 mt-1">
+            Target role or primary specialization (matches ATS keywords)
+          </p>
+        </div>
+
+        {/* Contact Info (Email & Phone) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label className="studio-label">Email Address</label>
+            <input
+              type="email"
+              value={profileData?.email || ""}
+              onChange={({ target }) => updateSection("email", target.value)}
+              placeholder="alex.morgan@example.com"
+              className="studio-input"
+            />
+          </div>
+
+          <div>
+            <label className="studio-label">Phone Number</label>
+            <input
+              type="tel"
+              value={profileData?.phone || ""}
+              onChange={({ target }) => updateSection("phone", target.value)}
+              placeholder="+1 (555) 234-5678"
+              className="studio-input"
+            />
+          </div>
+        </div>
+
+        {/* Location & Portfolio Website */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label className="studio-label">Location / City</label>
+            <input
+              type="text"
+              value={profileData?.location || ""}
+              onChange={({ target }) => updateSection("location", target.value)}
+              placeholder="San Francisco, CA (Remote)"
+              className="studio-input"
+            />
+          </div>
+
+          <div>
+            <label className="studio-label">Portfolio / Website</label>
+            <input
+              type="url"
+              value={profileData?.url?.href || ""}
+              onChange={({ target }) =>
+                updateSection("url", {
+                  ...profileData?.url,
+                  href: target.value,
+                  label: target.value.replace(/^https?:\/\//, ""),
+                })
+              }
+              placeholder="https://alexmorgan.dev"
+              className="studio-input"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default PersonalInfoForm;

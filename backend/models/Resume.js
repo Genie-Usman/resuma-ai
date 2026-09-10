@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const ResumeSchema = new mongoose.Schema(
     {
@@ -7,13 +7,19 @@ const ResumeSchema = new mongoose.Schema(
         slug: { type: String, required: true },
         thumbnailLink: { type: String },
         data: { type: mongoose.Schema.Types.Mixed, default: {} },
+        isPublic: { type: Boolean, default: true },
+        viewsCount: { type: Number, default: 0 },
+        lastViewedAt: { type: Date, default: null },
     },
     { timestamps: true }
 );
 
 // Unique slug per user
 ResumeSchema.index({ userId: 1, slug: 1 }, { unique: true });
+// Fast public slug queries
+ResumeSchema.index({ slug: 1 });
 // Speed up user-based queries
 ResumeSchema.index({ userId: 1 });
 
 module.exports = mongoose.model('Resume', ResumeSchema);
+

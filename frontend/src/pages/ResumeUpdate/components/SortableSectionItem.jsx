@@ -34,11 +34,11 @@ const SortableSectionItem = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group flex items-center justify-between px-3 py-2.5 rounded-lg border transition-all select-none cursor-pointer ${
+      className={`group flex items-center justify-between px-3 py-2 rounded-xl border text-sm transition-all select-none cursor-pointer ${
         isActive
-          ? "bg-purple-50 border-purple-400 text-purple-900 shadow-sm"
-          : "bg-white border-gray-200 hover:border-purple-200 hover:bg-gray-50/80 text-gray-700"
-      } ${!isVisible ? "opacity-50 bg-gray-50" : ""}`}
+          ? "bg-purple-50/80 border-purple-500 text-purple-950 font-semibold shadow-xs ring-1 ring-purple-500/20"
+          : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70 text-slate-700"
+      } ${!isVisible ? "opacity-45 bg-slate-50/60" : ""}`}
       onClick={onSelect}
     >
       {/* Left: Drag Handle + Icon + Label */}

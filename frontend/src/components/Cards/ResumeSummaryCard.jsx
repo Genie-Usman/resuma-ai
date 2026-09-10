@@ -1,7 +1,16 @@
 import { useState } from 'react';
-import { LuCopy, LuPencil, LuTrash2 } from 'react-icons/lu';
+import { LuCopy, LuPencil, LuTrash2, LuShare2, LuEye } from 'react-icons/lu';
 
-const ResumeSummaryCard = ({ imgUrl, title, lastUpdated, onSelect, onDuplicate, onDelete }) => {
+const ResumeSummaryCard = ({
+  imgUrl,
+  title,
+  lastUpdated,
+  viewsCount = 0,
+  onSelect,
+  onDuplicate,
+  onDelete,
+  onShare,
+}) => {
   const [bgColor, setBgColor] = useState('#FFFFFF');
 
   return (
@@ -10,8 +19,31 @@ const ResumeSummaryCard = ({ imgUrl, title, lastUpdated, onSelect, onDuplicate, 
       style={{ backgroundColor: bgColor }}
       onClick={onSelect}
     >
+      {/* Views Count Badge */}
+      {viewsCount > 0 && (
+        <div
+          className="absolute top-2 left-2 z-20 flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-xs text-[11px] font-semibold text-purple-700 shadow-xs border border-purple-100"
+          title={`Viewed ${viewsCount} times`}
+        >
+          <LuEye className="text-xs" />
+          <span>{viewsCount}</span>
+        </div>
+      )}
+
       {/* Action Buttons (Visible on hover) */}
       <div className="absolute top-2 right-2 z-20 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onShare?.();
+          }}
+          className="p-1.5 bg-white/95 hover:bg-purple-600 hover:text-white text-gray-700 rounded-md shadow transition-colors"
+          title="Share & Analytics"
+        >
+          <LuShare2 className="text-sm" />
+        </button>
+
         <button
           type="button"
           onClick={(e) => {

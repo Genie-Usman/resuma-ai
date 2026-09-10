@@ -30,6 +30,8 @@ import {
   LuSave,
   LuEye,
   LuTarget,
+  LuShare2,
+  LuFileJson,
 } from "react-icons/lu";
 import SortableSectionItem from "./SortableSectionItem";
 
@@ -75,6 +77,8 @@ const EditorSidebar = ({
   onOpenTheme,
   onOpenPreview,
   onOpenJobMatch,
+  onOpenShare,
+  onExportJson,
   onDownload,
   isSaving,
 }) => {
@@ -107,30 +111,30 @@ const EditorSidebar = ({
   };
 
   return (
-    <aside className="w-full bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col gap-4">
+    <aside className="w-full h-full bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-xs flex flex-col gap-3">
       {/* Top Section: Action Controls */}
-      <div className="flex items-center justify-between gap-2 pb-3 border-b border-gray-100">
-        <h3 className="text-sm font-bold text-gray-800 tracking-wide uppercase">
+      <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+        <h3 className="text-xs font-bold text-slate-800 tracking-wider uppercase">
           Resume Sections
         </h3>
-        <span className="text-xs text-gray-400 font-medium">Drag to reorder</span>
+        <span className="text-[11px] text-slate-400 font-medium">Drag to reorder</span>
       </div>
 
       {/* Fixed: Personal Information */}
       <div
         onClick={() => setActivePage("personal-info")}
-        className={`flex items-center justify-between px-3 py-2.5 rounded-lg border transition-all cursor-pointer ${
+        className={`flex items-center justify-between px-3 py-2 rounded-xl border text-sm transition-all cursor-pointer ${
           activePage === "personal-info"
-            ? "bg-purple-50 border-purple-400 text-purple-900 shadow-sm"
-            : "bg-white border-gray-200 hover:border-purple-200 hover:bg-gray-50/80 text-gray-700"
+            ? "bg-purple-50/80 border-purple-500 text-purple-950 font-semibold shadow-xs ring-1 ring-purple-500/20"
+            : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70 text-slate-700"
         }`}
       >
         <div className="flex items-center gap-2.5">
-          <div className="w-4 flex justify-center text-purple-600 font-bold">•</div>
-          <LuUser className={`text-base ${activePage === "personal-info" ? "text-purple-600" : "text-gray-500"}`} />
+          <div className="w-2.5 h-2.5 rounded-full bg-purple-600 shrink-0" />
+          <LuUser className={`text-base ${activePage === "personal-info" ? "text-purple-600" : "text-slate-500"}`} />
           <span className="text-sm font-medium">Personal Information</span>
         </div>
-        <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">
+        <span className="text-[10px] font-bold text-purple-700 bg-purple-100/70 px-2 py-0.5 rounded-full uppercase tracking-wider">
           Core
         </span>
       </div>
@@ -145,7 +149,7 @@ const EditorSidebar = ({
           items={sortableKeys}
           strategy={verticalListSortingStrategy}
         >
-          <div className="flex flex-col gap-2 max-h-[460px] overflow-y-auto custom-scrollbar pr-1">
+          <div className="flex-1 min-h-[300px] overflow-y-auto custom-scrollbar pr-1 flex flex-col gap-1.5">
             {sortableKeys.map((key) => {
               const sec = sections[key];
               const IconComponent = SECTION_ICONS[key] || LuSparkles;
@@ -168,57 +172,22 @@ const EditorSidebar = ({
         </SortableContext>
       </DndContext>
 
-      {/* Bottom Actions */}
-      <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
-        <button
-          type="button"
-          onClick={onOpenJobMatch}
-          className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-white bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-lg transition-all shadow-xs cursor-pointer"
-          title="Analyze ATS match against a job description"
-        >
-          <LuTarget className="text-sm" />
-          <span>ATS Job Match Analyzer</span>
-        </button>
-
-        <div className="grid grid-cols-2 gap-2">
+      {/* Sidebar Footer: Fast Utilities */}
+      <div className="pt-3 border-t border-slate-100 flex flex-col gap-2 shrink-0">
+        {onExportJson && (
           <button
             type="button"
-            onClick={onOpenTheme}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors"
+            onClick={onExportJson}
+            className="flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100/80 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-purple-200"
+            title="Export resume in open-standard JSON Resume format"
           >
-            <LuPalette className="text-sm" />
-            Theme
+            <LuFileJson className="text-sm text-purple-600" />
+            <span>Export JSON Resume</span>
           </button>
-
-          <button
-            type="button"
-            onClick={onOpenPreview}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors"
-          >
-            <LuEye className="text-sm" />
-            Preview
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={onSave}
-            disabled={isSaving}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors disabled:opacity-50"
-          >
-            <LuSave className="text-sm" />
-            {isSaving ? "Saving..." : "Save"}
-          </button>
-
-          <button
-            type="button"
-            onClick={onDownload}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors shadow-sm"
-          >
-            <LuDownload className="text-sm" />
-            PDF Export
-          </button>
+        )}
+        <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+          <span>{sortableKeys.length + 1} sections active</span>
+          <span className="text-purple-600 font-medium">A4 Standard</span>
         </div>
       </div>
     </aside>
