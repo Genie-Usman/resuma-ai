@@ -1,6 +1,5 @@
-const fs = require('fs');
-const path = require('path');
 const Resume = require('../models/Resume');
+const { uploadMedia } = require('../config/cloudinary');
 
 const uploadResumeImages = async (req, res) => {
   try {
@@ -11,31 +10,31 @@ const uploadResumeImages = async (req, res) => {
       return res.status(404).json({ message: 'Resume not found or unauthorized' });
     }
 
-    const uploadsFolder = path.join(__dirname, '..', 'uploads');
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-
     const newThumbnail = req.files?.thumbnail?.[0];
     const newProfileImage = req.files?.profileImage?.[0];
 
     if (newThumbnail) {
-      if (resume.thumbnailLink) {
-        const oldThumbnail = path.join(uploadsFolder, path.basename(resume.thumbnailLink));
-        if (fs.existsSync(oldThumbnail)) fs.unlinkSync(oldThumbnail);
-      }
-      resume.thumbnailLink = `${baseUrl}/uploads/${newThumbnail.filename}`;
+      const thumbnailUrl = await uploadMedia(
+        newThumbnail.buffer,
+        newThumbnail.originalname || `thumbnail-${resumeId}.png`,
+        req,
+        { folder: "resuma_ai/thumbnails" }
+      );
+      resume.thumbnailLink = thumbnailUrl;
     }
 
     if (newProfileImage) {
-      const oldUrl = resume.data?.basics?.picture?.url;
-      if (oldUrl) {
-        const oldProfile = path.join(uploadsFolder, path.basename(oldUrl));
-        if (fs.existsSync(oldProfile)) fs.unlinkSync(oldProfile);
-      }
+      const profileUrl = await uploadMedia(
+        newProfileImage.buffer,
+        newProfileImage.originalname || `profile-${resumeId}.png`,
+        req,
+        { folder: "resuma_ai/profiles" }
+      );
 
       resume.data = resume.data || {};
       resume.data.basics = resume.data.basics || {};
       resume.data.basics.picture = resume.data.basics.picture || {};
-      resume.data.basics.picture.url = `${baseUrl}/uploads/${newProfileImage.filename}`;
+      resume.data.basics.picture.url = profileUrl;
     }
 
     await resume.save();

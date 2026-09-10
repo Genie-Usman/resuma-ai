@@ -1,18 +1,26 @@
 const express = require("express");
-const { generateItemSummary } = require("../services/Gemini") 
+const { generateItemSummary } = require("../services/Gemini");
+const { geminiLimiter } = require("../middlewares/rateLimiter");
+const { validateRequest } = require("../middlewares/validateMiddleware");
+const { generateSummarySchema } = require("../validators/geminiValidator");
 
 const router = express.Router();
 
-router.post("/generate-item-summary", async (req, res) => {
-  const { section, item } = req.body;
+router.post(
+  "/generate-item-summary",
+  geminiLimiter,
+  validateRequest(generateSummarySchema),
+  async (req, res) => {
+    const { section, item } = req.body;
 
-  try {
-    const summary = await generateItemSummary({ section, item });
-    res.json({ summary });
-  } catch (err) {
-    console.error("Item summary generation error:", err.message);
-    res.status(500).json({ error: "Failed to generate item summary" });
+    try {
+      const summary = await generateItemSummary({ section, item });
+      res.json({ summary });
+    } catch (err) {
+      console.error("Item summary generation error:", err.message);
+      res.status(500).json({ error: "Failed to generate item summary" });
+    }
   }
-});
+);
 
-module.exports = router; 
+module.exports = router;

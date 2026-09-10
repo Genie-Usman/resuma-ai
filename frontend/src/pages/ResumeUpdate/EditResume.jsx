@@ -82,102 +82,25 @@ const EditResume = () => {
     e.preventDefault();
     const errors = [];
 
-    const basics = resumeData.data.basics;
-    const sections = resumeData.data.sections;
-    const basicSummary = sections.summary?.content || '';
+    const basics = resumeData?.data?.basics || {};
 
     switch (currentPage) {
       case 'personal-info': {
-        const { name, headline, email, phone, location } = basics;
-
-        const cleanedSummary = stripHtml(basicSummary)?.trim();
-
-        if (!name.trim()) errors.push("Name is required.");
-        if (!headline.trim()) errors.push("Headline is required.");
-        if (!email.trim()) errors.push("Valid email is required.");
-        if (!phone.trim()) errors.push("Phone is required.");
-        if (!location.trim()) errors.push("Location is required.");
-        if (!cleanedSummary) {
-          errors.push("Summary cannot be empty.");
-        }
-
-        break;
-      }
-
-      case 'profile-info': {
-        const profiles = sections.profiles?.items || [];
-
-        if (profiles.length === 0) {
-          errors.push("At least one profile is required.");
-        } else {
-          profiles.forEach((profile, i) => {
-            if (!profile.visible) return;
-
-            if (!profile.network?.trim()) { errors.push(`Profile #${i + 1}: Network is required.`) }
-            if (!profile.username?.trim()) { errors.push(`Profile #${i + 1}: Username is required.`) }
-            if (!profile.url?.href?.trim()) { errors.push(`Profile #${i + 1}: URL is required.`) }
-          });
+        const name = basics.name || '';
+        if (!name.trim()) {
+          errors.push("Full Name is required.");
         }
         break;
       }
 
-      case 'education-info': {
-        const educationItems = sections.education?.items || [];
-        if (educationItems.length === 0) {
-          errors.push("At least one education entry is required.");
-        } else {
-          educationItems.forEach((item, i) => {
-            if (!item.institution?.trim()) errors.push(`Education #${i + 1}: Institution is required.`);
-            if (!item.studyType?.trim()) errors.push(`Education #${i + 1}: Degree is required.`);
-          });
-        }
+      // All other sections (Profiles, Education, Skills, Projects, Languages, Interests, etc.) are completely optional!
+      default:
         break;
-      }
-
-      case 'skills-info': {
-        const skillsItems = sections.skills?.items || [];
-        if (skillsItems.length === 0) {
-          errors.push("At least one skill is required.");
-        } else {
-          skillsItems.forEach((item, i) => {
-            if (!item.name?.trim()) errors.push(`Skill #${i + 1}: Name is required.`);
-          });
-        }
-        break;
-      }
-
-      case 'projects-info': {
-        const projects = sections.projects?.items || [];
-        if (projects.length > 0) {
-          projects.forEach((item, i) => {
-            if (!item.name?.trim()) errors.push(`Project #${i + 1}: Name is required.`);
-            if (!item.description?.trim()) errors.push(`Project #${i + 1}: Description is required.`);
-          });
-        }
-        break;
-      }
-
-      case 'interests-and-languages-info': {
-        const languages = sections.languages?.items || [];
-        const interests = sections.interests?.items || [];
-        if (languages.length === 0) {
-          errors.push("At least one language is required.");
-        }
-        if (languages.length > 0) {
-          languages.forEach((item, i) => {
-            if (!item.name?.trim()) errors.push(`Language #${i + 1}: Name is required.`);
-          })
-        }
-        if (interests.length === 0) {
-          errors.push("At least one interest is required.");
-        }
-        break;
-      }
     }
 
     // Handle the result
     if (errors.length > 0) {
-      setErrorMsg(errors.join(", "))
+      setErrorMsg(errors.join(", "));
       return;
     }
 

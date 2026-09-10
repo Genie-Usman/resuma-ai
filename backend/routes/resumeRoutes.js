@@ -11,13 +11,16 @@ const { uploadResumeImages } = require("../controllers/uploadImages");
 const { protect } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/uploadMiddleware"); // ← this
 
+const { validateRequest } = require("../middlewares/validateMiddleware");
+const { createResumeSchema, updateResumeSchema } = require("../validators/resumeValidator");
+
 const router = express.Router();
 
 // Core Resume Routes
-router.post("/", protect, createResume);
+router.post("/", protect, validateRequest(createResumeSchema), createResume);
 router.get("/", protect, getUserResumes);
 router.get("/:id", protect, getResumeById);
-router.put("/:id", protect, updateResume);
+router.put("/:id", protect, validateRequest(updateResumeSchema), updateResume);
 router.delete("/:id", protect, deleteResume);
 
 // File Upload Route with Multer Middleware

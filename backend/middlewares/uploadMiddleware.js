@@ -1,17 +1,9 @@
 const multer = require("multer");
-const path = require("path");
 
-// Configure Storage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-         cb(null, path.join(__dirname, '..', 'uploads'));
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    },
-});
+// Configure In-Memory Storage for Cloudinary / buffer handling
+const storage = multer.memoryStorage();
 
-// File Filter
+// File Filter for common image types
 const fileFilter = (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/avif'];
     if (allowedTypes.includes(file.mimetype)) {
@@ -21,6 +13,12 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-const upload = multer({ storage, fileFilter });
+const upload = multer({
+    storage,
+    fileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    }
+});
 
 module.exports = upload;
