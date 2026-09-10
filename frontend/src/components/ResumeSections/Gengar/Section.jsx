@@ -8,7 +8,7 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
             <h4 className="mb-2 border-b text-base font-bold" style={{ borderColor: themeColors[2],color: themeColors[1] }}>{section.name}</h4>
 
             <div
-                className="grid gap-x-6 gap-y-3 min-w-0"
+                className="grid gap-x-6 gap-y-3 min-w-0 group-[.sidebar]:!grid-cols-1"
                 style={{ gridTemplateColumns: `repeat(${section.columns || 1}, minmax(0, 1fr))` }}
             >
                 {section.items

@@ -110,13 +110,13 @@ const ResumeSummaryCard = ({
           )}
         </div>
 
-        {/* View Count Floating Badge (Top-Left) */}
+        {/* View Count Floating Badge (Bottom-Left - Never covers candidate header!) */}
         {viewsCount > 0 && (
           <div
-            className="absolute top-4 left-4 z-10 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/95 backdrop-blur-md text-[10.5px] font-semibold text-slate-700 shadow-xs border border-slate-200/80"
+            className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur-md text-[10.5px] font-semibold text-white shadow-xs border border-white/10"
             title={`Viewed ${viewsCount} times`}
           >
-            <LuEye className="text-xs text-purple-600" />
+            <LuEye className="text-xs text-purple-300" />
             <span>{viewsCount}</span>
           </div>
         )}

@@ -109,6 +109,14 @@
 
 .wysiwyg {
   @apply prose max-w-none prose-headings:mb-2 prose-headings:mt-0 prose-p:mb-2 prose-p:mt-0 prose-p:leading-normal prose-a:break-all prose-ol:mb-2 prose-ol:mt-0 prose-ul:mb-2 prose-ul:mt-0 prose-li:mb-2 prose-li:mt-0 prose-li:leading-normal prose-img:mb-2 prose-img:mt-0 prose-hr:mb-2 prose-hr:mt-0;
+  word-break: break-word;
+}
+.wysiwyg p {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.wysiwyg p:last-child {
+  margin-bottom: 0;
 }
 
 /* Get Started Button */
@@ -492,5 +500,22 @@ h1, h2, h3, h4, h5, h6,
   background-color: #f1f5f9;
   background-image: radial-gradient(#cbd5e1 1.25px, transparent 1.25px);
   background-size: 20px 20px;
+}
+
+/* Resume Sidebar Layout Integrity:
+   Any section rendered inside a sidebar must strictly be 1 column ("one in a line").
+   This prevents 2-column squishing where items sit side-by-side in narrow ~250px sidebars. */
+.sidebar .grid[style*="grid-template-columns"],
+.group.sidebar .grid[style*="grid-template-columns"],
+.sidebar [style*="grid-template-columns"],
+[data-sidebar="true"] .grid[style*="grid-template-columns"] {
+  grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+}
+
+.sidebar .wysiwyg[style*="columns"],
+.group.sidebar .wysiwyg[style*="columns"],
+.sidebar [style*="columns: 2"],
+.sidebar [style*="columns: 3"] {
+  columns: 1 !important;
 }
 

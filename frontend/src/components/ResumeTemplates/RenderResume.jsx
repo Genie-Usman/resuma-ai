@@ -33,9 +33,72 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
     layout: normalizeLayout(metadata?.layout, sections),
   }), [metadata, sections]);
 
+  // Sanitize dates (prevent duplicate - Present), bullets, and enforce single-column in sidebars
+  const safeSections = useMemo(() => {
+    if (!sections) return {};
+    const formatted = { ...sections };
+
+    // Enforce: Any section placed in the sidebar MUST be single-column ("one in a line").
+    // Narrow sidebars (~250px) cannot fit 2 columns without broken text-wrapping and layout collapse.
+    const [layout] = Array.isArray(safeMetadata?.layout) ? safeMetadata.layout : [[]];
+    const sidebarIds = Array.isArray(layout?.[1]) ? layout[1] : [];
+
+    sidebarIds.forEach((key) => {
+      if (formatted[key]) {
+        formatted[key] = {
+          ...formatted[key],
+          columns: 1,
+        };
+      }
+    });
+
+    if (formatted.experience?.items) {
+      formatted.experience = {
+        ...formatted.experience,
+        items: formatted.experience.items.map((item) => {
+          if (!item) return item;
+          return {
+            ...item,
+            date: (item.date || "").replace(/(\s*[-–—]\s*Present)+/gi, " - Present"),
+            summary: (item.summary || "").replace(/([^\n>])\s*•/g, "$1<br>• "),
+          };
+        }),
+      };
+    }
+
+    if (formatted.education?.items) {
+      formatted.education = {
+        ...formatted.education,
+        items: formatted.education.items.map((item) => {
+          if (!item) return item;
+          return {
+            ...item,
+            date: (item.date || "").replace(/(\s*[-–—]\s*Present)+/gi, " - Present"),
+            summary: (item.summary || "").replace(/([^\n>])\s*•/g, "$1<br>• "),
+          };
+        }),
+      };
+    }
+
+    if (formatted.projects?.items) {
+      formatted.projects = {
+        ...formatted.projects,
+        items: formatted.projects.items.map((item) => {
+          if (!item) return item;
+          return {
+            ...item,
+            summary: (item.summary || item.description || "").replace(/([^\n>])\s*•/g, "$1<br>• "),
+          };
+        }),
+      };
+    }
+
+    return formatted;
+  }, [sections, safeMetadata]);
+
   const sharedProps = {
     basics,
-    sections,
+    sections: safeSections,
     metadata: safeMetadata,
     isFirstPage: true,
     containerWidth,

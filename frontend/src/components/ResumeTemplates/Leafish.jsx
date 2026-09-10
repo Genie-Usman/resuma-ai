@@ -81,13 +81,13 @@ const Leafish = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
             )}
 
             <div className="p-custom grid grid-cols-2 items-start space-x-6">
-                <div className={`grid gap-y-4 ${sidebarIds.length === 0 ? "col-span-2" : ""}`}>
+                <div className={`main group grid gap-y-4 ${sidebarIds.length === 0 ? "col-span-2" : ""}`}>
                     {mainIds.map((key) =>
                         mapSectionToComponent(key, sections[key], key, themeColors)
                     )}
                 </div>
 
-                <div className={`grid gap-y-4 ${sidebarIds.length === 0 ? "hidden" : ""}`}>
+                <div className={`sidebar group grid gap-y-4 ${sidebarIds.length === 0 ? "hidden" : ""}`}>
                     {sidebarIds.map((key) =>
                         mapSectionToComponent(key, sections[key], key, themeColors)
                     )}

@@ -8,8 +8,9 @@ const Experience = ({ section, themeColors }) => {
                 <div key={item.id}>
                     <div style={{ fontWeight: 'bold', color: themeColors[1] }}>{item.company}</div>
                     <div style={{ color: themeColors[1] }}>{item.position}</div>
-                    <div style={{ color: themeColors[1] }}>{item.location}</div>
-                    <div style={{ fontWeight: 'bold', color: themeColors[1] }}>{item.date}</div>
+                    <div style={{ fontWeight: 'bold', color: themeColors[1] }}>
+                      {(item.date || "").replace(/(\s*[-–—]\s*Present)+/gi, " - Present")}
+                    </div>
                 </div>
             )}
         </Section>

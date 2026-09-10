@@ -119,6 +119,8 @@ const ResumeAuditModal = ({
       onClose={onClose}
       title="Resume Audit"
       hideHeader
+      hideCloseBtn
+      noPadding
       width="94vw"
       height="92vh"
       maxWidth="56rem"

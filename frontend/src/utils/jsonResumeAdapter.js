@@ -6,9 +6,13 @@
 
 const stripHtml = (html) => {
   if (!html) return "";
+  const withBreaks = html
+    .replace(/<\/p\s*>/gi, "\n")
+    .replace(/<\/li\s*>/gi, "\n")
+    .replace(/<br\s*\/?>/gi, "\n");
   const tmp = document.createElement("div");
-  tmp.innerHTML = html;
-  return tmp.textContent || tmp.innerText || "";
+  tmp.innerHTML = withBreaks;
+  return (tmp.textContent || tmp.innerText || "").trim();
 };
 
 /**
@@ -43,15 +47,19 @@ export const exportToJsonResume = (resume, customTitle) => {
         url: p.url?.href || p.url?.label || p.url || "",
       })),
     },
-    work: (sections.experience?.items || []).map((exp) => ({
-      name: exp.company || "",
-      position: exp.position || "",
-      location: exp.location || "",
-      startDate: exp.date || "",
-      endDate: "",
-      summary: exp.summary ? stripHtml(exp.summary) : "",
-      highlights: [],
-    })),
+    work: (sections.experience?.items || []).map((exp) => {
+      const cleanDate = (exp.date || "").replace(/(\s*[-–—]\s*Present)+/gi, " - Present");
+      const parts = cleanDate.split(/\s*[-–—]\s*/);
+      return {
+        name: exp.company || "",
+        position: exp.position || "",
+        location: exp.location || "",
+        startDate: parts[0] || "",
+        endDate: parts[1] || "",
+        summary: exp.summary ? stripHtml(exp.summary) : "",
+        highlights: [],
+      };
+    }),
     education: (sections.education?.items || []).map((ed) => ({
       institution: ed.institution || "",
       area: ed.area || "",
@@ -221,9 +229,21 @@ export const importFromJsonResume = (jsonInput, defaultUser = {}) => {
           date: w.startDate
             ? w.endDate
               ? `${w.startDate} - ${w.endDate}`
+              : /present|current|[-–—]/i.test(w.startDate)
+              ? (w.startDate || "").replace(/(\s*[-–—]\s*Present)+/gi, " - Present")
               : `${w.startDate} - Present`
             : "",
-          summary: w.summary || (Array.isArray(w.highlights) ? w.highlights.join("\n") : ""),
+          summary: (() => {
+            const raw = w.summary || (Array.isArray(w.highlights) ? w.highlights.join("\n") : "");
+            if (!raw) return "";
+            if (raw.includes("<p>") || raw.includes("<br>")) return raw;
+            return raw
+              .split(/\n+/)
+              .map((l) => l.trim())
+              .filter(Boolean)
+              .map((l) => `<p>${l.startsWith("•") ? l : `• ${l}`}</p>`)
+              .join("");
+          })(),
           url: {
             label: w.url || "",
             href: w.url || "",
@@ -252,7 +272,7 @@ export const importFromJsonResume = (jsonInput, defaultUser = {}) => {
       skills: {
         id: "skills",
         name: "Skills",
-        columns: 2,
+        columns: 1,
         separateLinks: true,
         visible: Array.isArray(json.skills) && json.skills.length > 0,
         items: (json.skills || []).map((s, idx) => ({
@@ -309,7 +329,7 @@ export const importFromJsonResume = (jsonInput, defaultUser = {}) => {
       languages: {
         id: "languages",
         name: "Languages",
-        columns: 2,
+        columns: 1,
         separateLinks: true,
         visible: Array.isArray(json.languages) && json.languages.length > 0,
         items: (json.languages || []).map((l, idx) => ({
@@ -335,7 +355,7 @@ export const importFromJsonResume = (jsonInput, defaultUser = {}) => {
       interests: {
         id: "interests",
         name: "Interests",
-        columns: 2,
+        columns: 1,
         separateLinks: true,
         visible: Array.isArray(json.interests) && json.interests.length > 0,
         items: (json.interests || []).map((i, idx) => ({

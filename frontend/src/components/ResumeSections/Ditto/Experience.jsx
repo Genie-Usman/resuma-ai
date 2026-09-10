@@ -12,7 +12,9 @@ const Experience = ({ section, themeColors }) => {
                     </div>
 
                     <div className="shrink-0 text-right">
-                        <div style={{ fontWeight: 'bold', color: themeColors[1] }}>{item.date}</div>
+                        <div style={{ fontWeight: 'bold', color: themeColors[1] }}>
+                          {(item.date || "").replace(/(\s*[-–—]\s*Present)+/gi, " - Present")}
+                        </div>
                         <div style={{ color: themeColors[1] }}>{item.location}</div>
                     </div>
                 </div>

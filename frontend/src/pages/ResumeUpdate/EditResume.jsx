@@ -925,15 +925,16 @@ const EditResume = () => {
         aria-hidden="true"
         style={{
           position: "fixed",
-          top: "-10000px",
-          left: "-10000px",
+          top: 0,
+          left: "-9999px",
           width: "794px",
-          opacity: 0,
+          height: "1123px",
+          overflow: "hidden",
           pointerEvents: "none",
           zIndex: -9999,
         }}
       >
-        <div ref={offscreenCaptureRef} className="a4-paper-sheet bg-white" style={{ width: "794px" }}>
+        <div ref={offscreenCaptureRef} className="a4-paper-sheet bg-white" style={{ width: "794px", minHeight: "1123px" }}>
           {resumeData?.data?.basics && (
             <RenderResume
               templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}

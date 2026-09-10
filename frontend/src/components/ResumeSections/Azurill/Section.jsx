@@ -24,7 +24,7 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
 
       {/* Sidebar & Main Section */}
       <div
-        className="grid gap-x-6 gap-y-3 min-w-0 group-[.sidebar]:mx-auto group-[.sidebar]:text-center"
+        className="grid gap-x-6 gap-y-3 min-w-0 group-[.sidebar]:!grid-cols-1 group-[.sidebar]:mx-auto group-[.sidebar]:text-center"
         style={{ gridTemplateColumns: `repeat(${section.columns || 1}, minmax(0, 1fr))` }}
       >
         {section.items
@@ -62,7 +62,9 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
                 {/* Summary */}
                 {summary && summary.trim() !== '' && (
                   <div
-                    dangerouslySetInnerHTML={{ __html: summary }}
+                    dangerouslySetInnerHTML={{
+                      __html: summary.replace(/([^\n>])\s*•/g, "$1<br>• "),
+                    }}
                     style={{ color: themeColors[1] }}
                     className="wysiwyg"
                   />
