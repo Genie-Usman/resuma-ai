@@ -28,6 +28,22 @@ export const useResumeData = (resumeId) => {
         const resumeInfo = response.data;
         const defaultData = getDefaultResumeData();
         const incomingData = resumeInfo.data || {};
+
+        // If the incoming resume has no content at all (0 experience, 0 education, 0 skills, 0 summary),
+        // seed with default starter content so the template renders beautifully
+        const hasContent =
+          (incomingData.sections?.experience?.items?.length || 0) > 0 ||
+          (incomingData.sections?.education?.items?.length || 0) > 0 ||
+          (incomingData.sections?.skills?.items?.length || 0) > 0 ||
+          Boolean(incomingData.sections?.summary?.content?.trim());
+
+        const mergedSections = hasContent
+          ? {
+              ...defaultData.sections,
+              ...(incomingData.sections || {}),
+            }
+          : defaultData.sections;
+
         const safeData = {
           ...defaultData,
           ...incomingData,
@@ -35,10 +51,7 @@ export const useResumeData = (resumeId) => {
             ...defaultData.basics,
             ...(incomingData.basics || {}),
           },
-          sections: {
-            ...defaultData.sections,
-            ...(incomingData.sections || {}),
-          },
+          sections: mergedSections,
           metadata: {
             ...defaultData.metadata,
             ...(incomingData.metadata || {}),

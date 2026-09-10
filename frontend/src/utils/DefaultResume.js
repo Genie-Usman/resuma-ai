@@ -29,7 +29,101 @@ export const getDefaultResumeData = (user = {}) => ({
       columns: 1,
       separateLinks: true,
       visible: true,
-      content: ''
+      content: '<p>Innovative, results-driven professional with extensive experience leading strategic initiatives, collaborating with cross-functional teams, and delivering high-impact solutions that drive organizational growth.</p>'
+    },
+    experience: {
+      id: 'experience',
+      name: 'Work Experience',
+      columns: 1,
+      separateLinks: true,
+      visible: true,
+      items: [
+        {
+          company: "HyperScale Global Innovations",
+          position: "Lead Solutions Specialist",
+          location: "San Francisco, CA",
+          date: "2022 - Present",
+          summary: "<p>• Spearheaded end-to-end technical initiatives resulting in a 35% increase in operational efficiency across distributed teams.<br>• Collaborated with senior leadership to architect scalable solutions and establish modern engineering workflows.<br>• Mentored high-performing team members in agile delivery and technical excellence.</p>",
+          visible: true,
+          url: { label: "hyperscale.tech", href: "https://hyperscale.tech" }
+        },
+        {
+          company: "NovaCore Technologies",
+          position: "Senior Systems Specialist",
+          location: "Austin, TX",
+          date: "2019 - 2022",
+          summary: "<p>• Designed and deployed responsive client solutions supporting 500K+ active users with 99.9% uptime.<br>• Streamlined cross-department collaboration, reducing project delivery cycle times by 25%.</p>",
+          visible: true,
+          url: { label: "novacore.io", href: "https://novacore.io" }
+        }
+      ]
+    },
+    education: {
+      id: 'education',
+      name: 'Education',
+      columns: 1,
+      separateLinks: true,
+      visible: true,
+      items: [
+        {
+          institution: "University of California, Berkeley",
+          studyType: "Bachelor of Science",
+          area: "Computer Science & Business Systems",
+          score: "3.88 / 4.0 GPA",
+          date: "2015 - 2019",
+          summary: "<p>Dean's Honors List. Leadership award recipient.</p>",
+          visible: true,
+          url: { label: "", href: "" }
+        }
+      ]
+    },
+    skills: {
+      id: 'skills',
+      name: 'Key Skills',
+      columns: 1,
+      separateLinks: true,
+      visible: true,
+      items: [
+        {
+          name: "Strategic Architecture",
+          description: "Executive Level",
+          level: 5,
+          keywords: "System Design, Microservices, Cloud Infrastructure",
+          visible: true
+        },
+        {
+          name: "Cross-Functional Leadership",
+          description: "Advanced",
+          level: 5,
+          keywords: "Agile, Roadmapping, Stakeholder Alignment",
+          visible: true
+        },
+        {
+          name: "Full-Stack Development",
+          description: "Expert",
+          level: 4,
+          keywords: "React, Node.js, TypeScript, REST APIs",
+          visible: true
+        }
+      ]
+    },
+    projects: {
+      id: 'projects',
+      name: 'Featured Projects',
+      columns: 1,
+      separateLinks: true,
+      visible: true,
+      items: [
+        {
+          name: "Cloud Management Dashboard",
+          description: "Enterprise Operations Portal",
+          date: "2023",
+          summary: "<p>Architected a high-throughput monitoring portal delivering real-time analytics with sub-second latency.</p>",
+          keywords: ["React", "Analytics", "Cloud"],
+          visible: true,
+          url: { label: "github.com/project", href: "https://github.com" }
+        }
+      ]
     },
     awards: {
       id: 'awards',
@@ -45,23 +139,16 @@ export const getDefaultResumeData = (user = {}) => ({
       columns: 1,
       separateLinks: true,
       visible: true,
-      items: []
-    },
-    education: {
-      id: 'education',
-      name: 'Education',
-      columns: 1,
-      separateLinks: true,
-      visible: true,
-      items: []
-    },
-    experience: {
-      id: 'experience',
-      name: 'Experience',
-      columns: 1,
-      separateLinks: true,
-      visible: true,
-      items: []
+      items: [
+        {
+          name: "AWS Certified Solutions Architect",
+          issuer: "Amazon Web Services",
+          date: "2023",
+          summary: "",
+          visible: true,
+          url: { label: "", href: "" }
+        }
+      ]
     },
     volunteer: {
       id: 'volunteer',
@@ -85,7 +172,14 @@ export const getDefaultResumeData = (user = {}) => ({
       columns: 1,
       separateLinks: true,
       visible: true,
-      items: []
+      items: [
+        {
+          name: "English",
+          description: "Native / Bilingual",
+          level: 5,
+          visible: true
+        }
+      ]
     },
     profiles: {
       id: 'profiles',
@@ -93,15 +187,22 @@ export const getDefaultResumeData = (user = {}) => ({
       columns: 1,
       separateLinks: true,
       visible: true,
-      items: []
-    },
-    projects: {
-      id: 'projects',
-      name: 'Projects',
-      columns: 1,
-      separateLinks: true,
-      visible: true,
-      items: []
+      items: [
+        {
+          network: "LinkedIn",
+          username: "linkedin.com/in/professional",
+          icon: "linkedin",
+          visible: true,
+          url: { label: "LinkedIn", href: "https://linkedin.com" }
+        },
+        {
+          network: "GitHub",
+          username: "github.com/developer",
+          icon: "github",
+          visible: true,
+          url: { label: "GitHub", href: "https://github.com" }
+        }
+      ]
     },
     publications: {
       id: 'publications',
@@ -117,16 +218,15 @@ export const getDefaultResumeData = (user = {}) => ({
       columns: 1,
       separateLinks: true,
       visible: true,
-      items: []
+      items: [
+        {
+          name: "Available upon request",
+          description: "Professional references available upon request",
+          visible: true
+        }
+      ]
     },
-    skills: {
-      id: 'skills',
-      name: 'Skills',
-      columns: 1,
-      separateLinks: true,
-      visible: true,
-      items: []
-    },
+    custom: {}
   },
 
   metadata: {

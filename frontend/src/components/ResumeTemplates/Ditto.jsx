@@ -73,7 +73,7 @@ const Ditto = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false,
     return (
         <div
             ref={resumeRef}
-            className="space-y-3 min-h-0 print:min-h-0"
+            className="min-h-0 print:min-h-0"
             style={{
                 backgroundColor: themeColors[0],
                 color: themeColors[1],
@@ -84,25 +84,20 @@ const Ditto = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false,
             }}
         >
             {isFirstPage && (
-                <div className="relative">
-                    <ResumeHeader basics={basics} themeColors={themeColors} />
-                    <div
-                        className="absolute inset-x-0 top-0 h-[85px] w-full"
-                        style={{ backgroundColor: themeColors[2] }}
-                    />
-                </div>
+                <ResumeHeader basics={basics} themeColors={themeColors} />
             )}
 
-            <div className="grid grid-cols-3">
-                <div className="sidebar pl-4 pb-4 pr-4 group space-y-4">
-                    {sidebarIds.map((key) =>
-                        mapSectionToComponent(key, sections[key], key, themeColors)
-                    )}
-                </div>
+            <div className="grid grid-cols-12 gap-6 px-8 py-6">
+                {sidebarIds.length > 0 && (
+                    <div className="sidebar col-span-4 group space-y-5">
+                        {sidebarIds.map((key) =>
+                            mapSectionToComponent(key, sections[key], key, themeColors)
+                        )}
+                    </div>
+                )}
 
                 <div
-                    className={`main pr-4 pb-4 group space-y-4 ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"
-                        }`}
+                    className={`main group space-y-5 ${sidebarIds.length > 0 ? "col-span-8" : "col-span-12"}`}
                 >
                     {mainIds.map((key) =>
                         mapSectionToComponent(key, sections[key], key, themeColors)
@@ -110,7 +105,6 @@ const Ditto = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false,
                 </div>
             </div>
         </div>
-
     );
 };
 
