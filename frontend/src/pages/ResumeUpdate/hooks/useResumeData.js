@@ -26,13 +26,32 @@ export const useResumeData = (resumeId) => {
       const response = await axiosInstance.get(API_PATHS.RESUME.GET_BY_ID(resumeId));
       if (response.data) {
         const resumeInfo = response.data;
+        const defaultData = getDefaultResumeData();
+        const incomingData = resumeInfo.data || {};
+        const safeData = {
+          ...defaultData,
+          ...incomingData,
+          basics: {
+            ...defaultData.basics,
+            ...(incomingData.basics || {}),
+          },
+          sections: {
+            ...defaultData.sections,
+            ...(incomingData.sections || {}),
+          },
+          metadata: {
+            ...defaultData.metadata,
+            ...(incomingData.metadata || {}),
+          },
+        };
+
         setResumeData((prev) => ({
           ...prev,
           _id: resumeInfo._id,
           title: resumeInfo.title || "Untitled",
-          template: resumeInfo.template || prev.template,
+          template: safeData.metadata?.template || resumeInfo.template || prev.template || "azurill",
           thumbnailLink: resumeInfo.thumbnailLink || "",
-          data: resumeInfo.data || prev.data,
+          data: safeData,
         }));
       }
     } catch (error) {

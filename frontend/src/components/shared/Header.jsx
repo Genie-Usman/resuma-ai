@@ -1,32 +1,45 @@
-import { useContext } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { UserContext } from "../../context/userContext"
+import { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../../context/userContext";
 
 // Assets
-import LOGO from "../../assets/logo.svg"
+import LOGO from "../../assets/logo.svg";
 
 // Components
-import ProfileInfoCard from "../Cards/ProfileInfoCard"
+import ProfileInfoCard from "../Cards/ProfileInfoCard";
 
 const Header = () => {
-    const navigate = useNavigate();
-    const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+  const { user } = useContext(UserContext);
 
-    return (
-        <header className='flex justify-between items-center mb-16 mx-0 pr-2 md:pr-0 md:mx-4'>
-            <div>
-                {/* Image */}
-                <img src={LOGO} alt="logo" className='w-[150px] cursor-pointer' onClick={() => navigate('/')} />
-            </div>
-            {/* Account Button */}
-            {user ? <ProfileInfoCard /> : <Link
-                className='bg-purple-100 text-sm font-semibold text-black px-7 py-2.5 rounded-lg hover:bg-gray-800 hover:text-white transition-colors cursor-pointer'
-                to='/auth/login'
-            >
-                Login
-            </Link>}
-        </header>
-    )
-}
+  return (
+    <header className="flex justify-between items-center mb-8 px-4 sm:px-6 py-3 bg-white/80 backdrop-blur-xl rounded-2xl border border-slate-200/80 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)]">
+      <div className="flex items-center gap-3">
+        {/* Logo */}
+        <img
+          src={LOGO}
+          alt="Resuma AI"
+          className="w-[135px] cursor-pointer hover:opacity-90 transition-opacity"
+          onClick={() => navigate("/")}
+        />
+        <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase bg-purple-50 text-purple-700 border border-purple-200/60">
+          Studio
+        </span>
+      </div>
 
-export default Header
+      {/* Account Button */}
+      {user ? (
+        <ProfileInfoCard />
+      ) : (
+        <Link
+          className="bg-purple-600 text-xs font-semibold text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-colors cursor-pointer shadow-xs"
+          to="/auth/login"
+        >
+          Sign In
+        </Link>
+      )}
+    </header>
+  );
+};
+
+export default Header;

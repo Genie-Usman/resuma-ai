@@ -31,9 +31,16 @@ const createResume = async (req, res) => {
       slug = `${baseSlug}-${count++}`;
     }
 
-    const resumeData = data && typeof data === 'object' && Object.keys(data).length > 0
-      ? data
-      : getDefaultResumeData(user);
+    let resumeData;
+    if (data && typeof data === 'object' && data.basics && data.sections) {
+      resumeData = data;
+    } else {
+      resumeData = getDefaultResumeData(user);
+      const chosenTemplate = req.body.template || data?.metadata?.template;
+      if (chosenTemplate) {
+        resumeData.metadata.template = chosenTemplate;
+      }
+    }
 
     const newResume = await Resume.create({
       userId: user._id,
@@ -73,6 +80,35 @@ const getResumeById = async (req, res) => {
 
     if(!resume){
       return res.status(404).json({message: 'Resume not found'});
+    }
+
+    // Auto-heal incomplete or missing data schema
+    if (!resume.data || !resume.data.basics || !resume.data.sections) {
+      const user = await User.findById(req.user._id).select('name email profileImageURL');
+      const defaultData = getDefaultResumeData(user || {});
+      const currentTemplate = resume.data?.metadata?.template || 'azurill';
+      defaultData.metadata.template = currentTemplate;
+
+      resume.data = {
+        ...defaultData,
+        ...(resume.data || {}),
+        basics: {
+          ...defaultData.basics,
+          ...(resume.data?.basics || {}),
+        },
+        sections: {
+          ...defaultData.sections,
+          ...(resume.data?.sections || {}),
+        },
+        metadata: {
+          ...defaultData.metadata,
+          ...(resume.data?.metadata || {}),
+          template: currentTemplate,
+        },
+      };
+
+      resume.markModified('data');
+      await resume.save();
     }
 
     res.json(resume);
