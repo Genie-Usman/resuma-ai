@@ -187,3 +187,139 @@
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* ==========================================================================
+   A4 Pagination & High-Definition Vector Print Engine
+   Standard A4 Dimensions: 210mm x 297mm (794px x 1123px at 96 DPI)
+   ========================================================================== */
+
+/* Standard A4 Screen Dimensions */
+:root {
+  --a4-width-px: 794px;
+  --a4-height-px: 1123px;
+  --a4-width-mm: 210mm;
+  --a4-height-mm: 297mm;
+}
+
+.a4-paper-sheet {
+  width: var(--a4-width-px);
+  min-height: var(--a4-height-px);
+  background-color: #ffffff;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Page Break Avoidance for ATS Cleanliness */
+.page-break-avoid,
+.resume-section,
+.resume-item,
+section,
+article,
+header,
+h1, h2, h3, h4, h5, h6,
+.wysiwyg > p,
+.wysiwyg > ul,
+.wysiwyg > ol {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.page-break-before {
+  break-before: page;
+  page-break-before: always;
+}
+
+/* Visual Page Break Guide */
+.page-break-guide-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-top: 2px dashed rgba(239, 68, 68, 0.85);
+  z-index: 30;
+  pointer-events: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.page-break-guide-pill {
+  position: absolute;
+  right: 12px;
+  top: -12px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+  pointer-events: auto;
+  user-select: none;
+}
+
+/* Print Stylesheet for ATS-Searchable Vector PDF Export */
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide app chrome, controls, modals, sidebars */
+  .no-print,
+  .page-break-guide-line,
+  .page-break-guide-pill,
+  header,
+  nav,
+  aside,
+  button,
+  .btn,
+  .modal-backdrop {
+    display: none !important;
+  }
+
+  /* A4 Print Sheet Container */
+  .a4-print-sheet,
+  .a4-paper-sheet {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    transform: none !important;
+  }
+
+  /* Prevent page slicing through content */
+  .page-break-avoid,
+  .resume-section,
+  .resume-item,
+  section,
+  article,
+  header,
+  h1, h2, h3, h4, h5, h6,
+  .wysiwyg > p,
+  .wysiwyg > ul {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Ensure links are active and styled cleanly */
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}

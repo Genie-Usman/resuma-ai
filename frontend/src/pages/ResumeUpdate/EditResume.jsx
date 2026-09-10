@@ -7,6 +7,7 @@ import {
   LuEye,
   LuDownload,
   LuArrowLeft,
+  LuInfo,
 } from "react-icons/lu";
 import toast from "react-hot-toast";
 
@@ -19,6 +20,7 @@ import DashboardLayout from "../../components/layouts/DashboardLayout";
 import TitleInput from "../../components/Inputs/TitleInput";
 import Modal from "../../components/shared/Modal.jsx";
 import EditorSidebar from "./components/EditorSidebar.jsx";
+import ResumeCanvas from "./components/ResumeCanvas.jsx";
 import ThemeSelector from "./ThemeSelector.jsx";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
 import { RESUME_TEMPLATES } from "../../constants";
@@ -64,7 +66,6 @@ const EditResume = () => {
   const resumeDownloadRef = useRef(null);
 
   const [activePage, setActivePage] = useState("personal-info");
-  const [baseWidth, setBaseWidth] = useState(800);
   const [newProfileImageFile, setNewProfileImageFile] = useState(null);
 
   // Modular Hooks
@@ -90,20 +91,7 @@ const EditResume = () => {
     openPreviewModal,
     setOpenPreviewModal,
     handlePrint,
-  } = useResumeExport(resumeDownloadRef);
-
-  // Resize handling for preview container
-  const updateBaseWidth = () => {
-    if (resumeRef.current) {
-      setBaseWidth(resumeRef.current.offsetWidth);
-    }
-  };
-
-  useEffect(() => {
-    updateBaseWidth();
-    window.addEventListener("resize", updateBaseWidth);
-    return () => window.removeEventListener("resize", updateBaseWidth);
-  }, []);
+  } = useResumeExport(resumeDownloadRef, resumeData?.title);
 
   // Delete Resume
   const handleDeleteResume = async () => {
@@ -384,21 +372,18 @@ const EditResume = () => {
             {renderForm()}
           </div>
 
-          {/* Right Column: Live Resume Canvas (Col 8-12 on Desktop) */}
-          <div
-            ref={resumeRef}
-            className="lg:col-span-5 bg-gray-50 rounded-xl border border-gray-200 shadow-inner p-2 overflow-auto max-h-[85vh] custom-scrollbar"
-          >
+          {/* Right Column: Live A4 Resume Canvas with Page Break Guides & Height Calculation */}
+          <div className="lg:col-span-5 h-[85vh]">
             {resumeData?.data?.basics && (
-              <RenderResume
-                templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
+              <ResumeCanvas
                 resumeData={resumeData?.data}
-                containerWidth={baseWidth}
+                templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
                 colorPalette={[
                   resumeData?.data?.metadata?.theme?.background,
                   resumeData?.data?.metadata?.theme?.text,
                   resumeData?.data?.metadata?.theme?.primary,
                 ]}
+                canvasRef={resumeRef}
               />
             )}
           </div>
@@ -438,29 +423,41 @@ const EditResume = () => {
         />
       </Modal>
 
-      {/* Print & Preview Modal */}
+      {/* Print & Preview Modal (A4 High-Def Vector PDF) */}
       <Modal
         isOpen={openPreviewModal}
         onClose={() => setOpenPreviewModal(false)}
-        title={resumeData?.title}
+        title={resumeData?.title || "Resume Preview"}
         showActionBtn
-        actionBtnText="Download PDF"
+        actionBtnText="Download ATS Vector PDF"
         actionBtnIcon={<LuDownload className="text-base" />}
         onActionClick={handlePrint}
         width="95vw"
-        height="90vh"
+        height="92vh"
         isPrint={true}
       >
-        <div ref={resumeDownloadRef} className="mx-auto w-full p-4">
-          <RenderResume
-            templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
-            resumeData={resumeData?.data}
-            colorPalette={[
-              resumeData?.data?.metadata?.theme?.background,
-              resumeData?.data?.metadata?.theme?.text,
-              resumeData?.data?.metadata?.theme?.primary,
-            ]}
-          />
+        <div className="flex flex-col gap-3 max-w-5xl mx-auto w-full p-2">
+          {/* ATS Vector Advice Banner */}
+          <div className="p-3 bg-purple-50/90 border border-purple-200 rounded-xl text-xs text-purple-900 flex items-start gap-2.5 shadow-xs">
+            <LuInfo className="text-base text-purple-600 mt-0.5 shrink-0" />
+            <div>
+              <span className="font-semibold text-purple-950">ATS-Searchable Vector PDF:</span> This export generates 100% searchable vector text with active hyperlinks (GitHub, LinkedIn, Portfolio). In the browser print dialog, select <strong>Destination: Save as PDF</strong>, <strong>Paper size: A4</strong>, and ensure <strong>Background graphics</strong> is checked.
+            </div>
+          </div>
+
+          <div className="overflow-auto max-h-[72vh] p-4 bg-gray-100/90 rounded-xl border border-gray-200 flex justify-center custom-scrollbar">
+            <div ref={resumeDownloadRef} className="a4-paper-sheet shadow-2xl rounded-xs bg-white">
+              <RenderResume
+                templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
+                resumeData={resumeData?.data}
+                colorPalette={[
+                  resumeData?.data?.metadata?.theme?.background,
+                  resumeData?.data?.metadata?.theme?.text,
+                  resumeData?.data?.metadata?.theme?.primary,
+                ]}
+              />
+            </div>
+          </div>
         </div>
       </Modal>
     </DashboardLayout>
