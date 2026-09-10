@@ -44,7 +44,7 @@ const ShareModal = ({ isOpen, onClose, resume }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Share Resume & Recruiter Analytics"
+      title="Share Resume"
       width="540px"
     >
       <div className="flex flex-col gap-5 p-2 text-gray-800">
@@ -55,10 +55,10 @@ const ShareModal = ({ isOpen, onClose, resume }) => {
           </div>
           <div>
             <h3 className="text-sm font-bold text-gray-900">
-              Public Recruiter Link
+              Public Resume Link
             </h3>
             <p className="text-xs text-gray-500">
-              Anyone with this link can view and download your resume without logging in.
+              Anyone with this link can view your resume without logging in.
             </p>
           </div>
         </div>
@@ -107,7 +107,7 @@ const ShareModal = ({ isOpen, onClose, resume }) => {
             </div>
             <div>
               <span className="block text-[11px] text-gray-500 font-medium">
-                Recruiter Views
+                Total Views
               </span>
               <span className="text-base font-bold text-gray-900">
                 {viewsCount} {viewsCount === 1 ? "view" : "views"}
@@ -138,10 +138,10 @@ const ShareModal = ({ isOpen, onClose, resume }) => {
             </div>
             <div>
               <span className="block text-xs font-bold text-gray-900">
-                JSON Resume Standard
+                Download JSON Data
               </span>
               <span className="block text-[11px] text-gray-500">
-                Export to open-source jsonresume.org schema
+                Save your resume information in standard JSON format
               </span>
             </div>
           </div>

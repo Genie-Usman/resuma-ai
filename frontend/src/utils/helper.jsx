@@ -80,16 +80,23 @@ export const fixTailwindColors = (element) => {
 export const captureElementAsImage = async (element) => {
   if (!element) throw new Error("No element provided.");
 
-  // Wait for images to fully load
+  // Wait for images to load (graceful resolution on error or timeout)
   const images = Array.from(element.querySelectorAll("img"));
   await Promise.all(
     images.map((img) => {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         if (img.complete && img.naturalHeight !== 0) {
           resolve();
         } else {
-          img.onload = () => resolve();
-          img.onerror = () => reject(`Image failed to load: ${img.src}`);
+          const timer = setTimeout(() => resolve(), 2500);
+          img.onload = () => {
+            clearTimeout(timer);
+            resolve();
+          };
+          img.onerror = () => {
+            clearTimeout(timer);
+            resolve();
+          };
         }
       });
     })
@@ -99,25 +106,29 @@ export const captureElementAsImage = async (element) => {
   const originalTransform = element.style.transform;
   const originalWidth = element.style.width;
 
-  // Remove scaling before capture
-  element.style.transform = "none";
-  element.style.width = `${element.scrollWidth}px`;
-  
-  // Capture full element
-  const canvas = await html2canvas(element, {
-    useCORS: true,
-    scale: 2,
-    backgroundColor: null,
-    scrollY: -window.scrollY,
-    windowWidth: element.scrollWidth,
-    windowHeight: element.scrollHeight,
-  });
+  try {
+    // Remove scaling before capture
+    element.style.transform = "none";
+    const captureWidth = element.scrollWidth || 794;
+    const captureHeight = element.scrollHeight || 1123;
+    element.style.width = `${captureWidth}px`;
+    
+    // Capture full element
+    const canvas = await html2canvas(element, {
+      useCORS: true,
+      scale: 1.5,
+      backgroundColor: "#ffffff",
+      scrollY: -window.scrollY,
+      windowWidth: captureWidth,
+      windowHeight: captureHeight,
+    });
 
-  // Restore styles
-  element.style.transform = originalTransform;
-  element.style.width = originalWidth;
-
-  return canvas.toDataURL("image/png");
+    return canvas.toDataURL("image/png");
+  } finally {
+    // Always restore original styles
+    element.style.transform = originalTransform;
+    element.style.width = originalWidth;
+  }
 };
 
 export const dataURLToFile = (dataUrl, fileName) => {

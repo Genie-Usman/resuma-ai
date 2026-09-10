@@ -1,13 +1,10 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   LuZoomIn,
   LuZoomOut,
   LuMaximize2,
-  LuFileText,
   LuScissors,
   LuLayers,
-  LuTriangleAlert,
-  LuCircleCheckBig,
 } from "react-icons/lu";
 import { usePageCalculator, A4_WIDTH_PX, A4_HEIGHT_PX } from "../hooks/usePageCalculator";
 import RenderResume from "../../../components/ResumeTemplates/RenderResume";
@@ -34,18 +31,14 @@ const ResumeCanvas = ({
 
   // Real-time pagination calculation
   const {
-    totalHeight,
     pageCount,
-    lastPageUsagePercent,
-    isNearSinglePageLimit,
-    overflowPercent,
     breakPositions,
   } = usePageCalculator(sheetContentRef);
 
-  // Auto-fit scale to available column width
+  // Auto-fit scale to available column width (accounting for 48px padding + 16px vertical scrollbar + margin)
   const calculateAutoFit = () => {
     if (!containerRef.current) return;
-    const containerWidth = containerRef.current.clientWidth - 32; // 32px padding
+    const containerWidth = containerRef.current.clientWidth - 80;
     if (containerWidth > 0) {
       const calculatedScale = Math.min(1.05, Math.max(0.35, containerWidth / A4_WIDTH_PX));
       setZoom(Number(calculatedScale.toFixed(2)));
@@ -79,56 +72,13 @@ const ResumeCanvas = ({
     calculateAutoFit();
   };
 
-  // Status Badge Colors based on pagination metrics
-  const statusBadge = useMemo(() => {
-    if (pageCount === 1) {
-      return {
-        label: `1 Page (${lastPageUsagePercent}% filled)`,
-        color: "bg-emerald-50 text-emerald-700 border-emerald-200",
-        icon: <LuCircleCheckBig className="text-sm text-emerald-600" />,
-      };
-    }
-    if (isNearSinglePageLimit) {
-      return {
-        label: `2 Pages (Spilling over by ~${overflowPercent}%)`,
-        color: "bg-amber-50 text-amber-700 border-amber-200",
-        icon: <LuTriangleAlert className="text-sm text-amber-600" />,
-      };
-    }
-    return {
-      label: `${pageCount} Pages (A4 Standard)`,
-      color: "bg-purple-50 text-purple-700 border-purple-200",
-      icon: <LuFileText className="text-sm text-purple-600" />,
-    };
-  }, [pageCount, lastPageUsagePercent, isNearSinglePageLimit, overflowPercent]);
-
   return (
     <div
       ref={containerRef}
       className="flex flex-col h-full bg-slate-100/90 rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden"
     >
       {/* Canvas Top Control Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 bg-white/95 backdrop-blur-md border-b border-slate-200/80 text-xs text-slate-700 select-none z-10 shrink-0">
-        {/* Left: Page Count Badge & Overflow Warning */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border font-medium ${statusBadge.color}`}
-            title={`Total height: ${totalHeight}px (Standard A4: ${A4_HEIGHT_PX}px)`}
-          >
-            {statusBadge.icon}
-            <span>{statusBadge.label}</span>
-          </div>
-
-          {isNearSinglePageLimit && (
-            <div
-              className="hidden xl:flex items-center gap-1 text-[11px] text-amber-700 bg-amber-50/90 px-2 py-0.5 rounded-lg border border-amber-200"
-              title="Only a tiny section spilled to page 2. Trim 1-2 bullets to fit cleanly on 1 page!"
-            >
-              <span>💡 Tip: Trim 1–2 lines to fit 1 page</span>
-            </div>
-          )}
-        </div>
-
+      <div className="flex items-center justify-end gap-2 px-3.5 py-2 bg-white/95 backdrop-blur-md border-b border-slate-200/80 text-xs text-slate-700 select-none z-10 shrink-0">
         {/* Right: View & Zoom Controls */}
         <div className="flex items-center gap-1.5">
           {/* Guide Cutoff Lines Toggle */}
@@ -207,7 +157,7 @@ const ResumeCanvas = ({
       </div>
 
       {/* Main Canvas Scroll Area with Studio Pattern Backdrop */}
-      <div className="flex-1 overflow-auto p-4 sm:p-6 flex justify-center items-start custom-scrollbar studio-canvas-pattern">
+      <div className={`flex-1 overflow-y-auto ${zoom > 1.05 ? "overflow-x-auto" : "overflow-x-hidden"} p-4 sm:p-6 flex justify-center items-start custom-scrollbar studio-canvas-pattern`}>
         {/* Continuous View: Single Scaled Document Sheet */}
         {viewMode === "continuous" && (
           <div

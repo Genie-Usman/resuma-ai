@@ -133,16 +133,16 @@ const ProjectsForm = ({
               </div>
 
               <div>
-                <label className="studio-label">Technologies & Keywords</label>
+                <label className="studio-label">Technologies Used</label>
                 <input
                   type="text"
                   value={item.keywords || ""}
                   onChange={({ target }) => updateArrayItem(index, "keywords", target.value)}
-                  placeholder="e.g. Next.js, Python, PyTorch, Redis, Docker, AWS"
+                  placeholder="e.g. React, Node.js, Docker, PostgreSQL"
                   className="studio-input"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Comma-separated keywords help ATS matching algorithms discover your relevant stack.
+                  Separate technologies with commas
                 </p>
               </div>
             </div>

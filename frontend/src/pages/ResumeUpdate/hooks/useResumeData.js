@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import axiosInstance from "../../../utils/axiosInstance";
 import { API_PATHS } from "../../../utils/apiPaths";
 import { getDefaultResumeData } from "../../../utils/DefaultResume";
@@ -12,6 +12,11 @@ export const useResumeData = (resumeId) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  const resumeDataRef = useRef(resumeData);
+  useEffect(() => {
+    resumeDataRef.current = resumeData;
+  }, [resumeData]);
 
   // Fetch Resume Details by ID
   const fetchResumeDetails = useCallback(async () => {
@@ -184,41 +189,46 @@ export const useResumeData = (resumeId) => {
   }, []);
 
   // Save Resume to Database
-  const saveResume = useCallback(async (customData = null) => {
+  const saveResume = useCallback(async (customData = null, silent = false) => {
     try {
       setIsSaving(true);
-      const payload = customData || resumeData;
+      const payload = customData || resumeDataRef.current || resumeData;
       const response = await axiosInstance.put(API_PATHS.RESUME.UPDATE(resumeId), payload);
-      toast.success("Resume saved successfully!");
+      if (!silent) toast.success("Resume saved successfully!");
       return response.data;
     } catch (error) {
       console.error("Save resume error:", error);
-      toast.error(error.response?.data?.message || "Failed to save resume.");
+      if (!silent) toast.error(error.response?.data?.message || "Failed to save resume.");
       throw error;
     } finally {
       setIsSaving(false);
     }
-  }, [resumeData, resumeId]);
+  }, [resumeId, resumeData]);
 
   // Upload Thumbnail & Profile Images and Save
-  const uploadImagesAndSave = useCallback(async (newProfileImageFile, resumeElement) => {
+  const uploadImagesAndSave = useCallback(async (newProfileImageFile, resumeElement, silent = false) => {
     try {
       setIsSaving(true);
-      let uploadedProfileImageUrl = resumeData.data.basics.picture.url || "";
+      const currentResume = resumeDataRef.current || resumeData;
+      let uploadedProfileImageUrl = currentResume.data?.basics?.picture?.url || "";
 
       if (newProfileImageFile) {
-        const imgUploadRes = await uploadImage(newProfileImageFile);
-        if (imgUploadRes?.imageUrl) {
-          uploadedProfileImageUrl = imgUploadRes.imageUrl;
-          updateSection("basics", "picture", {
-            ...resumeData.data.basics.picture,
-            url: uploadedProfileImageUrl,
-          });
-          await new Promise((r) => setTimeout(r, 200));
+        try {
+          const imgUploadRes = await uploadImage(newProfileImageFile);
+          if (imgUploadRes?.imageUrl) {
+            uploadedProfileImageUrl = imgUploadRes.imageUrl;
+            updateSection("basics", "picture", {
+              ...currentResume.data?.basics?.picture,
+              url: uploadedProfileImageUrl,
+            });
+            await new Promise((r) => setTimeout(r, 200));
+          }
+        } catch (profileUploadErr) {
+          console.warn("Profile image upload failed:", profileUploadErr);
         }
       }
 
-      const profileImgUrl = resumeData.data.basics?.picture?.url;
+      const profileImgUrl = currentResume.data?.basics?.picture?.url;
       if (profileImgUrl) {
         try {
           await waitForImageToLoad(profileImgUrl);
@@ -227,36 +237,41 @@ export const useResumeData = (resumeId) => {
         }
       }
 
-      let thumbnailLink = resumeData.thumbnailLink || "";
+      let thumbnailLink = currentResume.thumbnailLink || "";
       if (resumeElement) {
-        fixTailwindColors(resumeElement);
-        await new Promise((r) => setTimeout(r, 500));
-        const imageDataUrl = await captureElementAsImage(resumeElement);
-        const thumbnailFile = dataURLToFile(imageDataUrl, `resume-${resumeId}.png`);
+        try {
+          fixTailwindColors(resumeElement);
+          await new Promise((r) => setTimeout(r, 250));
+          const imageDataUrl = await captureElementAsImage(resumeElement);
+          const thumbnailFile = dataURLToFile(imageDataUrl, `resume-${resumeId}.png`);
 
-        const formData = new FormData();
-        if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
+          const formData = new FormData();
+          if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
 
-        const uploadResponse = await axiosInstance.put(
-          API_PATHS.RESUME.UPLOAD_IMAGES(resumeId),
-          formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
+          const uploadResponse = await axiosInstance.put(
+            API_PATHS.RESUME.UPLOAD_IMAGES(resumeId),
+            formData,
+            { headers: { "Content-Type": "multipart/form-data" } }
+          );
 
-        if (uploadResponse.data?.thumbnailLink) {
-          thumbnailLink = uploadResponse.data.thumbnailLink;
+          if (uploadResponse.data?.thumbnailLink) {
+            thumbnailLink = uploadResponse.data.thumbnailLink;
+          }
+        } catch (captureErr) {
+          console.warn("Thumbnail capture or upload error:", captureErr);
         }
       }
 
+      const latestData = resumeDataRef.current || currentResume;
       const updatedResume = {
-        ...resumeData,
-        thumbnailLink,
+        ...latestData,
+        thumbnailLink: thumbnailLink || latestData.thumbnailLink,
         data: {
-          ...resumeData.data,
+          ...latestData.data,
           basics: {
-            ...resumeData.data.basics,
+            ...latestData.data?.basics,
             picture: {
-              ...resumeData.data.basics.picture,
+              ...latestData.data?.basics?.picture,
               url: uploadedProfileImageUrl,
             },
           },
@@ -264,16 +279,22 @@ export const useResumeData = (resumeId) => {
       };
 
       setResumeData(updatedResume);
-      await saveResume(updatedResume);
+      await saveResume(updatedResume, silent);
       return updatedResume;
     } catch (error) {
       console.error("Failed to upload images and save:", error);
-      toast.error("Failed to save thumbnail/image");
+      if (!silent) toast.error("Failed to save resume");
+      // Fallback: at least save the JSON data
+      try {
+        await saveResume(resumeDataRef.current || resumeData, silent);
+      } catch (fallbackErr) {
+        console.error("Fallback save failed:", fallbackErr);
+      }
       throw error;
     } finally {
       setIsSaving(false);
     }
-  }, [resumeData, resumeId, saveResume, updateSection]);
+  }, [resumeId, resumeData, saveResume, updateSection]);
 
   return {
     resumeData,

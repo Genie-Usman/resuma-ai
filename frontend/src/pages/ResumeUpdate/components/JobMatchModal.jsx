@@ -111,7 +111,7 @@ const JobMatchModal = ({ isOpen, onClose, resumeData, onAddSkill }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="ATS Job Match Analyzer"
+      title="Job Match"
       width="90vw"
       height="88vh"
     >
@@ -123,10 +123,10 @@ const JobMatchModal = ({ isOpen, onClose, resumeData, onAddSkill }) => {
           </div>
           <div>
             <h3 className="text-base md:text-lg font-bold text-gray-900">
-              Target Job Description Match & ATS Keyword Gaps
+              Compare with Job Description
             </h3>
             <p className="text-xs md:text-sm text-gray-500">
-              Paste the job description for the role you want to apply for. Gemini AI compares it against your active resume to identify keyword matches, critical missing skills, and actionable ATS recommendations.
+              Paste a job description to see matching keywords, missing skills, and suggestions for your resume.
             </p>
           </div>
         </div>
@@ -183,7 +183,7 @@ const JobMatchModal = ({ isOpen, onClose, resumeData, onAddSkill }) => {
                 ) : (
                   <>
                     <LuSparkles className="text-base" />
-                    <span>Analyze ATS Match</span>
+                    <span>Compare Resume</span>
                   </>
                 )}
               </button>
@@ -318,7 +318,7 @@ const JobMatchModal = ({ isOpen, onClose, resumeData, onAddSkill }) => {
                     <LuLightbulb className="text-sm" />
                   </div>
                   <h4 className="text-sm font-bold text-gray-900">
-                    Actionable Recommendations to Boost ATS Score
+                    Suggestions to Improve Your Match
                   </h4>
                 </div>
                 <div className="flex flex-col gap-2.5">

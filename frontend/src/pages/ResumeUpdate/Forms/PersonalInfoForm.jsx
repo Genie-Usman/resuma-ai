@@ -16,13 +16,9 @@ const PersonalInfoForm = ({ profileData, updateSection }) => {
             Personal Information
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Core biographical and contact details displayed prominently at the top of your resume.
+            Your contact details and basic information.
           </p>
         </div>
-        <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
-          <LuUser className="w-3.5 h-3.5 text-purple-600" />
-          Core Section
-        </span>
       </div>
 
       {/* Profile Photo */}
@@ -65,16 +61,16 @@ const PersonalInfoForm = ({ profileData, updateSection }) => {
 
         {/* Professional Headline */}
         <div>
-          <label className="studio-label">Professional Headline</label>
+          <label className="studio-label">Headline / Job Title</label>
           <input
             type="text"
             value={profileData?.headline || ""}
             onChange={({ target }) => updateSection("headline", target.value)}
-            placeholder="e.g. Senior Full-Stack AI Engineer & Cloud Architect"
+            placeholder="e.g. Senior Software Engineer"
             className="studio-input"
           />
           <p className="text-[11px] text-slate-400 mt-1">
-            Target role or primary specialization (matches ATS keywords)
+            Your current role or professional title
           </p>
         </div>
 

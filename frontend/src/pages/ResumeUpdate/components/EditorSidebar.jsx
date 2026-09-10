@@ -284,15 +284,14 @@ const EditorSidebar = ({
             type="button"
             onClick={onExportJson}
             className="flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100/80 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-purple-200"
-            title="Export resume in open-standard JSON Resume format"
+            title="Export as JSON"
           >
             <LuFileJson className="text-sm text-purple-600" />
-            <span>Export JSON Resume</span>
+            <span>Export JSON</span>
           </button>
         )}
-        <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+        <div className="flex items-center justify-center text-[11px] text-slate-400 px-1">
           <span>{sortableKeys.length + 1} sections active</span>
-          <span className="text-purple-600 font-medium">A4 Standard</span>
         </div>
       </div>
     </aside>

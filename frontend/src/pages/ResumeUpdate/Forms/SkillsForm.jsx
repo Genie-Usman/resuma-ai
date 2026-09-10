@@ -40,16 +40,12 @@ const SkillsForm = ({
       <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-            Technical & Professional Skills
+            Skills
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Group your proficiencies by category to optimize ATS keyword density.
+            Add your skills grouped by category (e.g. Languages, Tools).
           </p>
         </div>
-        <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
-          <LuWrench className="w-3.5 h-3.5 text-purple-600" />
-          Keywords
-        </span>
       </div>
 
       {/* Skills Group Cards */}

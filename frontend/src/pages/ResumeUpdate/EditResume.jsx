@@ -75,6 +75,10 @@ const EditResume = () => {
 
   const resumeRef = useRef(null);
   const resumeDownloadRef = useRef(null);
+  const offscreenCaptureRef = useRef(null);
+  const lastSavedDataRef = useRef(null);
+  const initialLoadedRef = useRef(false);
+  const autoSaveTimerRef = useRef(null);
 
   const [activePage, setActivePage] = useState("personal-info");
   const [newProfileImageFile, setNewProfileImageFile] = useState(null);
@@ -82,6 +86,8 @@ const EditResume = () => {
   const [openShareModal, setOpenShareModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isNavigatingBack, setIsNavigatingBack] = useState(false);
   const [viewMode, setViewMode] = useState("split"); // "split" | "edit" | "preview"
 
   // Modular Hooks
@@ -108,6 +114,51 @@ const EditResume = () => {
     setOpenPreviewModal,
     handlePrint,
   } = useResumeExport(resumeDownloadRef, resumeData?.title);
+
+  // Snapshot initial loaded data
+  useEffect(() => {
+    if (!isLoading && resumeData?._id && !initialLoadedRef.current) {
+      initialLoadedRef.current = true;
+      lastSavedDataRef.current = JSON.stringify(resumeData);
+    }
+  }, [isLoading, resumeData]);
+
+  // Background debounced auto-save (1.5s debounce)
+  useEffect(() => {
+    if (!initialLoadedRef.current || isLoading || isDeleting || isNavigatingBack) return;
+
+    const currentString = JSON.stringify(resumeData);
+    if (lastSavedDataRef.current === null) {
+      lastSavedDataRef.current = currentString;
+      return;
+    }
+
+    if (currentString === lastSavedDataRef.current) {
+      return;
+    }
+
+    setHasUnsavedChanges(true);
+
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    autoSaveTimerRef.current = setTimeout(async () => {
+      try {
+        await saveResume(resumeData, true);
+        lastSavedDataRef.current = JSON.stringify(resumeData);
+        setHasUnsavedChanges(false);
+      } catch (err) {
+        console.warn("Background auto-save failed:", err);
+      }
+    }, 1500);
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [resumeData, isLoading, isDeleting, isNavigatingBack, saveResume]);
 
   // Memoized Theme Colors to prevent unneeded child canvas re-renders
   const themeColorPalette = useMemo(() => [
@@ -193,12 +244,42 @@ const EditResume = () => {
     }
   };
 
-  // Quick Save Handler
-  const handleQuickSave = async () => {
+  // Manual Save Handler
+  const handleManualSave = async () => {
     try {
-      await uploadImagesAndSave(newProfileImageFile, resumeRef.current);
+      const targetElement = resumeRef.current || offscreenCaptureRef.current;
+      await uploadImagesAndSave(newProfileImageFile, targetElement, false);
+      lastSavedDataRef.current = JSON.stringify(resumeData);
+      setHasUnsavedChanges(false);
     } catch {
       // Error handled inside hook
+    }
+  };
+
+  // Back to Dashboard Handler (Auto-saves progress & generates dashboard thumbnail)
+  const handleBackToDashboard = async () => {
+    if (isNavigatingBack) return;
+    setIsNavigatingBack(true);
+
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    try {
+      toast.loading("Saving progress & thumbnail...", { id: "back-nav-save" });
+      const targetElement = resumeRef.current || offscreenCaptureRef.current;
+      await uploadImagesAndSave(newProfileImageFile, targetElement, true);
+      toast.success("Progress saved!", { id: "back-nav-save" });
+    } catch (err) {
+      console.warn("Save on back encountered an issue, saving data directly:", err);
+      try {
+        await saveResume(resumeData, true);
+        toast.success("Progress saved!", { id: "back-nav-save" });
+      } catch (fallbackErr) {
+        console.error("Critical: Could not save resume data on back navigation:", fallbackErr);
+      }
+    } finally {
+      navigate("/dashboard");
     }
   };
 
@@ -418,11 +499,16 @@ const EditResume = () => {
         {/* Left: Back + Title + Real-time Save Status */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
-            onClick={() => navigate("/dashboard")}
-            className="p-1.5 text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-colors cursor-pointer shrink-0"
-            title="Back to Dashboard"
+            onClick={handleBackToDashboard}
+            disabled={isNavigatingBack}
+            className="p-1.5 text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+            title="Save progress & Back to Dashboard"
           >
-            <LuArrowLeft className="text-lg" />
+            {isNavigatingBack ? (
+              <LuRefreshCw className="text-lg animate-spin text-purple-600" />
+            ) : (
+              <LuArrowLeft className="text-lg" />
+            )}
           </button>
 
           <div className="h-4 w-px bg-slate-200 hidden sm:block shrink-0" />
@@ -437,9 +523,15 @@ const EditResume = () => {
 
           {/* Real-time Save Status Pill */}
           <div className="hidden md:flex items-center text-[11px] font-medium shrink-0">
-            {isSaving ? (
-              <span className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/70">
-                <LuRefreshCw className="animate-spin text-xs" /> Saving...
+            {isSaving || isNavigatingBack ? (
+              <span className="flex items-center gap-1.5 text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/80">
+                <LuRefreshCw className="animate-spin text-xs text-amber-600" />
+                <span>Saving...</span>
+              </span>
+            ) : hasUnsavedChanges ? (
+              <span className="flex items-center gap-1.5 text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/80" title="Changes pending auto-save">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                <span>Unsaved changes</span>
               </span>
             ) : (
               <span className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/70">
@@ -501,7 +593,7 @@ const EditResume = () => {
             type="button"
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-xl shadow-xs transition-all cursor-pointer"
             onClick={() => setOpenJobMatchModal(true)}
-            title="Analyze ATS match with a target job description"
+            title="Compare with job description"
           >
             <LuSparkles className="text-xs" />
             <span className="hidden lg:inline">Job Match</span>
@@ -512,7 +604,7 @@ const EditResume = () => {
             type="button"
             className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 rounded-xl border border-slate-200/90 shadow-2xs transition-colors cursor-pointer"
             onClick={() => setOpenThemeSelector(true)}
-            title="Change resume template and color palette"
+            title="Change template and colors"
           >
             <LuPalette className="text-xs text-slate-500" />
             <span className="hidden xl:inline">Theme</span>
@@ -523,10 +615,26 @@ const EditResume = () => {
             type="button"
             className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100/70 rounded-xl border border-purple-200/70 transition-colors cursor-pointer"
             onClick={() => setOpenShareModal(true)}
-            title="Share public link & track recruiter views"
+            title="Share resume link"
           >
             <LuShare2 className="text-xs" />
             <span className="hidden xl:inline">Share</span>
+          </button>
+
+          {/* Explicit Save Button */}
+          <button
+            type="button"
+            disabled={isSaving || isNavigatingBack}
+            onClick={handleManualSave}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100/80 rounded-xl border border-purple-200/80 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+            title="Save resume progress"
+          >
+            {isSaving || isNavigatingBack ? (
+              <LuRefreshCw className="text-xs animate-spin text-purple-600" />
+            ) : (
+              <LuSave className="text-xs" />
+            )}
+            <span>Save</span>
           </button>
 
           {/* Export PDF (Primary Action) */}
@@ -534,7 +642,7 @@ const EditResume = () => {
             type="button"
             className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors cursor-pointer"
             onClick={() => setOpenPreviewModal(true)}
-            title="Download high-definition ATS vector PDF"
+            title="Download PDF"
           >
             <LuDownload className="text-xs" />
             <span>Export PDF</span>
@@ -632,24 +740,28 @@ const EditResume = () => {
       <Modal
         isOpen={openThemeSelector}
         onClose={() => setOpenThemeSelector(false)}
-        title="Change Theme"
-        width="85vw"
-        height="80vh"
+        hideHeader={true}
+        hideCloseBtn={true}
+        noPadding={true}
+        width="95vw"
+        maxWidth="1400px"
+        height="88vh"
       >
         <ThemeSelector
           selectedTheme={resumeData?.template}
           setSelectedTheme={(value) => {
             setResumeData((prev) => ({
               ...prev,
+              template: value?.template || prev.template,
               data: {
                 ...prev.data,
                 metadata: {
                   ...prev.data.metadata,
                   template: value?.template || prev.data.metadata.template,
                   theme: {
-                    background: value?.colorPalette?.[0] || prev.data.metadata.theme.background,
-                    text: value?.colorPalette?.[1] || prev.data.metadata.theme.text,
-                    primary: value?.colorPalette?.[2] || prev.data.metadata.theme.primary,
+                    background: value?.colors?.[0] || prev.data.metadata.theme.background,
+                    text: value?.colors?.[1] || prev.data.metadata.theme.text,
+                    primary: value?.colors?.[2] || prev.data.metadata.theme.primary,
                   },
                 },
               },
@@ -661,13 +773,13 @@ const EditResume = () => {
         />
       </Modal>
 
-      {/* Print & Preview Modal (A4 High-Def Vector PDF) */}
+      {/* Print & Preview Modal */}
       <Modal
         isOpen={openPreviewModal}
         onClose={() => setOpenPreviewModal(false)}
         title={resumeData?.title || "Resume Preview"}
         showActionBtn
-        actionBtnText="Download ATS Vector PDF"
+        actionBtnText="Download PDF"
         actionBtnIcon={<LuDownload className="text-base" />}
         onActionClick={handlePrint}
         width="95vw"
@@ -675,11 +787,11 @@ const EditResume = () => {
         isPrint={true}
       >
         <div className="flex flex-col gap-3 max-w-5xl mx-auto w-full p-2">
-          {/* ATS Vector Advice Banner */}
+          {/* Print settings tip */}
           <div className="p-3 bg-purple-50/90 border border-purple-200 rounded-xl text-xs text-purple-900 flex items-start gap-2.5 shadow-xs">
             <LuInfo className="text-base text-purple-600 mt-0.5 shrink-0" />
             <div>
-              <span className="font-semibold text-purple-950">ATS-Searchable Vector PDF:</span> This export generates 100% searchable vector text with active hyperlinks (GitHub, LinkedIn, Portfolio). In the browser print dialog, select <strong>Destination: Save as PDF</strong>, <strong>Paper size: A4</strong>, and ensure <strong>Background graphics</strong> is checked.
+              <span className="font-semibold text-purple-950">Printing tip:</span> In the print dialog, select <strong>Save as PDF</strong> and make sure <strong>Background graphics</strong> is turned on so colors and formatting are saved.
             </div>
           </div>
 
@@ -726,6 +838,30 @@ const EditResume = () => {
         isLoading={isDeleting}
         isDestructive={true}
       />
+
+      {/* Off-screen canvas for reliable thumbnail capture fallback */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          top: "-10000px",
+          left: "-10000px",
+          width: "794px",
+          opacity: 0,
+          pointerEvents: "none",
+          zIndex: -9999,
+        }}
+      >
+        <div ref={offscreenCaptureRef} className="a4-paper-sheet bg-white" style={{ width: "794px" }}>
+          {resumeData?.data?.basics && (
+            <RenderResume
+              templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
+              resumeData={resumeData?.data}
+              colorPalette={themeColorPalette}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 };
