@@ -293,12 +293,15 @@ const EditResume = () => {
   // Manual Save Handler
   const handleManualSave = async () => {
     try {
-      const targetElement = resumeRef.current || offscreenCaptureRef.current;
-      await uploadImagesAndSave(newProfileImageFile, targetElement, false);
+      toast.loading("Saving resume & thumbnail...", { id: "manual-save" });
+      const targetElement = offscreenCaptureRef.current || resumeRef.current;
+      await uploadImagesAndSave(newProfileImageFile, targetElement, true);
       lastSavedDataRef.current = JSON.stringify(resumeData);
       setHasUnsavedChanges(false);
-    } catch {
-      // Error handled inside hook
+      toast.success("Resume & thumbnail saved!", { id: "manual-save" });
+    } catch (err) {
+      console.error("Manual save failed:", err);
+      toast.error("Failed to save resume", { id: "manual-save" });
     }
   };
 
@@ -313,7 +316,7 @@ const EditResume = () => {
 
     try {
       toast.loading("Saving progress & thumbnail...", { id: "back-nav-save" });
-      const targetElement = resumeRef.current || offscreenCaptureRef.current;
+      const targetElement = offscreenCaptureRef.current || resumeRef.current;
       await uploadImagesAndSave(newProfileImageFile, targetElement, true);
       toast.success("Progress saved!", { id: "back-nav-save" });
     } catch (err) {
@@ -920,21 +923,26 @@ const EditResume = () => {
         isDestructive={true}
       />
 
-      {/* Off-screen canvas for reliable thumbnail capture fallback */}
+      {/* Off-screen canvas for reliable 100% fidelity A4 thumbnail capture */}
       <div
         aria-hidden="true"
         style={{
           position: "fixed",
           top: 0,
-          left: "-9999px",
+          left: 0,
           width: "794px",
           height: "1123px",
           overflow: "hidden",
           pointerEvents: "none",
           zIndex: -9999,
+          opacity: 1,
         }}
       >
-        <div ref={offscreenCaptureRef} className="a4-paper-sheet bg-white" style={{ width: "794px", minHeight: "1123px" }}>
+        <div
+          ref={offscreenCaptureRef}
+          className="a4-paper-sheet bg-white"
+          style={{ width: "794px", height: "1123px", overflow: "hidden" }}
+        >
           {resumeData?.data?.basics && (
             <RenderResume
               templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}

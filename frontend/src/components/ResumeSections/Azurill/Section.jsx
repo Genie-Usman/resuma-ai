@@ -14,12 +14,12 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
 
       {/* Sidebar Name */}
       <div
-        className="mx-auto mb-2 hidden items-center gap-x-2 text-center font-bold group-[.sidebar]:flex"
+        className="mx-auto mb-2 hidden items-center justify-center gap-x-2 text-center font-bold group-[.sidebar]:flex"
         style={{ color: themeColors[2] }}
       >
-        <div className="size-1.5 rounded-full border " style={{ color: themeColors[2] }} />
-        <h4>{section.name}</h4>
-        <div className="size-1.5 rounded-full border " style={{ color: themeColors[2] }} />
+        <span className="heading-dot size-1.5 rounded-full border shrink-0 inline-block align-middle" style={{ borderColor: themeColors[2] }} />
+        <h4 className="leading-tight">{section.name}</h4>
+        <span className="heading-dot size-1.5 rounded-full border shrink-0 inline-block align-middle" style={{ borderColor: themeColors[2] }} />
       </div>
 
       {/* Sidebar & Main Section */}

@@ -1,5 +1,5 @@
 import { LuLink } from "react-icons/lu";
-import html2canvas from "html2canvas"
+import { toJpeg } from "html-to-image";
 
 export const validateEmail = (email) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,23 +30,40 @@ export const LinkedEntity = ({ name, url, separateLinks, className, themeColors,
   );
 };
 
-export const Link = ({ url, icon, iconOnRight, label, className, themeColors }) => {
+export const Link = ({ url, icon, iconOnRight, label, className, themeColors, showIcon = true }) => {
   const isValidUrl = url && typeof url.href === 'string' && url.href.startsWith('http');
 
   if (!isValidUrl) return null;
 
-  return (
-    <div className="flex items-center gap-x-1.5">
-      {!iconOnRight && (icon || <LuLink className="font-bold" style={{ color: themeColors[2] }} />)}
+  const shouldShowIcon = showIcon && icon !== false && icon !== null;
+
+  if (!shouldShowIcon) {
+    return (
       <a
         href={url.href}
         target="_blank"
         rel="noreferrer noopener nofollow"
-        className={`inline-block ${className || ''}`}
+        className={`hover:underline align-middle ${className || ''}`}
+        style={{ color: themeColors?.[1] }}
       >
         {label || url.label || url.href}
       </a>
-      {iconOnRight && (icon || <LuLink className="font-bold" style={{ color: themeColors[2] }} />)}
+    );
+  }
+
+  return (
+    <div className="inline-flex items-center gap-x-1.5 align-middle">
+      {!iconOnRight && (icon || <LuLink className="font-bold shrink-0" style={{ color: themeColors?.[2] }} />)}
+      <a
+        href={url.href}
+        target="_blank"
+        rel="noreferrer noopener nofollow"
+        className={`inline-block hover:underline align-middle ${className || ''}`}
+        style={{ color: themeColors?.[1] }}
+      >
+        {label || url.label || url.href}
+      </a>
+      {iconOnRight && (icon || <LuLink className="font-bold shrink-0" style={{ color: themeColors?.[2] }} />)}
     </div>
   );
 };
@@ -63,32 +80,39 @@ export const linearTransform = (
 };
 
 export const fixTailwindColors = (element) => {
+  if (!element) return;
   const elements = element.querySelectorAll("*");
 
   elements.forEach((el) => {
-    const style = window.getComputedStyle(el);
-
-    ["color", "backgroundColor", "borderColor"].forEach((prop) => {
-      const value = style[prop];
-      if (value.includes("oklch")) {
-        el.style[prop] = "#000" // Fallback
-      }
-    })
-  })
-}
+    try {
+      const style = window.getComputedStyle(el);
+      ["color", "backgroundColor", "borderColor"].forEach((prop) => {
+        const value = style?.[prop];
+        if (typeof value === "string" && value.includes("oklch")) {
+          el.style[prop] = "#000"; // Fallback
+        }
+      });
+    } catch {
+      // Ignore individual element computed style errors
+    }
+  });
+};
 
 export const captureElementAsImage = async (element) => {
   if (!element) throw new Error("No element provided.");
 
-  // Wait for images to load (graceful resolution on error or timeout)
+  // Pre-load images with timeout guard
   const images = Array.from(element.querySelectorAll("img"));
   await Promise.all(
     images.map((img) => {
+      if (!img.crossOrigin && img.src && !img.src.startsWith("data:") && !img.src.startsWith("blob:")) {
+        img.crossOrigin = "anonymous";
+      }
       return new Promise((resolve) => {
         if (img.complete && img.naturalHeight !== 0) {
           resolve();
         } else {
-          const timer = setTimeout(() => resolve(), 2500);
+          const timer = setTimeout(() => resolve(), 2000);
           img.onload = () => {
             clearTimeout(timer);
             resolve();
@@ -102,30 +126,65 @@ export const captureElementAsImage = async (element) => {
     })
   );
 
-  // Save original styles
+  // Ensure web fonts are ready before capture
+  if (document.fonts && document.fonts.ready) {
+    try {
+      await document.fonts.ready;
+    } catch {
+      // ignore font loading error
+    }
+  }
+
+  // Save original inline styles to restore after capture
   const originalTransform = element.style.transform;
   const originalWidth = element.style.width;
 
   try {
-    // Remove scaling before capture
     element.style.transform = "none";
-    const captureWidth = element.scrollWidth || 794;
-    const captureHeight = element.scrollHeight || 1123;
-    element.style.width = `${captureWidth}px`;
-    
-    // Capture full element
-    const canvas = await html2canvas(element, {
-      useCORS: true,
-      scale: 1.5,
+    element.style.width = "794px";
+
+    const filter = (node) => {
+      if (!node || !node.classList) return true;
+      return (
+        !node.classList.contains("page-break-guide-line") &&
+        !node.classList.contains("page-break-guide-pill")
+      );
+    };
+
+    // html-to-image utilizes native browser SVG foreignObject rendering,
+    // guaranteeing exact 1:1 fidelity with live DOM (flex centering, gaps, fonts, and icons)
+    const dataUrl = await toJpeg(element, {
+      quality: 0.92,
+      width: 794,
+      height: 1123,
       backgroundColor: "#ffffff",
-      scrollY: -window.scrollY,
-      windowWidth: captureWidth,
-      windowHeight: captureHeight,
+      pixelRatio: 1,
+      filter,
+      style: {
+        transform: "none",
+        width: "794px",
+        margin: "0",
+        boxShadow: "none",
+      },
     });
 
-    return canvas.toDataURL("image/png");
+    return dataUrl;
+  } catch (err) {
+    console.warn("html-to-image standard capture failed, retrying with skipFonts:", err);
+    try {
+      return await toJpeg(element, {
+        quality: 0.92,
+        width: 794,
+        height: 1123,
+        backgroundColor: "#ffffff",
+        pixelRatio: 1,
+        skipFonts: true,
+      });
+    } catch (fallbackErr) {
+      console.error("Critical thumbnail capture failure:", fallbackErr);
+      throw fallbackErr;
+    }
   } finally {
-    // Always restore original styles
     element.style.transform = originalTransform;
     element.style.width = originalWidth;
   }

@@ -146,9 +146,27 @@ const ProfileForm = ({
                     type="text"
                     value={item.icon || ""}
                     onChange={({ target }) => updateArrayItem(index, "icon", target.value)}
-                    placeholder="github, linkedin, twitter, portfolio, medium"
+                    placeholder="globe, linkedin, github, x"
                     className="studio-input flex-1"
                   />
+                </div>
+                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                  <span className="text-[11px] text-slate-400 font-medium mr-0.5">Quick picks:</span>
+                  {["globe", "linkedin", "github", "x"].map((slugOption) => (
+                    <button
+                      key={slugOption}
+                      type="button"
+                      onClick={() => updateArrayItem(index, "icon", slugOption)}
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded-md transition-colors cursor-pointer ${
+                        item.icon?.toLowerCase() === slugOption
+                          ? "bg-purple-100 text-purple-700 font-semibold border border-purple-200"
+                          : "bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200/60"
+                      }`}
+                    >
+                      <BrandIcon slug={slugOption} className="w-3 h-3" />
+                      <span>{slugOption}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>

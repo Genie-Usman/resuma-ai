@@ -8,13 +8,13 @@ const Profiles = ({ section, themeColors }) => {
     return (
         <Section section={section} themeColors={themeColors}>
             {(item) => (
-                <div className="flex items-center gap-x-2">
+                <div className="flex items-center gap-x-2 min-w-0">
                     <BrandIcon
                         slug={item.icon}
-                        style={{ color: themeColors[1] }}
+                        className="size-4 shrink-0"
                     />
                     {item.url?.href ? (
-                        <Link url={item.url} label={item.username} themeColors={themeColors} />
+                        <Link url={item.url} label={item.username} themeColors={themeColors} showIcon={false} />
                     ) : (
                         <span style={{ color: themeColors[1] }}>{item.username}</span>
                     )}

@@ -18,20 +18,20 @@ const ResumeHeader = ({ basics, themeColors }) => {
         <div className="text-base">{basics.headline}</div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 text-sm">
+      <div className="flex flex-wrap items-center justify-center gap-x-3.5 gap-y-1 text-sm leading-normal">
         {basics.location && (
           <div className="flex items-center gap-x-1.5">
-            <LuMapPin style={{ color: themeColors[2] }} />
-            <span>{basics.location}</span>
+            <LuMapPin style={{ color: themeColors[2] }} className="shrink-0 size-3.5" />
+            <span className="leading-normal">{basics.location}</span>
           </div>
         )}
 
         {basics.phone && (
           <div className="flex items-center gap-x-1.5">
-            <LuPhone style={{ color: themeColors[2] }} />
+            <LuPhone style={{ color: themeColors[2] }} className="shrink-0 size-3.5" />
             <a
               href={`tel:${basics.phone}`}
-              className="hover:underline"
+              className="hover:underline leading-normal"
               style={{ color: themeColors[1] }}
             >
               {basics.phone}
@@ -41,10 +41,10 @@ const ResumeHeader = ({ basics, themeColors }) => {
 
         {basics.email && (
           <div className="flex items-center gap-x-1.5">
-            <MdAlternateEmail style={{ color: themeColors[2] }} />
+            <MdAlternateEmail style={{ color: themeColors[2] }} className="shrink-0 size-3.5" />
             <a
               href={`mailto:${basics.email}`}
-              className="hover:underline"
+              className="hover:underline leading-normal"
               style={{ color: themeColors[1] }}
             >
               {basics.email}
@@ -54,12 +54,12 @@ const ResumeHeader = ({ basics, themeColors }) => {
 
         {basics.url?.href && isValidUrl(basics.url.href) && (
           <div className="flex items-center gap-x-1.5">
-            <LuLink style={{ color: themeColors[2] }} />
+            <LuLink style={{ color: themeColors[2] }} className="shrink-0 size-3.5" />
             <a
               href={basics.url.href}
               target="_blank"
               rel="noreferrer noopener"
-              className="hover:underline"
+              className="hover:underline leading-normal"
               style={{ color: themeColors[1] }}
             >
               {basics.url.label || basics.url.href}

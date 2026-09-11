@@ -273,9 +273,10 @@ export const useResumeData = (resumeId) => {
       if (resumeElement) {
         try {
           fixTailwindColors(resumeElement);
-          await new Promise((r) => setTimeout(r, 250));
+          await new Promise((r) => setTimeout(r, 350));
           const imageDataUrl = await captureElementAsImage(resumeElement);
-          const thumbnailFile = dataURLToFile(imageDataUrl, `resume-${resumeId}.png`);
+          const ext = imageDataUrl.startsWith("data:image/jpeg") ? "jpg" : "png";
+          const thumbnailFile = dataURLToFile(imageDataUrl, `resume-${resumeId}.${ext}`);
 
           const formData = new FormData();
           if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
@@ -290,7 +291,7 @@ export const useResumeData = (resumeId) => {
             thumbnailLink = uploadResponse.data.thumbnailLink;
           }
         } catch (captureErr) {
-          console.warn("Thumbnail capture or upload error:", captureErr);
+          console.error("Thumbnail capture or upload error:", captureErr);
         }
       }
 
@@ -310,6 +311,7 @@ export const useResumeData = (resumeId) => {
         },
       };
 
+      resumeDataRef.current = updatedResume;
       setResumeData(updatedResume);
       await saveResume(updatedResume, silent);
       return updatedResume;

@@ -320,6 +320,7 @@ const Dashboard = () => {
               <ResumeSummaryCard
                 key={resume?._id}
                 imgUrl={resume?.thumbnailLink || null}
+                resumeData={resume?.data}
                 title={resume?.title}
                 viewsCount={resume?.viewsCount || 0}
                 lastUpdated={

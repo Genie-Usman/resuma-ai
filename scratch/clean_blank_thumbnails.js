@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import dotenv from "dotenv";
+import mongoose from "../backend/node_modules/mongoose/index.js";
+import dotenv from "../backend/node_modules/dotenv/lib/main.js";
 dotenv.config({ path: "./backend/.env" });
 
 async function run() {
@@ -12,7 +12,7 @@ async function run() {
     {
       $or: [
         { thumbnailLink: { $regex: "ctsus6l95shgv5nmvoso" } },
-        { title: /Executive Leadership/i }
+        { thumbnailLink: { $regex: "fjkejflr8e84kjbr0m98" } }
       ]
     },
     { $set: { thumbnailLink: "" } }

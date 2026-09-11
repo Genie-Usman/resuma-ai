@@ -80,13 +80,13 @@ const ResumeHeader = ({ sections, basics, themeColors }) => {
                     {profiles
                         .filter((item) => item.visible)
                         .map((item) => (
-                            <div className="flex items-center gap-x-2">
+                            <div className="flex items-center gap-x-2 min-w-0" key={item.id || item.url?.href || item.username}>
                                 <BrandIcon
                                     slug={item.icon}
-                                    style={{ color: themeColors[1] }}
+                                    className="size-4 shrink-0"
                                 />
                                 {item.url?.href ? (
-                                    <Link url={item.url} label={item.username} themeColors={themeColors} />
+                                    <Link url={item.url} label={item.username} themeColors={themeColors} showIcon={false} />
                                 ) : (
                                     <span style={{ color: themeColors[1] }}>{item.username}</span>
                                 )}

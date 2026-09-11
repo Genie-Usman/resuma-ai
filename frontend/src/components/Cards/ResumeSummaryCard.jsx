@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LuCopy,
   LuTrash2,
@@ -8,9 +8,11 @@ import {
   LuSparkles,
   LuArrowUpRight,
 } from "react-icons/lu";
+import RenderResume from "../ResumeTemplates/RenderResume";
 
 const ResumeSummaryCard = ({
   imgUrl,
+  resumeData,
   title,
   lastUpdated,
   viewsCount = 0,
@@ -25,6 +27,10 @@ const ResumeSummaryCard = ({
 }) => {
   const [imgError, setImgError] = useState(false);
 
+  useEffect(() => {
+    setImgError(false);
+  }, [imgUrl]);
+
   // Treat generic unsplash stock photos as placeholder so we render the authentic document sheet
   const isStockPhoto = typeof imgUrl === "string" && imgUrl.includes("images.unsplash.com");
   const showCustomThumbnail = imgUrl && !isStockPhoto && !imgError;
@@ -35,9 +41,9 @@ const ResumeSummaryCard = ({
       className="group relative flex flex-col bg-white rounded-2xl border border-slate-200/80 hover:border-purple-300 hover:shadow-[0_16px_36px_-8px_rgba(124,58,237,0.12),0_8px_16px_-4px_rgba(0,0,0,0.04)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden cursor-pointer w-full shadow-2xs"
     >
       {/* 1. Preview Gallery Canvas Area */}
-      <div className="relative w-full aspect-[1/1.34] bg-[#f6f7fb] p-3 sm:p-3.5 flex items-center justify-center overflow-hidden border-b border-slate-100">
-        {/* Paper Sheet Container */}
-        <div className="w-full h-full bg-white rounded-lg shadow-[0_2px_10px_-2px_rgba(0,0,0,0.06),0_1px_3px_0_rgba(0,0,0,0.04)] ring-1 ring-black/[0.06] overflow-hidden relative flex flex-col transition-transform duration-300 group-hover:scale-[1.02]">
+      <div className="relative w-full bg-[#f6f7fb] p-3 sm:p-3.5 flex items-center justify-center overflow-hidden border-b border-slate-100">
+        {/* Paper Sheet Container - Authentic A4 Aspect Ratio */}
+        <div className="w-full aspect-[210/297] bg-white rounded-lg shadow-[0_2px_10px_-2px_rgba(0,0,0,0.06),0_1px_3px_0_rgba(0,0,0,0.04)] ring-1 ring-black/[0.06] overflow-hidden relative flex flex-col transition-transform duration-300 group-hover:scale-[1.02]">
           {showCustomThumbnail ? (
             <img
               src={imgUrl}
@@ -45,66 +51,50 @@ const ResumeSummaryCard = ({
               onError={() => setImgError(true)}
               className="w-full h-full object-cover object-top"
             />
-          ) : (
-            /* Executive Miniature Document Cover Fallback */
-            <div className="w-full h-full flex flex-col justify-between bg-white text-slate-800 select-none">
-              {/* Top Accent Strip */}
+          ) : resumeData?.basics ? (
+            /* Authentic Live Scaled Document Preview (100% consistent with real templates) */
+            <div className="w-full h-full overflow-hidden bg-white relative select-none pointer-events-none">
               <div
-                className="h-2 w-full shrink-0"
+                style={{
+                  width: "794px",
+                  height: "1123px",
+                  transform: "scale(0.31)",
+                  transformOrigin: "top left",
+                }}
+              >
+                <RenderResume
+                  templateId={template}
+                  resumeData={resumeData}
+                  colorPalette={
+                    resumeData?.metadata?.theme?.primary
+                      ? [
+                          resumeData.metadata.theme.background || "#ffffff",
+                          resumeData.metadata.theme.text || "#111827",
+                          resumeData.metadata.theme.primary || themeColor,
+                        ]
+                      : [themeColor]
+                  }
+                />
+              </div>
+            </div>
+          ) : (
+            /* Minimalist Elegant Fallback */
+            <div className="w-full h-full flex flex-col justify-between bg-white text-slate-800 select-none p-3.5">
+              <div
+                className="h-1.5 w-full rounded-full shrink-0"
                 style={{ backgroundColor: themeColor || "#7c3aed" }}
               />
-
-              <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1">
-                {/* Header Profile Area */}
-                <div>
-                  <h5 className="font-extrabold text-slate-900 text-xs sm:text-[13px] tracking-tight truncate">
-                    {candidateName || title || "Professional Resume"}
-                  </h5>
-                  <p className="text-[9.5px] font-medium text-slate-500 truncate mt-0.5">
-                    {role || "Executive Resume"}
-                  </p>
-                  <div className="h-px bg-slate-100 my-2" />
-                </div>
-
-                {/* Simulated Content Layout */}
-                <div className="space-y-2.5 my-auto">
-                  {/* Experience Section */}
-                  <div>
-                    <span className="text-[7.5px] font-bold tracking-wider text-slate-400 uppercase block mb-1">
-                      Experience
-                    </span>
-                    <div className="h-1.5 bg-slate-700/70 rounded-full w-3/4 mb-1" />
-                    <div className="h-1 bg-slate-300 rounded-full w-1/2 mb-1.5" />
-                    <div className="h-1 bg-slate-100 rounded-full w-full mb-0.5" />
-                    <div className="h-1 bg-slate-100 rounded-full w-4/5" />
-                  </div>
-
-                  {/* Skills / Projects Section */}
-                  <div>
-                    <span className="text-[7.5px] font-bold tracking-wider text-slate-400 uppercase block mb-1">
-                      Skills & Highlights
-                    </span>
-                    <div className="flex flex-wrap gap-1">
-                      <span className="px-1.5 py-0.5 rounded text-[7.5px] font-semibold bg-purple-50 text-purple-700 border border-purple-100">
-                        Leadership
-                      </span>
-                      <span className="px-1.5 py-0.5 rounded text-[7.5px] font-semibold bg-slate-50 text-slate-600 border border-slate-200/60">
-                        Architecture
-                      </span>
-                      <span className="px-1.5 py-0.5 rounded text-[7.5px] font-semibold bg-slate-50 text-slate-600 border border-slate-200/60">
-                        Engineering
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer Sheet Stamp */}
-                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[8px] text-slate-400 font-medium">
-                  <span className="capitalize">
-                    Template: {template || "Standard"}
-                  </span>
-                  <span className="text-purple-600 font-semibold">Resuma AI</span>
-                </div>
+              <div className="my-auto">
+                <h5 className="font-extrabold text-slate-900 text-xs tracking-tight truncate">
+                  {candidateName || title || "Professional Resume"}
+                </h5>
+                <p className="text-[10px] font-medium text-slate-500 truncate mt-0.5">
+                  {role || "Executive Resume"}
+                </p>
+              </div>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[8px] text-slate-400 font-medium">
+                <span className="capitalize">{template || "Standard"}</span>
+                <span className="text-purple-600 font-semibold">Resuma AI</span>
               </div>
             </div>
           )}
@@ -121,9 +111,9 @@ const ResumeSummaryCard = ({
           </div>
         )}
 
-        {/* Template Floating Pill (Top-Right) */}
+        {/* Template Floating Pill (Top-Right Canvas Edge) */}
         {template && (
-          <div className="absolute top-4 right-4 z-10 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md text-[10px] font-medium text-white shadow-xs capitalize tracking-tight">
+          <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-900/85 backdrop-blur-md text-[10px] font-medium text-white shadow-xs capitalize tracking-tight border border-white/10">
             <LuSparkles className="text-[10px] text-purple-300" />
             <span>{template}</span>
           </div>
