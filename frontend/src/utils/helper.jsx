@@ -79,24 +79,6 @@ export const linearTransform = (
   return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 };
 
-export const fixTailwindColors = (element) => {
-  if (!element) return;
-  const elements = element.querySelectorAll("*");
-
-  elements.forEach((el) => {
-    try {
-      const style = window.getComputedStyle(el);
-      ["color", "backgroundColor", "borderColor"].forEach((prop) => {
-        const value = style?.[prop];
-        if (typeof value === "string" && value.includes("oklch")) {
-          el.style[prop] = "#000"; // Fallback
-        }
-      });
-    } catch {
-      // Ignore individual element computed style errors
-    }
-  });
-};
 
 export const captureElementAsImage = async (element) => {
   if (!element) throw new Error("No element provided.");

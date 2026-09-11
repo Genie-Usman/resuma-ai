@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import axiosInstance from "../../../utils/axiosInstance";
 import { API_PATHS } from "../../../utils/apiPaths";
 import { getDefaultResumeData } from "../../../utils/DefaultResume";
-import { captureElementAsImage, dataURLToFile, fixTailwindColors, waitForImageToLoad } from "../../../utils/helper";
+import { captureElementAsImage, dataURLToFile, waitForImageToLoad } from "../../../utils/helper";
 import uploadImage from "../../../utils/uploadImage";
 import toast from "react-hot-toast";
 import { reorderLayoutColumns } from "../../../utils/layoutUtils";
@@ -272,8 +272,6 @@ export const useResumeData = (resumeId) => {
       let thumbnailLink = currentResume.thumbnailLink || "";
       if (resumeElement) {
         try {
-          fixTailwindColors(resumeElement);
-          await new Promise((r) => setTimeout(r, 350));
           const imageDataUrl = await captureElementAsImage(resumeElement);
           const ext = imageDataUrl.startsWith("data:image/jpeg") ? "jpg" : "png";
           const thumbnailFile = dataURLToFile(imageDataUrl, `resume-${resumeId}.${ext}`);
