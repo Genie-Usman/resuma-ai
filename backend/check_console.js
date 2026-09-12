@@ -7,9 +7,9 @@ dotenv.config({ path: ".env" });
 
 async function checkConsole() {
   await mongoose.connect(process.env.MONGO_URI);
-  const User = mongoose.model("User", new mongoose.Schema({ name: String, email: String }));
-  const user = await User.findOne();
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+  const Resume = mongoose.model("Resume", new mongoose.Schema({}, { strict: false }));
+  const resume = await Resume.findById("6aa2168dcd8942b6d43fd72e");
+  const token = jwt.sign({ id: resume.userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
   const PORT = 9235;
   const chromeProcess = spawn("C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", [
@@ -75,7 +75,40 @@ async function checkConsole() {
     });
 
     await send("Page.navigate", { url: "http://localhost:5173/resume/6aa2168dcd8942b6d43fd72e" });
-    await new Promise((r) => setTimeout(r, 4000));
+    await new Promise((r) => setTimeout(r, 3000));
+
+    await send("Runtime.evaluate", {
+      expression: `(() => {
+        const items = Array.from(document.querySelectorAll('div.cursor-pointer'));
+        const profItem = items.find(el => el.textContent.includes('Online Profiles'));
+        if (profItem) {
+          profItem.click();
+        }
+      })()`
+    });
+    await new Promise((r) => setTimeout(r, 1500));
+
+    // Type 'tiktok' into the first Icon Slug input
+    await send("Runtime.evaluate", {
+      expression: `(() => {
+        const inputs = Array.from(document.querySelectorAll('input'));
+        const iconInput = inputs.find(i => i.placeholder && i.placeholder.includes('globe, linkedin'));
+        if (iconInput) {
+          // Simulate typing 't', 'ti', 'tik', 'tiktok'
+          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+          nativeInputValueSetter.call(iconInput, 'tiktok');
+          iconInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      })()`
+    });
+    await new Promise((r) => setTimeout(r, 1500));
+
+    const screenshotData = await send("Page.captureScreenshot");
+    if (screenshotData && screenshotData.data) {
+      const fs = (await import("fs")).default;
+      fs.writeFileSync("tiktok_verified.png", Buffer.from(screenshotData.data, "base64"));
+      console.log("Screenshot saved to tiktok_verified.png");
+    }
 
     console.log("=== CONSOLE LOGS & EXCEPTIONS ===");
     console.log(JSON.stringify(consoleLogs, null, 2));

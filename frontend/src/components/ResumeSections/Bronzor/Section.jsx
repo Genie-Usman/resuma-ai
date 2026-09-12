@@ -1,7 +1,7 @@
 import Rating from './Rating';
 
 const Section = ({ section, children, className, urlKey, levelKey, summaryKey, keywordsKey, themeColors }) => {
-    if (!section.visible || section.items.length === 0) return null;
+    if (!section?.visible || !section?.items?.length) return null;
 
     return (
         <section id={section.id} className="grid grid-cols-5 border-t pt-2.5 bronzor-section">

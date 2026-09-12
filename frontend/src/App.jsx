@@ -14,6 +14,7 @@ import SignUp from "./pages/Auth/SignUp";
 import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy";
 import UserProvider from "./context/userContext";
 import { startKeepAliveHeartbeat } from "./utils/keepAlive";
+import ErrorBoundary from "./components/shared/ErrorBoundary";
 
 const App = () => {
   useEffect(() => {
@@ -22,8 +23,9 @@ const App = () => {
   }, []);
   return (
     <UserProvider>
-      <div>
-        <Router>
+      <ErrorBoundary>
+        <div>
+          <Router>
           <Routes>
             {/* Auth Routes */}
             <Route
@@ -62,7 +64,8 @@ const App = () => {
             <Route path='/privacy-policy' element={<PrivacyPolicy />} />
           </Routes>
         </Router>
-      </div>
+        </div>
+      </ErrorBoundary>
 
       <Toaster
         toastOptions={{

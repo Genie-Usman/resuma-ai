@@ -1,149 +1,140 @@
-import { forwardRef, useState, useEffect } from "react";
-import { LuGlobe, LuLink } from "react-icons/lu";
+import { forwardRef, useState } from "react";
+import LINKEDIN from "../../assets/linkedin.svg";
+import { LuGlobe, LuLink, LuMail, LuPhone } from "react-icons/lu";
 
-// In-memory cache for fetched SimpleIcons SVG paths and brand fill colors
-const simpleIconsCache = new Map();
-
-// Local fallback aliases for generic web concepts
+// Generic concept fallbacks (SimpleIcons does not host non-brand icons like 'portfolio' or 'email')
 const GENERIC_ICONS = {
   globe: LuGlobe,
   web: LuGlobe,
   website: LuGlobe,
   portfolio: LuGlobe,
   link: LuLink,
+  url: LuLink,
+  email: LuMail,
+  mail: LuMail,
+  phone: LuPhone,
+  call: LuPhone,
 };
 
-// Authentic LinkedIn path for the white 'in' letters
-const LINKEDIN_IN_PATH =
-  "M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452z";
+// URL to platform detector so full URLs like 'https://github.com/...' don't break SimpleIcons CDN
+function extractPlatformSlug(raw) {
+  if (!raw) return "";
+  const lower = String(raw).toLowerCase().trim();
+  if (lower.includes("linkedin.com")) return "linkedin";
+  if (lower.includes("github.com")) return "github";
+  if (lower.includes("gitlab.com")) return "gitlab";
+  if (lower.includes("bitbucket.org")) return "bitbucket";
+  if (lower.includes("x.com") || lower.includes("twitter.com")) return "x";
+  if (lower.includes("leetcode.com")) return "leetcode";
+  if (lower.includes("hackerrank.com")) return "hackerrank";
+  if (lower.includes("kaggle.com")) return "kaggle";
+  if (lower.includes("codeforces.com")) return "codeforces";
+  if (lower.includes("codechef.com")) return "codechef";
+  if (lower.includes("stackoverflow.com")) return "stackoverflow";
+  if (lower.includes("medium.com")) return "medium";
+  if (lower.includes("dev.to")) return "devto";
+  if (lower.includes("hashnode.dev") || lower.includes("hashnode.com")) return "hashnode";
+  if (lower.includes("dribbble.com")) return "dribbble";
+  if (lower.includes("behance.net")) return "behance";
+  if (lower.includes("figma.com")) return "figma";
+  if (lower.includes("instagram.com")) return "instagram";
+  if (lower.includes("facebook.com")) return "facebook";
+  if (lower.includes("youtube.com")) return "youtube";
+  if (lower.includes("discord.gg") || lower.includes("discord.com")) return "discord";
+  if (lower.includes("slack.com")) return "slack";
+  if (lower.includes("t.me") || lower.includes("telegram.me")) return "telegram";
+  if (lower.includes("wa.me") || lower.includes("whatsapp.com")) return "whatsapp";
+  if (lower.includes("twitch.tv")) return "twitch";
+  if (lower.includes("reddit.com")) return "reddit";
+  if (lower.includes("threads.net")) return "threads";
+  if (lower.includes("substack.com")) return "substack";
+  if (lower.includes("tiktok.com")) return "tiktok";
+  if (lower.includes("youtube.com") || lower.includes("youtu.be")) return "youtube";
+  if (lower.includes("pinterest.com")) return "pinterest";
+  if (lower.includes("snapchat.com")) return "snapchat";
+  return "";
+}
 
 const BrandIcon = forwardRef(({ slug = "", className = "size-5", style = {}, ...props }, ref) => {
-  const [iconData, setIconData] = useState(null);
-  const [hasError, setHasError] = useState(false);
+  const [failedSlug, setFailedSlug] = useState(null);
 
-  if (!slug) return null;
+  if (!slug && slug !== 0) return null;
 
-  const rawSlug = slug.toLowerCase().trim();
-  const normalized = rawSlug.replace(/[-_\s]+/g, "");
+  // Defensive input handling: string, URL, object, number
+  let raw = "";
+  if (typeof slug === "string") {
+    raw = slug.trim();
+  } else if (slug && typeof slug === "object") {
+    raw = String(slug.href || slug.label || slug.name || slug.icon || "").trim();
+  } else {
+    raw = String(slug).trim();
+  }
 
-  // 1. Generic icons (globe, portfolio, website, link) - use crisp neutral dark color
-  const GenericIcon = GENERIC_ICONS[normalized] || GENERIC_ICONS[rawSlug];
+  if (!raw) return null;
+
+  // Clean slug from URL if pasted, else sanitize
+  let cleanSlug = extractPlatformSlug(raw);
+  if (!cleanSlug) {
+    cleanSlug = raw.toLowerCase().replace(/https?:\/\/(www\.)?/g, "").replace(/[^a-z0-9]/g, "");
+  }
+
+  // 1. Generic non-brand concepts (globe, website, portfolio, email, phone)
+  const GenericIcon = GENERIC_ICONS[cleanSlug];
   if (GenericIcon) {
     return (
       <GenericIcon
         ref={ref}
         className={`${className} shrink-0 inline-block align-middle`}
-        style={{ ...style, color: "#334155" }}
+        style={{ color: "#475569", ...style }}
         {...props}
       />
     );
   }
 
-  // 2. Special case: LinkedIn - authentic blue rounded square with crisp white 'in' letters
-  if (normalized === "linkedin" || normalized === "linkedincom") {
+  // 2. LinkedIn: SimpleIcons CDN removed LinkedIn due to trademark takedown (HTTP 404).
+  // Use our local authentic SimpleIcons LinkedIn SVG so LinkedIn never breaks!
+  if (cleanSlug === "linkedin" || cleanSlug === "linkedincom") {
     return (
-      <svg
+      <img
         ref={ref}
-        xmlns="http://www.w3.org/2000/svg"
-        role="img"
-        viewBox="0 0 24 24"
-        className={`${className} shrink-0 inline-block align-middle`}
+        alt="LinkedIn"
+        className={`${className} shrink-0 inline-block align-middle object-contain`}
         style={style}
+        src={LINKEDIN}
+        crossOrigin="anonymous"
+        loading="lazy"
         {...props}
-      >
-        <rect width="24" height="24" rx="4" fill="#0A66C2" />
-        <path fill="#FFFFFF" d={LINKEDIN_IN_PATH} />
-      </svg>
+      />
     );
   }
 
-  // 3. Normalize Twitter to 'x'
-  const fetchSlug = normalized === "twitter" || normalized === "twittercom" ? "x" : rawSlug;
+  // 3. Twitter: SimpleIcons renamed slug from 'twitter' to 'x'
+  const simpleIconsSlug = cleanSlug === "twitter" || cleanSlug === "twittercom" ? "x" : cleanSlug;
 
-  // Check cache first
-  const cached = simpleIconsCache.get(fetchSlug);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    if (simpleIconsCache.has(fetchSlug)) {
-      setIconData(simpleIconsCache.get(fetchSlug));
-      return;
-    }
-
-    // Fetch from SimpleIcons CDN (supports all 3000+ SimpleIcons)
-    fetch(`https://cdn.simpleicons.org/${fetchSlug}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Icon not found on SimpleIcons");
-        }
-        return res.text();
-      })
-      .then((svgText) => {
-        if (!isMounted) return;
-        const pathMatch = svgText.match(/<path[^>]*d=["']([^"']+)["']/);
-        const fillMatch = svgText.match(/fill=["']([^"']+)["']/);
-        if (pathMatch && pathMatch[1]) {
-          const data = {
-            d: pathMatch[1],
-            fill: fillMatch ? fillMatch[1] : "#181717",
-          };
-          simpleIconsCache.set(fetchSlug, data);
-          setIconData(data);
-        } else {
-          setHasError(true);
-        }
-      })
-      .catch(() => {
-        if (isMounted) setHasError(true);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [fetchSlug]);
-
-  // When path is ready, render inline vector SVG using its authentic brand fill color
-  const active = cached || iconData;
-  if (active) {
-    return (
-      <svg
-        ref={ref}
-        xmlns="http://www.w3.org/2000/svg"
-        role="img"
-        viewBox="0 0 24 24"
-        className={`${className} shrink-0 inline-block align-middle`}
-        style={style}
-        {...props}
-      >
-        <path fill={active.fill} d={active.d} />
-      </svg>
-    );
-  }
-
-  // If fetch errored or 404, fall back to clean globe icon
-  if (hasError) {
+  // If the SimpleIcons CDN returned an error / 404 for this exact slug, gracefully show clean globe
+  if (failedSlug === simpleIconsSlug) {
     return (
       <LuGlobe
         ref={ref}
         className={`${className} shrink-0 inline-block align-middle`}
-        style={{ ...style, color: "#334155" }}
+        style={{ color: "#475569", ...style }}
         {...props}
       />
     );
   }
 
-  // While fetching, render an eager image with original brand colors
+  // 4. Primary: Render authentic icon directly from SimpleIcons CDN
   return (
     <img
+      key={simpleIconsSlug}
       ref={ref}
-      alt={fetchSlug}
-      className={`${className} shrink-0 inline-block align-middle`}
+      alt={simpleIconsSlug}
+      className={`${className} shrink-0 inline-block align-middle object-contain`}
       style={style}
-      src={`https://cdn.simpleicons.org/${fetchSlug}`}
+      src={`https://cdn.simpleicons.org/${simpleIconsSlug}`}
       crossOrigin="anonymous"
-      loading="eager"
-      onError={() => setHasError(true)}
+      loading="lazy"
+      onError={() => setFailedSlug(simpleIconsSlug)}
       {...props}
     />
   );
@@ -152,4 +143,3 @@ const BrandIcon = forwardRef(({ slug = "", className = "size-5", style = {}, ...
 BrandIcon.displayName = "BrandIcon";
 
 export default BrandIcon;
-

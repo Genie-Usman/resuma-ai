@@ -11,7 +11,7 @@ const Section = ({
   themeColors,
   isSidebar = false
 }) => {
-  if (!section.visible || section.items.length === 0) return null;
+  if (!section?.visible || !section?.items?.length) return null;
 
   return (
     <section id={section.id} className="grid">

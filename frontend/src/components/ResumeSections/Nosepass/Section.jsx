@@ -1,5 +1,5 @@
 const Section = ({ section, children, urlKey, dateKey, summaryKey, keywordsKey, themeColors }) => {
-    if (!section.visible || section.items.length === 0) return null;
+    if (!section?.visible || !section?.items?.length) return null;
 
     const renderExtras = (item, summary, url, keywords) => (
         <>
