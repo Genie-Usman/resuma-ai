@@ -36,6 +36,7 @@ axiosInstance.interceptors.response.use(
             const isPublicRoute =
                 currentPath === "/" ||
                 currentPath.startsWith("/auth") ||
+                currentPath.startsWith("/privacy") ||
                 currentPath.startsWith("/view") ||
                 currentPath.startsWith("/r/") ||
                 currentPath.startsWith("/print/public");

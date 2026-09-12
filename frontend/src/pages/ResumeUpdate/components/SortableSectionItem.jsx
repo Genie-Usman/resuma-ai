@@ -1,7 +1,7 @@
 import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { LuGripVertical, LuEye, LuEyeOff, LuArrowRight, LuArrowLeft } from "react-icons/lu";
+import { LuGripVertical, LuEye, LuEyeOff } from "react-icons/lu";
 
 const SortableSectionItem = ({
   id,
@@ -9,7 +9,6 @@ const SortableSectionItem = ({
   isActive,
   onSelect,
   onToggleVisibility,
-  onMoveColumn,
   column = "main",
   isTwoColumn = true,
   icon: Icon,
@@ -54,7 +53,7 @@ const SortableSectionItem = ({
           {...listeners}
           className="text-slate-400 hover:text-purple-600 cursor-grab active:cursor-grabbing p-0.5 rounded touch-none shrink-0"
           onClick={(e) => e.stopPropagation()}
-          title={isTwoColumn ? "Drag to reorder or move across columns" : "Drag to reorder section"}
+          title="Drag to reorder section"
         >
           <LuGripVertical className="text-sm" />
         </button>
@@ -93,39 +92,12 @@ const SortableSectionItem = ({
         </span>
       </div>
 
-      {/* Right: Item Count Badge + Move Column Button (if 2-col) + Visibility Toggle */}
+      {/* Right: Item Count Badge + Visibility Toggle */}
       <div className="flex items-center gap-1.5 flex-shrink-0">
         {typeof itemCount === "number" && itemCount > 0 && (
           <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-full font-semibold">
             {itemCount}
           </span>
-        )}
-
-        {/* 1-Click Column Switcher Button (Only for 2-column templates) */}
-        {isTwoColumn && onMoveColumn && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onMoveColumn(id);
-            }}
-            className={`p-1 rounded-md text-slate-400 hover:bg-slate-100 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 cursor-pointer ${
-              isMain
-                ? "hover:text-purple-600"
-                : "hover:text-blue-600"
-            }`}
-            title={
-              isMain
-                ? "Move to Sidebar column"
-                : "Move to Main Content column"
-            }
-          >
-            {isMain ? (
-              <LuArrowRight className="text-xs" />
-            ) : (
-              <LuArrowLeft className="text-xs" />
-            )}
-          </button>
         )}
 
         {/* Eye Visibility Toggle */}

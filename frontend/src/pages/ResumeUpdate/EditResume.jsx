@@ -15,6 +15,8 @@ import {
   LuCheck,
   LuRefreshCw,
   LuSparkles,
+  LuUndo2,
+  LuRedo2,
 } from "react-icons/lu";
 import toast from "react-hot-toast";
 
@@ -108,7 +110,42 @@ const EditResume = () => {
     reorderSections,
     saveResume,
     uploadImagesAndSave,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
   } = useResumeData(resumeId);
+
+  // Global Keyboard Shortcuts for Undo (Ctrl+Z / Cmd+Z) and Redo (Ctrl+Y / Cmd+Y / Ctrl+Shift+Z / Cmd+Shift+Z)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const isCtrl = e.ctrlKey || e.metaKey;
+      if (!isCtrl) return;
+
+      // Don't intercept native undo/redo if the user is typing inside an input, textarea, or contentEditable (Tiptap)
+      const activeTag = document.activeElement?.tagName?.toLowerCase();
+      const isContentEditable = document.activeElement?.isContentEditable;
+      if (activeTag === "input" || activeTag === "textarea" || isContentEditable) {
+        return;
+      }
+
+      if (e.key === "z" || e.key === "Z") {
+        if (e.shiftKey) {
+          e.preventDefault();
+          if (canRedo) redo();
+        } else {
+          e.preventDefault();
+          if (canUndo) undo();
+        }
+      } else if (e.key === "y" || e.key === "Y") {
+        e.preventDefault();
+        if (canRedo) redo();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [undo, redo, canUndo, canRedo]);
 
   // Real-time deterministic audit score for studio header
   const liveAudit = useMemo(() => {
@@ -569,7 +606,7 @@ const EditResume = () => {
           {/* Title with hover edit */}
           <div className="flex items-center gap-2 min-w-0 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
             <TitleInput
-              title={resumeData.title}
+              title={resumeData?.title || ""}
               setTitle={(value) => setResumeData((prev) => ({ ...prev, title: value }))}
             />
           </div>
@@ -591,6 +628,38 @@ const EditResume = () => {
                 <LuCheck className="text-xs" /> Saved
               </span>
             )}
+          </div>
+
+          {/* Undo / Redo Actions */}
+          <div className="flex items-center gap-0.5 bg-slate-100/90 p-0.5 rounded-xl border border-slate-200/80 shrink-0">
+            <button
+              type="button"
+              onClick={undo}
+              disabled={!canUndo}
+              className={`p-1.5 rounded-lg text-xs transition-all flex items-center justify-center ${
+                canUndo
+                  ? "text-slate-700 hover:text-purple-700 hover:bg-white hover:shadow-2xs cursor-pointer active:scale-95"
+                  : "text-slate-300 cursor-not-allowed"
+              }`}
+              title="Undo (Ctrl+Z)"
+              aria-label="Undo"
+            >
+              <LuUndo2 className="text-sm" />
+            </button>
+            <button
+              type="button"
+              onClick={redo}
+              disabled={!canRedo}
+              className={`p-1.5 rounded-lg text-xs transition-all flex items-center justify-center ${
+                canRedo
+                  ? "text-slate-700 hover:text-purple-700 hover:bg-white hover:shadow-2xs cursor-pointer active:scale-95"
+                  : "text-slate-300 cursor-not-allowed"
+              }`}
+              title="Redo (Ctrl+Y or Ctrl+Shift+Z)"
+              aria-label="Redo"
+            >
+              <LuRedo2 className="text-sm" />
+            </button>
           </div>
         </div>
 

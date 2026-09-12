@@ -209,7 +209,7 @@ const EditorSidebar = ({
       return;
     }
 
-    // Two-Column Reordering (Main vs Sidebar)
+    // Two-Column Reordering (Main vs Sidebar strictly isolated)
     const activeId = active.id;
     const overId = over.id;
 
@@ -220,50 +220,24 @@ const EditorSidebar = ({
     const overSidebar = overId === "sidebar-column" || sidebarKeys.includes(overId);
 
     if (inMain && overMain) {
-      // Reorder within Main
+      // Reorder within Main only
       const oldIndex = mainKeys.indexOf(activeId);
       const newIndex = overId === "main-column" ? mainKeys.length - 1 : mainKeys.indexOf(overId);
-      if (oldIndex !== -1 && newIndex !== -1) {
+      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
         const newMain = arrayMove(mainKeys, oldIndex, newIndex);
         onReorderSections([newMain, sidebarKeys], templateId);
       }
     } else if (inSidebar && overSidebar) {
-      // Reorder within Sidebar
+      // Reorder within Sidebar only
       const oldIndex = sidebarKeys.indexOf(activeId);
       const newIndex = overId === "sidebar-column" ? sidebarKeys.length - 1 : sidebarKeys.indexOf(overId);
-      if (oldIndex !== -1 && newIndex !== -1) {
+      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
         const newSidebar = arrayMove(sidebarKeys, oldIndex, newIndex);
         onReorderSections([mainKeys, newSidebar], templateId);
       }
-    } else if (inMain && overSidebar) {
-      // Move section from Main to Sidebar
-      const newMain = mainKeys.filter((k) => k !== activeId);
-      const newSidebar = [...sidebarKeys];
-      const insertIndex = overId === "sidebar-column" ? newSidebar.length : newSidebar.indexOf(overId);
-      newSidebar.splice(insertIndex >= 0 ? insertIndex : newSidebar.length, 0, activeId);
-      onReorderSections([newMain, newSidebar], templateId);
-    } else if (inSidebar && overMain) {
-      // Move section from Sidebar to Main
-      const newSidebar = sidebarKeys.filter((k) => k !== activeId);
-      const newMain = [...mainKeys];
-      const insertIndex = overId === "main-column" ? newMain.length : newMain.indexOf(overId);
-      newMain.splice(insertIndex >= 0 ? insertIndex : newMain.length, 0, activeId);
-      onReorderSections([newMain, newSidebar], templateId);
     }
-  };
-
-  // Quick 1-click move button between Main and Sidebar columns (2-column templates only)
-  const handleMoveColumn = (key) => {
-    if (!isTwoColumn) return;
-    if (mainKeys.includes(key)) {
-      const newMain = mainKeys.filter((k) => k !== key);
-      const newSidebar = [...sidebarKeys, key];
-      onReorderSections([newMain, newSidebar], templateId);
-    } else if (sidebarKeys.includes(key)) {
-      const newSidebar = sidebarKeys.filter((k) => k !== key);
-      const newMain = [...mainKeys, key];
-      onReorderSections([newMain, newSidebar], templateId);
-    }
+    // Note: Cross-column drops (inMain -> overSidebar or inSidebar -> overMain) are intentionally ignored
+    // to preserve template column layout integrity and prevent broken resume layouts.
   };
 
   // -------------------------------------------------------------
@@ -453,7 +427,7 @@ const EditorSidebar = ({
         </div>
         <div className="flex items-center gap-1">
           <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">
-            {isTwoColumn ? "Drag to reorder & switch" : "Drag to reorder"}
+            Drag to reorder
           </span>
           <button
             type="button"
@@ -582,7 +556,6 @@ const EditorSidebar = ({
                           isActive={activePage === key}
                           onSelect={() => setActivePage(key)}
                           onToggleVisibility={() => onToggleVisibility(key)}
-                          onMoveColumn={handleMoveColumn}
                           icon={IconComponent}
                           itemCount={count}
                         />
@@ -625,7 +598,6 @@ const EditorSidebar = ({
                           isActive={activePage === key}
                           onSelect={() => setActivePage(key)}
                           onToggleVisibility={() => onToggleVisibility(key)}
-                          onMoveColumn={handleMoveColumn}
                           icon={IconComponent}
                           itemCount={count}
                         />

@@ -11,6 +11,7 @@ import Dashboard from './pages/Home/Dashboard';
 import LandingPage from "./pages/LandingPage"
 import Login from "./pages/Auth/Login";
 import SignUp from "./pages/Auth/SignUp";
+import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy";
 import UserProvider from "./context/userContext";
 import { startKeepAliveHeartbeat } from "./utils/keepAlive";
 
@@ -55,6 +56,10 @@ const App = () => {
             {/* Public Shareable Recruiter Routes */}
             <Route path='/view/:slug' element={<PublicResumeView />} />
             <Route path='/r/:slug' element={<PublicResumeView />} />
+
+            {/* Privacy Policy Routes */}
+            <Route path='/privacy' element={<PrivacyPolicy />} />
+            <Route path='/privacy-policy' element={<PrivacyPolicy />} />
           </Routes>
         </Router>
       </div>
