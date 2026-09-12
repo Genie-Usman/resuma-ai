@@ -67,6 +67,7 @@ const Nosepass = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fal
     const [layout] = Array.isArray(metadata.layout) ? metadata.layout : [[]];
     const mainIds = Array.isArray(layout[0]) ? layout[0] : [];
     const sidebarIds = Array.isArray(layout[1]) ? layout[1] : [];
+    const sectionIds = sidebarIds.length === 0 ? mainIds : [...sidebarIds, ...mainIds];
 
     return (
         <div
@@ -93,10 +94,7 @@ const Nosepass = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fal
             )}
 
             <div className="space-y-4">
-                {sidebarIds.map((key) =>
-                    mapSectionToComponent(key, sections[key], key, themeColors)
-                )}
-                {mainIds.map((key) =>
+                {sectionIds.map((key) =>
                     mapSectionToComponent(key, sections[key], key, themeColors)
                 )}
             </div>

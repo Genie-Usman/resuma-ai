@@ -66,6 +66,7 @@ const Bronzor = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
     const [layout] = Array.isArray(metadata.layout) ? metadata.layout : [[]];
     const mainIds = Array.isArray(layout[0]) ? layout[0] : [];
     const sidebarIds = Array.isArray(layout[1]) ? layout[1] : [];
+    const sectionIds = sidebarIds.length === 0 ? mainIds : [...mainIds, ...sidebarIds];
 
     return (
         <div
@@ -84,20 +85,11 @@ const Bronzor = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
                 <ResumeHeader basics={basics} themeColors={themeColors} />
             )}
 
-            <div
-                className='space-y-4 px-3'
-            >
-                {mainIds.map((key) =>
+            <div className='space-y-4 px-3'>
+                {sectionIds.map((key) =>
                     mapSectionToComponent(key, sections[key], key, themeColors)
                 )}
             </div>
-
-            <div className="space-y-4 px-3">
-                {sidebarIds.map((key) =>
-                    mapSectionToComponent(key, sections[key], key, themeColors)
-                )}
-            </div>
-
         </div>
     );
 };

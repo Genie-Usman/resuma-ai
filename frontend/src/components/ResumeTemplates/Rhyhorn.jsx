@@ -66,6 +66,7 @@ const Rhyhorn = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
     const [layout] = Array.isArray(metadata.layout) ? metadata.layout : [[]];
     const mainIds = Array.isArray(layout[0]) ? layout[0] : [];
     const sidebarIds = Array.isArray(layout[1]) ? layout[1] : [];
+    const sectionIds = sidebarIds.length === 0 ? mainIds : [...mainIds, ...sidebarIds];
 
     return (
         <div
@@ -84,11 +85,7 @@ const Rhyhorn = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
                 <ResumeHeader basics={basics} themeColors={themeColors} />
             )}
 
-            {mainIds.map((key) =>
-                mapSectionToComponent(key, sections[key], key, themeColors)
-            )}
-
-            {sidebarIds.map((key) =>
+            {sectionIds.map((key) =>
                 mapSectionToComponent(key, sections[key], key, themeColors)
             )}
         </div>

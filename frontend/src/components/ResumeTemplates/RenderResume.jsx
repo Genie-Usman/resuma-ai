@@ -30,8 +30,8 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
   // Self-healing layout normalization: guarantees [ [ col0, col1 ] ] for all templates
   const safeMetadata = useMemo(() => ({
     ...metadata,
-    layout: normalizeLayout(metadata?.layout, sections),
-  }), [metadata, sections]);
+    layout: normalizeLayout(metadata?.layout, sections, templateId),
+  }), [metadata, sections, templateId]);
 
   // Sanitize dates (prevent duplicate - Present), bullets, and enforce single-column in sidebars
   const safeSections = useMemo(() => {

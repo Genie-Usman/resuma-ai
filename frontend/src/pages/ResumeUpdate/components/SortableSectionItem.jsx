@@ -1,7 +1,7 @@
 import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { LuGripVertical, LuEye, LuEyeOff } from "react-icons/lu";
+import { LuGripVertical, LuEye, LuEyeOff, LuArrowRight, LuArrowLeft } from "react-icons/lu";
 
 const SortableSectionItem = ({
   id,
@@ -9,6 +9,9 @@ const SortableSectionItem = ({
   isActive,
   onSelect,
   onToggleVisibility,
+  onMoveColumn,
+  column = "main",
+  isTwoColumn = true,
   icon: Icon,
   itemCount,
 }) => {
@@ -24,24 +27,25 @@ const SortableSectionItem = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: isDragging ? "none" : transition,
-    opacity: isDragging ? 0.6 : 1,
+    opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 50 : 1,
   };
 
   const isVisible = section?.visible !== false;
+  const isMain = column === "main";
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`group flex items-center justify-between px-3 py-2 rounded-xl border text-sm transition-colors select-none cursor-pointer ${
+      className={`group flex items-center justify-between px-2.5 py-2 rounded-xl border text-sm transition-all select-none cursor-pointer ${
         isActive
-          ? "bg-purple-50/80 border-purple-500 text-purple-950 font-semibold shadow-xs ring-1 ring-purple-500/20"
-          : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70 text-slate-700"
-      } ${!isVisible ? "opacity-45 bg-slate-50/60" : ""}`}
+          ? "bg-purple-50/90 border-purple-500 text-purple-950 font-semibold shadow-xs ring-1 ring-purple-500/20"
+          : "bg-white border-slate-200/90 hover:border-slate-300 hover:bg-slate-50/80 text-slate-700"
+      } ${!isVisible ? "opacity-50 bg-slate-50/50" : ""}`}
       onClick={onSelect}
     >
-      {/* Left: Drag Handle + Icon + Label */}
+      {/* Left: Drag Handle + Column Accent (if 2-col) + Icon + Label */}
       <div className="flex items-center gap-2 flex-1 min-w-0">
         {/* Drag handle */}
         <button
@@ -50,16 +54,30 @@ const SortableSectionItem = ({
           {...listeners}
           className="text-slate-400 hover:text-purple-600 cursor-grab active:cursor-grabbing p-0.5 rounded touch-none shrink-0"
           onClick={(e) => e.stopPropagation()}
-          title="Drag to reorder"
+          title={isTwoColumn ? "Drag to reorder or move across columns" : "Drag to reorder section"}
         >
           <LuGripVertical className="text-sm" />
         </button>
+
+        {/* Column Dot Indicator (Only for 2-column templates) */}
+        {isTwoColumn && (
+          <span
+            className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+              isMain ? "bg-blue-500" : "bg-purple-500"
+            }`}
+            title={isMain ? "In Main Content Column" : "In Sidebar Column"}
+          />
+        )}
 
         {/* Section Icon */}
         {Icon && (
           <Icon
             className={`text-sm shrink-0 ${
-              isActive ? "text-purple-600" : "text-slate-500"
+              isActive
+                ? "text-purple-600"
+                : isTwoColumn && !isMain
+                ? "text-purple-500/80"
+                : "text-slate-500"
             }`}
           />
         )}
@@ -75,29 +93,56 @@ const SortableSectionItem = ({
         </span>
       </div>
 
-      {/* Right: Badge & Visibility Toggle */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      {/* Right: Item Count Badge + Move Column Button (if 2-col) + Visibility Toggle */}
+      <div className="flex items-center gap-1.5 flex-shrink-0">
         {typeof itemCount === "number" && itemCount > 0 && (
-          <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full font-semibold">
+          <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-full font-semibold">
             {itemCount}
           </span>
         )}
 
-        {/* Eye toggle */}
+        {/* 1-Click Column Switcher Button (Only for 2-column templates) */}
+        {isTwoColumn && onMoveColumn && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveColumn(id);
+            }}
+            className={`p-1 rounded-md text-slate-400 hover:bg-slate-100 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 cursor-pointer ${
+              isMain
+                ? "hover:text-purple-600"
+                : "hover:text-blue-600"
+            }`}
+            title={
+              isMain
+                ? "Move to Sidebar column"
+                : "Move to Main Content column"
+            }
+          >
+            {isMain ? (
+              <LuArrowRight className="text-xs" />
+            ) : (
+              <LuArrowLeft className="text-xs" />
+            )}
+          </button>
+        )}
+
+        {/* Eye Visibility Toggle */}
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
             onToggleVisibility();
           }}
-          className={`p-1 rounded-md transition-colors ${
+          className={`p-1 rounded-md transition-colors cursor-pointer ${
             isVisible
-              ? "text-gray-400 hover:text-purple-600 hover:bg-purple-100/50"
+              ? "text-slate-400 hover:text-purple-600 hover:bg-purple-50"
               : "text-red-400 hover:text-red-600 hover:bg-red-50"
           }`}
-          title={isVisible ? "Hide on resume" : "Show on resume"}
+          title={isVisible ? "Hide section on resume" : "Show section on resume"}
         >
-          {isVisible ? <LuEye className="text-base" /> : <LuEyeOff className="text-base" />}
+          {isVisible ? <LuEye className="text-sm" /> : <LuEyeOff className="text-sm" />}
         </button>
       </div>
     </div>

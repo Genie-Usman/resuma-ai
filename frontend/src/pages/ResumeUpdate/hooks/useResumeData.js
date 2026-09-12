@@ -199,12 +199,14 @@ export const useResumeData = (resumeId) => {
   }, []);
 
   // Reorder Sections in metadata.layout (Drag-and-Drop)
-  const reorderSections = useCallback((newSectionOrder) => {
+  const reorderSections = useCallback((newSectionOrder, templateId = null) => {
     setResumeData((prev) => {
+      const activeTemplate = templateId || prev.data?.metadata?.template || prev.template;
       const updatedLayout = reorderLayoutColumns(
         prev.data?.metadata?.layout,
         newSectionOrder,
-        prev.data?.sections
+        prev.data?.sections,
+        activeTemplate
       );
 
       return {

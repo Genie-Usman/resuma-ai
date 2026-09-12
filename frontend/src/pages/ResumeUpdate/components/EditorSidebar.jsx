@@ -5,6 +5,8 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  useDroppable,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -30,7 +32,11 @@ import {
   LuPanelLeftOpen,
 } from "react-icons/lu";
 import SortableSectionItem from "./SortableSectionItem";
-import { extractLayoutColumns } from "../../../utils/layoutUtils";
+import {
+  extractLayoutColumns,
+  DEFAULT_SIDEBAR_SECTIONS,
+} from "../../../utils/layoutUtils";
+import { isTwoColumnTemplate } from "../../../constants";
 
 const SECTION_ICONS = {
   "personal-info": LuUser,
@@ -48,32 +54,84 @@ const SECTION_ICONS = {
   references: LuUsers,
 };
 
-const DEFAULT_SORTABLE_KEYS = [
-  "profiles",
-  "experience",
-  "education",
-  "skills",
-  "projects",
-  "certifications",
-  "awards",
-  "languages",
-  "interests",
-  "publications",
-  "volunteer",
-  "references",
-];
+/**
+ * Droppable Column Container for Drag and Drop separation
+ */
+const DroppableColumn = ({
+  id,
+  title,
+  subtitle,
+  badgeColor = "blue",
+  count = 0,
+  children,
+}) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  const isBlue = badgeColor === "blue";
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      {/* Category Header */}
+      <div className="flex items-center justify-between px-1 pt-1 pb-0.5 select-none">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span
+            className={`w-2 h-2 rounded-full shrink-0 ${
+              isBlue ? "bg-blue-500" : "bg-purple-500"
+            }`}
+          />
+          <span className="text-[11px] font-bold tracking-wider uppercase text-slate-800 truncate">
+            {title}
+          </span>
+          {subtitle && (
+            <span className="text-[10px] font-medium text-slate-400 truncate hidden xl:inline">
+              {subtitle}
+            </span>
+          )}
+        </div>
+        <span
+          className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+            isBlue
+              ? "bg-blue-50 text-blue-700 border border-blue-200/70"
+              : "bg-purple-50 text-purple-700 border border-purple-200/70"
+          }`}
+        >
+          {count}
+        </span>
+      </div>
+
+      {/* Droppable Card Area */}
+      <div
+        ref={setNodeRef}
+        className={`rounded-xl p-1.5 flex flex-col gap-1.5 transition-all min-h-[58px] border ${
+          isOver
+            ? isBlue
+              ? "bg-blue-50/70 border-blue-400 ring-2 ring-blue-400/20 shadow-xs"
+              : "bg-purple-50/70 border-purple-400 ring-2 ring-purple-400/20 shadow-xs"
+            : isBlue
+            ? "bg-slate-50/60 border-slate-200/80"
+            : "bg-purple-50/20 border-purple-200/50"
+        }`}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
 
 const EditorSidebar = ({
   activePage,
   setActivePage,
   sections = {},
   layout = [[], []],
+  templateId = null,
   onToggleVisibility,
   onReorderSections,
   onExportJson,
   isSaving,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [activeId, setActiveId] = useState(null);
+
+  const isTwoColumn = useMemo(() => isTwoColumnTemplate(templateId), [templateId]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -83,26 +141,128 @@ const EditorSidebar = ({
     })
   );
 
-  // Derive sortable keys properly from 3D/2D layout or defaults
-  const sortableKeys = useMemo(() => {
-    const [col0, col1] = extractLayoutColumns(layout, sections);
-    const existing = [...col0, ...col1];
-    const combined = [
-      ...new Set([...existing, ...DEFAULT_SORTABLE_KEYS, ...Object.keys(sections)]),
-    ];
-    return combined.filter((key) => key !== "personal-info" && sections[key]);
-  }, [layout, sections]);
+  // Derive distinct Main Content and Sidebar section lists for 2-column templates
+  const [mainKeys, sidebarKeys] = useMemo(() => {
+    if (!isTwoColumn) return [[], []];
+
+    const [c0, c1] = extractLayoutColumns(layout, sections, templateId);
+    const validSections = Object.keys(sections || {}).filter(
+      (k) => k !== "personal-info" && sections[k]
+    );
+
+    const safeMain = c0.filter((k) => k !== "personal-info" && sections[k]);
+    const safeSidebar = c1.filter((k) => k !== "personal-info" && sections[k]);
+
+    // Make sure any section in `sections` that isn't in either column gets categorized
+    validSections.forEach((k) => {
+      if (!safeMain.includes(k) && !safeSidebar.includes(k)) {
+        if (DEFAULT_SIDEBAR_SECTIONS.has(k)) {
+          safeSidebar.push(k);
+        } else {
+          safeMain.push(k);
+        }
+      }
+    });
+
+    return [safeMain, safeSidebar];
+  }, [layout, sections, templateId, isTwoColumn]);
+
+  // Derive single flat section list for 1-column templates
+  const flatKeys = useMemo(() => {
+    if (isTwoColumn) return [];
+
+    const [c0] = extractLayoutColumns(layout, sections, templateId);
+    const validSections = Object.keys(sections || {}).filter(
+      (k) => k !== "personal-info" && sections[k]
+    );
+
+    const safeFlat = (c0 || []).filter((k) => k !== "personal-info" && sections[k]);
+
+    // Ensure any valid section not yet in the list is appended
+    validSections.forEach((k) => {
+      if (!safeFlat.includes(k)) {
+        safeFlat.push(k);
+      }
+    });
+
+    return safeFlat;
+  }, [layout, sections, templateId, isTwoColumn]);
+
+  const handleDragStart = (event) => {
+    setActiveId(event.active.id);
+  };
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
+    setActiveId(null);
+
     if (!over || active.id === over.id) return;
 
-    const oldIndex = sortableKeys.indexOf(active.id);
-    const newIndex = sortableKeys.indexOf(over.id);
+    // Single-Column Reordering
+    if (!isTwoColumn) {
+      const oldIndex = flatKeys.indexOf(active.id);
+      const newIndex = over.id === "single-column" ? flatKeys.length - 1 : flatKeys.indexOf(over.id);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newFlat = arrayMove(flatKeys, oldIndex, newIndex);
+        onReorderSections(newFlat, templateId);
+      }
+      return;
+    }
 
-    if (oldIndex !== -1 && newIndex !== -1) {
-      const newOrder = arrayMove(sortableKeys, oldIndex, newIndex);
-      onReorderSections(newOrder);
+    // Two-Column Reordering (Main vs Sidebar)
+    const activeId = active.id;
+    const overId = over.id;
+
+    const inMain = mainKeys.includes(activeId);
+    const inSidebar = sidebarKeys.includes(activeId);
+
+    const overMain = overId === "main-column" || mainKeys.includes(overId);
+    const overSidebar = overId === "sidebar-column" || sidebarKeys.includes(overId);
+
+    if (inMain && overMain) {
+      // Reorder within Main
+      const oldIndex = mainKeys.indexOf(activeId);
+      const newIndex = overId === "main-column" ? mainKeys.length - 1 : mainKeys.indexOf(overId);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newMain = arrayMove(mainKeys, oldIndex, newIndex);
+        onReorderSections([newMain, sidebarKeys], templateId);
+      }
+    } else if (inSidebar && overSidebar) {
+      // Reorder within Sidebar
+      const oldIndex = sidebarKeys.indexOf(activeId);
+      const newIndex = overId === "sidebar-column" ? sidebarKeys.length - 1 : sidebarKeys.indexOf(overId);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newSidebar = arrayMove(sidebarKeys, oldIndex, newIndex);
+        onReorderSections([mainKeys, newSidebar], templateId);
+      }
+    } else if (inMain && overSidebar) {
+      // Move section from Main to Sidebar
+      const newMain = mainKeys.filter((k) => k !== activeId);
+      const newSidebar = [...sidebarKeys];
+      const insertIndex = overId === "sidebar-column" ? newSidebar.length : newSidebar.indexOf(overId);
+      newSidebar.splice(insertIndex >= 0 ? insertIndex : newSidebar.length, 0, activeId);
+      onReorderSections([newMain, newSidebar], templateId);
+    } else if (inSidebar && overMain) {
+      // Move section from Sidebar to Main
+      const newSidebar = sidebarKeys.filter((k) => k !== activeId);
+      const newMain = [...mainKeys];
+      const insertIndex = overId === "main-column" ? newMain.length : newMain.indexOf(overId);
+      newMain.splice(insertIndex >= 0 ? insertIndex : newMain.length, 0, activeId);
+      onReorderSections([newMain, newSidebar], templateId);
+    }
+  };
+
+  // Quick 1-click move button between Main and Sidebar columns (2-column templates only)
+  const handleMoveColumn = (key) => {
+    if (!isTwoColumn) return;
+    if (mainKeys.includes(key)) {
+      const newMain = mainKeys.filter((k) => k !== key);
+      const newSidebar = [...sidebarKeys, key];
+      onReorderSections([newMain, newSidebar], templateId);
+    } else if (sidebarKeys.includes(key)) {
+      const newSidebar = sidebarKeys.filter((k) => k !== key);
+      const newMain = [...mainKeys, key];
+      onReorderSections([newMain, newSidebar], templateId);
     }
   };
 
@@ -140,40 +300,122 @@ const EditorSidebar = ({
             <LuUser className="text-base" />
           </button>
 
-          {/* Section Icons */}
-          {sortableKeys.map((key) => {
-            const sec = sections[key];
-            const Icon = SECTION_ICONS[key] || LuSparkles;
-            const isActive = activePage === key;
-            const isVisible = sec?.visible !== false;
+          {/* 1-Column Mode: Continuous vertical icon list */}
+          {!isTwoColumn &&
+            flatKeys.map((key) => {
+              const sec = sections[key];
+              const Icon = SECTION_ICONS[key] || LuSparkles;
+              const isActive = activePage === key;
+              const isVisible = sec?.visible !== false;
 
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setActivePage(key)}
-                className={`relative p-2.5 rounded-xl transition-all cursor-pointer ${
-                  isActive
-                    ? "bg-purple-600 text-white shadow-xs"
-                    : "text-slate-600 hover:bg-slate-100"
-                } ${!isVisible ? "opacity-40" : ""}`}
-                title={`${sec?.name || key} (${sec?.items?.length || 0} items)`}
-              >
-                <Icon className="text-base" />
-                {Array.isArray(sec?.items) && sec.items.length > 0 && (
-                  <span
-                    className={`absolute -top-0.5 -right-0.5 text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold ${
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setActivePage(key)}
+                  className={`relative p-2.5 rounded-xl transition-all cursor-pointer ${
+                    isActive
+                      ? "bg-purple-600 text-white shadow-xs"
+                      : "text-slate-600 hover:bg-slate-100"
+                  } ${!isVisible ? "opacity-40" : ""}`}
+                  title={sec?.name || key}
+                >
+                  <Icon className="text-base" />
+                  {Array.isArray(sec?.items) && sec.items.length > 0 && (
+                    <span
+                      className={`absolute -top-0.5 -right-0.5 text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold ${
+                        isActive
+                          ? "bg-white text-purple-700"
+                          : "bg-slate-200 text-slate-700"
+                      }`}
+                    >
+                      {sec.items.length}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+
+          {/* 2-Column Mode: Separated Main and Sidebar Icons */}
+          {isTwoColumn && (
+            <>
+              {/* Divider: Main Column */}
+              <div className="w-6 h-px bg-slate-200 my-1" title="Main Content Sections" />
+
+              {/* Main Column Icons */}
+              {mainKeys.map((key) => {
+                const sec = sections[key];
+                const Icon = SECTION_ICONS[key] || LuSparkles;
+                const isActive = activePage === key;
+                const isVisible = sec?.visible !== false;
+
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setActivePage(key)}
+                    className={`relative p-2.5 rounded-xl transition-all cursor-pointer ${
                       isActive
-                        ? "bg-white text-purple-700"
-                        : "bg-slate-200 text-slate-700"
-                    }`}
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "text-slate-600 hover:bg-slate-100"
+                    } ${!isVisible ? "opacity-40" : ""}`}
+                    title={`${sec?.name || key} (Main Column)`}
                   >
-                    {sec.items.length}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+                    <Icon className="text-base" />
+                    {Array.isArray(sec?.items) && sec.items.length > 0 && (
+                      <span
+                        className={`absolute -top-0.5 -right-0.5 text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold ${
+                          isActive
+                            ? "bg-white text-blue-700"
+                            : "bg-slate-200 text-slate-700"
+                        }`}
+                      >
+                        {sec.items.length}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+
+              {/* Divider: Sidebar Column */}
+              <div className="w-6 h-px bg-purple-200 my-1" title="Sidebar Column Sections" />
+
+              {/* Sidebar Column Icons */}
+              {sidebarKeys.map((key) => {
+                const sec = sections[key];
+                const Icon = SECTION_ICONS[key] || LuSparkles;
+                const isActive = activePage === key;
+                const isVisible = sec?.visible !== false;
+
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setActivePage(key)}
+                    className={`relative p-2.5 rounded-xl transition-all cursor-pointer ${
+                      isActive
+                        ? "bg-purple-600 text-white shadow-xs"
+                        : "text-slate-600 hover:bg-slate-100"
+                    } ${!isVisible ? "opacity-40" : ""}`}
+                    title={`${sec?.name || key} (Sidebar Column)`}
+                  >
+                    <Icon className="text-base" />
+                    {Array.isArray(sec?.items) && sec.items.length > 0 && (
+                      <span
+                        className={`absolute -top-0.5 -right-0.5 text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold ${
+                          isActive
+                            ? "bg-white text-purple-700"
+                            : "bg-slate-200 text-slate-700"
+                        }`}
+                      >
+                        {sec.items.length}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </>
+          )}
         </div>
 
         {/* Bottom: JSON Export */}
@@ -193,13 +435,17 @@ const EditorSidebar = ({
     );
   }
 
+  // Active section data for DragOverlay preview
+  const activeSection = activeId ? sections[activeId] : null;
+  const ActiveIcon = activeId ? SECTION_ICONS[activeId] || LuSparkles : null;
+
   // -------------------------------------------------------------
-  // Expanded Drawer Mode (240px - 260px)
+  // Expanded Drawer Mode (240px - 270px)
   // -------------------------------------------------------------
   return (
-    <aside className="w-full h-full bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-xs flex flex-col gap-3 transition-all duration-200">
+    <aside className="w-full h-full bg-white border border-slate-200/90 rounded-2xl p-3 shadow-xs flex flex-col gap-2.5 transition-all duration-200">
       {/* Top Section: Action Controls */}
-      <div className="flex items-center justify-between gap-1 pb-2.5 border-b border-slate-100">
+      <div className="flex items-center justify-between gap-1 pb-2 border-b border-slate-100">
         <div className="flex items-center gap-1.5 min-w-0">
           <h3 className="text-xs font-bold text-slate-800 tracking-wider uppercase truncate">
             Resume Sections
@@ -207,7 +453,7 @@ const EditorSidebar = ({
         </div>
         <div className="flex items-center gap-1">
           <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">
-            Drag to reorder
+            {isTwoColumn ? "Drag to reorder & switch" : "Drag to reorder"}
           </span>
           <button
             type="button"
@@ -223,14 +469,14 @@ const EditorSidebar = ({
       {/* Fixed: Personal Information */}
       <div
         onClick={() => setActivePage("personal-info")}
-        className={`flex items-center justify-between px-3 py-2 rounded-xl border text-sm transition-colors cursor-pointer ${
+        className={`flex items-center justify-between px-3 py-2 rounded-xl border text-sm transition-colors cursor-pointer select-none ${
           activePage === "personal-info"
             ? "bg-purple-50/90 border-purple-500 text-purple-950 font-semibold shadow-xs ring-1 ring-purple-500/20"
             : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70 text-slate-700"
         }`}
       >
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-2.5 h-2.5 rounded-full bg-purple-600 shrink-0" />
+          <div className="w-2 h-2 rounded-full bg-purple-600 shrink-0" />
           <LuUser
             className={`text-base shrink-0 ${
               activePage === "personal-info" ? "text-purple-600" : "text-slate-500"
@@ -243,55 +489,198 @@ const EditorSidebar = ({
         </span>
       </div>
 
-      {/* Drag and Drop Sortable Sections */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-        autoScroll={false}
-      >
-        <SortableContext
-          items={sortableKeys}
-          strategy={verticalListSortingStrategy}
+      {/* Scrollable Container with Conditional Drag-and-Drop Structure */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 flex flex-col gap-3 min-h-[300px]">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          autoScroll={false}
         >
-          <div className="flex-1 min-h-[300px] overflow-y-auto custom-scrollbar pr-1 flex flex-col gap-1.5">
-            {sortableKeys.map((key) => {
-              const sec = sections[key];
-              const IconComponent = SECTION_ICONS[key] || LuSparkles;
-              const count = Array.isArray(sec?.items) ? sec.items.length : undefined;
+          {/* ========================================================= */}
+          {/* 1-COLUMN TEMPLATES: Single Unified Drag-and-Drop Column   */}
+          {/* ========================================================= */}
+          {!isTwoColumn && (
+            <SortableContext
+              id="single-column"
+              items={flatKeys}
+              strategy={verticalListSortingStrategy}
+            >
+              <DroppableColumn
+                id="single-column"
+                title="Resume Sections"
+                subtitle="Single Column"
+                badgeColor="purple"
+                count={flatKeys.length}
+              >
+                {flatKeys.length === 0 ? (
+                  <div className="py-3 px-2 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-lg select-none">
+                    No sections available
+                  </div>
+                ) : (
+                  flatKeys.map((key) => {
+                    const sec = sections[key];
+                    const IconComponent = SECTION_ICONS[key] || LuSparkles;
+                    const count = Array.isArray(sec?.items) ? sec.items.length : undefined;
 
-              return (
-                <SortableSectionItem
-                  key={key}
-                  id={key}
-                  section={sec}
-                  isActive={activePage === key}
-                  onSelect={() => setActivePage(key)}
-                  onToggleVisibility={() => onToggleVisibility(key)}
-                  icon={IconComponent}
-                  itemCount={count}
-                />
-              );
-            })}
-          </div>
-        </SortableContext>
-      </DndContext>
+                    return (
+                      <SortableSectionItem
+                        key={key}
+                        id={key}
+                        column="main"
+                        isTwoColumn={false}
+                        section={sec}
+                        isActive={activePage === key}
+                        onSelect={() => setActivePage(key)}
+                        onToggleVisibility={() => onToggleVisibility(key)}
+                        icon={IconComponent}
+                        itemCount={count}
+                      />
+                    );
+                  })
+                )}
+              </DroppableColumn>
+            </SortableContext>
+          )}
 
-      {/* Sidebar Footer: Fast Utilities */}
-      <div className="pt-2.5 border-t border-slate-100 flex flex-col gap-2 shrink-0">
+          {/* ========================================================= */}
+          {/* 2-COLUMN TEMPLATES: Separated Main Content & Sidebar Columns */}
+          {/* ========================================================= */}
+          {isTwoColumn && (
+            <>
+              {/* Column 1: Main Content */}
+              <SortableContext
+                id="main-column"
+                items={mainKeys}
+                strategy={verticalListSortingStrategy}
+              >
+                <DroppableColumn
+                  id="main-column"
+                  title="Main Content"
+                  subtitle="Wide Column"
+                  badgeColor="blue"
+                  count={mainKeys.length}
+                >
+                  {mainKeys.length === 0 ? (
+                    <div className="py-3 px-2 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-lg select-none">
+                      Drag sections here
+                    </div>
+                  ) : (
+                    mainKeys.map((key) => {
+                      const sec = sections[key];
+                      const IconComponent = SECTION_ICONS[key] || LuSparkles;
+                      const count = Array.isArray(sec?.items) ? sec.items.length : undefined;
+
+                      return (
+                        <SortableSectionItem
+                          key={key}
+                          id={key}
+                          column="main"
+                          isTwoColumn={true}
+                          section={sec}
+                          isActive={activePage === key}
+                          onSelect={() => setActivePage(key)}
+                          onToggleVisibility={() => onToggleVisibility(key)}
+                          onMoveColumn={handleMoveColumn}
+                          icon={IconComponent}
+                          itemCount={count}
+                        />
+                      );
+                    })
+                  )}
+                </DroppableColumn>
+              </SortableContext>
+
+              {/* Column 2: Sidebar Column */}
+              <SortableContext
+                id="sidebar-column"
+                items={sidebarKeys}
+                strategy={verticalListSortingStrategy}
+              >
+                <DroppableColumn
+                  id="sidebar-column"
+                  title="Sidebar"
+                  subtitle="Narrow Column"
+                  badgeColor="purple"
+                  count={sidebarKeys.length}
+                >
+                  {sidebarKeys.length === 0 ? (
+                    <div className="py-3 px-2 text-center text-xs text-purple-400/80 border border-dashed border-purple-200/60 rounded-lg select-none">
+                      Drag sections here
+                    </div>
+                  ) : (
+                    sidebarKeys.map((key) => {
+                      const sec = sections[key];
+                      const IconComponent = SECTION_ICONS[key] || LuSparkles;
+                      const count = Array.isArray(sec?.items) ? sec.items.length : undefined;
+
+                      return (
+                        <SortableSectionItem
+                          key={key}
+                          id={key}
+                          column="sidebar"
+                          isTwoColumn={true}
+                          section={sec}
+                          isActive={activePage === key}
+                          onSelect={() => setActivePage(key)}
+                          onToggleVisibility={() => onToggleVisibility(key)}
+                          onMoveColumn={handleMoveColumn}
+                          icon={IconComponent}
+                          itemCount={count}
+                        />
+                      );
+                    })
+                  )}
+                </DroppableColumn>
+              </SortableContext>
+            </>
+          )}
+
+          {/* Smooth Drag Overlay preview */}
+          <DragOverlay>
+            {activeId && activeSection ? (
+              <div className="px-3 py-2 rounded-xl bg-white border-2 border-purple-500 shadow-lg text-slate-800 flex items-center gap-2 text-xs font-semibold select-none opacity-95">
+                {isTwoColumn && (
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      mainKeys.includes(activeId) ? "bg-blue-500" : "bg-purple-500"
+                    }`}
+                  />
+                )}
+                {ActiveIcon && <ActiveIcon className="text-sm text-purple-600" />}
+                <span className="capitalize">{activeSection.name || activeId}</span>
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
+
+      {/* Sidebar Footer: Fast Utilities & Column Status */}
+      <div className="pt-2 border-t border-slate-100 flex flex-col gap-1.5 shrink-0">
         {onExportJson && (
           <button
             type="button"
             onClick={onExportJson}
-            className="flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100/80 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-purple-200"
+            className="flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100/80 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-purple-200"
             title="Export as JSON"
           >
             <LuFileJson className="text-sm text-purple-600" />
             <span>Export JSON</span>
           </button>
         )}
-        <div className="flex items-center justify-center text-[11px] text-slate-400 px-1">
-          <span>{sortableKeys.length + 1} sections active</span>
+        <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+          {isTwoColumn ? (
+            <>
+              <span>{mainKeys.length} main · {sidebarKeys.length} sidebar</span>
+              <span className="font-medium text-blue-600/80 bg-blue-50 px-1.5 py-0.5 rounded">2-Column Layout</span>
+            </>
+          ) : (
+            <>
+              <span>{flatKeys.length} sections total</span>
+              <span className="font-medium text-purple-600/80 bg-purple-50 px-1.5 py-0.5 rounded">1-Column Layout</span>
+            </>
+          )}
         </div>
       </div>
     </aside>

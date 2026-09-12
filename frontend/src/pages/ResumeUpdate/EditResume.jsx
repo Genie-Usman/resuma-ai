@@ -218,6 +218,11 @@ const EditResume = () => {
     resumeData?.data?.metadata?.theme?.primary,
   ]);
 
+  const currentTemplateId =
+    resumeData?.data?.metadata?.template ||
+    resumeData?.template ||
+    RESUME_TEMPLATES[0].id;
+
   // Quick-add missing skill from Job Match analysis
   const handleAddMissingSkill = (skillName) => {
     setResumeData((prev) => {
@@ -747,6 +752,7 @@ const EditResume = () => {
                 setActivePage={setActivePage}
                 sections={resumeData.data?.sections || {}}
                 layout={resumeData.data?.metadata?.layout || [[], []]}
+                templateId={currentTemplateId}
                 onToggleVisibility={toggleSectionVisibility}
                 onReorderSections={reorderSections}
                 onExportJson={handleExportJson}
@@ -782,6 +788,7 @@ const EditResume = () => {
                 setActivePage={setActivePage}
                 sections={resumeData.data?.sections || {}}
                 layout={resumeData.data?.metadata?.layout || [[], []]}
+                templateId={currentTemplateId}
                 onToggleVisibility={toggleSectionVisibility}
                 onReorderSections={reorderSections}
                 onExportJson={handleExportJson}

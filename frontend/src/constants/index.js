@@ -11,66 +11,92 @@ import ONYX from "../assets/template_images/onyx.jpg"
 import PIKACHU from "../assets/template_images/pikachu.jpg"
 import RHYHORN from "../assets/template_images/rhyhorn.jpg"
 
+export { TWO_COLUMN_TEMPLATES, isTwoColumnTemplate } from "../utils/layoutUtils";
+
 export const RESUME_TEMPLATES = [
     {
         id: 'azurill',
         thumbnail: AZURILL,
-        colorPaletteCode: 'azurill'
+        colorPaletteCode: 'azurill',
+        columns: 2,
+        layoutType: 'two-column',
     },
     {
         id: 'bronzor',
         thumbnail: BRONZOR,
-        colorPaletteCode: 'bronzor'
+        colorPaletteCode: 'bronzor',
+        columns: 1,
+        layoutType: 'single-column',
     },
     {
         id: 'chikorita',
         thumbnail: CHIKORITA,
-        colorPaletteCode: 'chikorita'
+        colorPaletteCode: 'chikorita',
+        columns: 2,
+        layoutType: 'two-column',
     },
     {
         id: 'ditto',
         thumbnail: DITTO,
-        colorPaletteCode: 'ditto'
+        colorPaletteCode: 'ditto',
+        columns: 2,
+        layoutType: 'two-column',
     },
     {
         id: 'gengar',
         thumbnail: GENGAR,
-        colorPaletteCode: 'gengar'
+        colorPaletteCode: 'gengar',
+        columns: 2,
+        layoutType: 'two-column',
     },
     {
         id: 'glalie',
         thumbnail: GLALIE,
-        colorPaletteCode: 'glalie'
+        colorPaletteCode: 'glalie',
+        columns: 2,
+        layoutType: 'two-column',
     },
     {
         id: 'kakuna',
         thumbnail: KAKUNA,
-        colorPaletteCode: 'kakuna'
+        colorPaletteCode: 'kakuna',
+        columns: 1,
+        layoutType: 'single-column',
     },
     {
         id: 'leafish',
         thumbnail: LEAFISH,
-        colorPaletteCode: 'leafish'
+        colorPaletteCode: 'leafish',
+        columns: 2,
+        layoutType: 'two-column',
     },
     {
         id: 'nosepass',
         thumbnail: NOSEPASS,
-        colorPaletteCode: 'nosepass'
+        colorPaletteCode: 'nosepass',
+        columns: 1,
+        layoutType: 'single-column',
     },
     {
         id: 'onyx',
         thumbnail: ONYX,
-        colorPaletteCode: 'onyx'
+        colorPaletteCode: 'onyx',
+        columns: 1,
+        layoutType: 'single-column',
     },
     {
         id: 'pikachu',
         thumbnail: PIKACHU,
-        colorPaletteCode: 'pikachu'
+        colorPaletteCode: 'pikachu',
+        columns: 2,
+        layoutType: 'two-column',
     },
     {
         id: 'rhyhorn',
         thumbnail: RHYHORN,
-        colorPaletteCode: 'rhyhorn'
+        colorPaletteCode: 'rhyhorn',
+        columns: 1,
+        layoutType: 'single-column',
     },
 ]
 

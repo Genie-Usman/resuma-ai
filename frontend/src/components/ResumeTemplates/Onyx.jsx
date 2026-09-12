@@ -64,6 +64,7 @@ const Onyx = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false, 
     const [layout] = Array.isArray(metadata.layout) ? metadata.layout : [[]];
     const mainIds = Array.isArray(layout[0]) ? layout[0] : [];
     const sidebarIds = Array.isArray(layout[1]) ? layout[1] : [];
+    const sectionIds = sidebarIds.length === 0 ? mainIds : [...sidebarIds, ...mainIds];
 
     return (
         <div
@@ -82,11 +83,7 @@ const Onyx = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false, 
                 <ResumeHeader basics={basics} themeColors={themeColors} sections={sections}/>
             )}
 
-            {sidebarIds.map((key) =>
-                mapSectionToComponent(key, sections[key], key, themeColors)
-            )}
-
-            {mainIds.map((key) =>
+            {sectionIds.map((key) =>
                 mapSectionToComponent(key, sections[key], key, themeColors)
             )}
         </div>
