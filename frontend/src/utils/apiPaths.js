@@ -6,7 +6,10 @@ export const API_PATHS = {
     AUTH: {
         REGISTER: '/api/auth/register',
         LOGIN: '/api/auth/login',
+        LOGOUT: '/api/auth/logout',
         GET_PROFILE: '/api/auth/profile',
+        GOOGLE_AUTH: '/api/auth/google',
+        LINKEDIN_AUTH: '/api/auth/linkedin',
     },
 
     RESUME: {

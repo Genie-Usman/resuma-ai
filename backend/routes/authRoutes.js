@@ -1,5 +1,14 @@
 const express = require("express");
-const { registerUser, loginUser, getUserProfile } = require("../controllers/authController");
+const {
+    registerUser,
+    loginUser,
+    logoutUser,
+    getUserProfile,
+    googleAuth,
+    googleCallback,
+    linkedinAuth,
+    linkedinCallback,
+} = require("../controllers/authController");
 const { protect } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/uploadMiddleware");
 const { authLimiter } = require("../middlewares/rateLimiter");
@@ -12,7 +21,16 @@ const router = express.Router();
 // Auth Routes with Rate Limiting and Zod Validation
 router.post("/register", authLimiter, validateRequest(registerSchema), registerUser);
 router.post("/login", authLimiter, validateRequest(loginSchema), loginUser);
+router.post("/logout", logoutUser);
 router.get("/profile", protect, getUserProfile);
+
+// Google OAuth 2.0 Routes
+router.get("/google", googleAuth);
+router.get("/google/callback", googleCallback);
+
+// LinkedIn OAuth 2.0 (OpenID Connect) Routes
+router.get("/linkedin", linkedinAuth);
+router.get("/linkedin/callback", linkedinCallback);
 
 // Upload Image Route (Cloudinary with Local Fallback)
 router.post("/upload-image", upload.single("image"), async (req, res) => {

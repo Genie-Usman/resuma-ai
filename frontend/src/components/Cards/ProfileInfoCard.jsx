@@ -7,9 +7,9 @@ const ProfileInfoCard = () => {
   const { user, clearUser } = useContext(UserContext);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.clear();
-    clearUser();
+    await clearUser();
     navigate("/");
   };
 

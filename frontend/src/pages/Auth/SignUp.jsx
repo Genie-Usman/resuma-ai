@@ -1,5 +1,6 @@
-import { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useContext, useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { UserContext } from '../../context/userContext';
 
 // Utils
@@ -10,9 +11,11 @@ import uploadImage from '../../utils/uploadImage';
 
 // Components
 import ProfilePhotoSelector from '../../components/Inputs/ProfilePhotoSelector';
+import SocialAuthButtons from '../../components/Auth/SocialAuthButtons';
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { updateUser } = useContext(UserContext);
 
   const [formData, setFormData] = useState({
@@ -22,9 +25,31 @@ const SignUp = () => {
     profileImageURL: '',
   });
 
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
+
+  // Handle OAuth Redirect Error notifications (clean URL after displaying once)
+  useEffect(() => {
+    const oauthError = searchParams.get('oauth_error');
+    if (oauthError) {
+      // Clean query parameter from URL immediately
+      navigate('/auth/sign-up', { replace: true });
+
+      if (oauthError.includes('credentials_missing')) {
+        const provider = oauthError.includes('google') ? 'Google' : 'LinkedIn';
+        toast.error(
+          `${provider} OAuth credentials are not set. Add ${provider.toUpperCase()}_CLIENT_ID and ${provider.toUpperCase()}_CLIENT_SECRET to backend/.env`,
+          { id: 'oauth-error', duration: 6000 }
+        );
+      } else if (oauthError === 'access_denied') {
+        toast.error('Authentication was canceled.', { id: 'oauth-error' });
+      } else {
+        toast.error(`Authentication failed (${oauthError}).`, { id: 'oauth-error' });
+      }
+    }
+  }, [searchParams, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,7 +60,6 @@ const SignUp = () => {
     e.preventDefault();
 
     const newErrors = {};
-
     if (!formData.name) newErrors.name = 'Please enter your name.';
     if (!validateEmail(formData.email)) newErrors.email = 'Please enter a valid email address.';
     if (!formData.password) newErrors.password = 'Please enter your password.';
@@ -46,36 +70,32 @@ const SignUp = () => {
     }
 
     setErrors({});
+    setLoading(true);
 
-    // SignUp API call
     try {
+      let uploadedProfileImageUrl = formData.profileImageURL;
       if (profilePic) {
         const imgUploadRes = await uploadImage(profilePic);
-        formData.profileImageURL = imgUploadRes.imageUrl || "";
+        uploadedProfileImageUrl = imgUploadRes.imageUrl || "";
       }
 
-
+      // Backend automatically sets HttpOnly 'token' cookie on success
       const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        profileImageURL: formData.profileImageURL,
+        profileImageURL: uploadedProfileImageUrl,
       });
 
-      const { token } = response.data;
-
-      if (token) {
-        localStorage.setItem('token', token);
-        updateUser(response.data);
-        navigate('/dashboard');
-      }
-
+      updateUser(response.data);
+      toast.success('Account created successfully!');
+      navigate('/dashboard');
     } catch (error) {
-      if (error.response && error.response.data.message) {
-        console.error(error.response.data.message);
-      } else {
-        console.error('Something went wrong. Please try again.');
-      }
+      const message = error.response?.data?.message || 'Something went wrong. Please try again.';
+      toast.error(message);
+      setErrors({ form: message });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,25 +108,32 @@ const SignUp = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="space-y-1.5">
         <h2 className="text-2xl font-semibold tracking-tight">Create a new account</h2>
-        <h6>
-          <span className="opacity-75">Already have an account?</span>
-          <button className="px-1.5 text-black font-bold hover:underline">
-            <Link to="/auth/login">
-              Sign in now <span className="ml-1">→</span>
-            </Link>
-          </button>
-        </h6>
+        <div className="text-sm text-gray-600">
+          Already have an account?
+          <Link to="/auth/login" className="text-black font-bold hover:underline ml-1">
+            Sign in now →
+          </Link>
+        </div>
       </div>
+
+      {/* Social OAuth Sign-Up (Google & LinkedIn) */}
+      <SocialAuthButtons mode="sign-up" />
 
       <form
         onSubmit={handleSubmit}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
-        className="flex flex-col gap-y-3"
+        className="flex flex-col gap-y-3.5"
       >
+        {errors.form && (
+          <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-600 font-medium">
+            {errors.form}
+          </div>
+        )}
+
         <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} />
 
         <div>
@@ -117,7 +144,7 @@ const SignUp = () => {
             value={formData.name}
             onChange={handleChange}
             placeholder="John Doe"
-            className="w-full border border-gray-300 px-3 py-1.5 rounded"
+            className="w-full border border-gray-300 px-3 py-2 rounded text-sm focus:outline-hidden focus:ring-2 focus:ring-black/10 focus:border-black transition-all"
           />
           {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
         </div>
@@ -130,7 +157,7 @@ const SignUp = () => {
             value={formData.email}
             onChange={handleChange}
             placeholder="john.doe@example.com"
-            className="w-full border border-gray-300 px-3 py-1.5 rounded lowercase"
+            className="w-full border border-gray-300 px-3 py-2 rounded lowercase text-sm focus:outline-hidden focus:ring-2 focus:ring-black/10 focus:border-black transition-all"
           />
           {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
         </div>
@@ -142,7 +169,7 @@ const SignUp = () => {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full border border-gray-300 px-3 py-1.5 rounded"
+            className="w-full border border-gray-300 px-3 py-2 rounded text-sm focus:outline-hidden focus:ring-2 focus:ring-black/10 focus:border-black transition-all"
           />
           <p className="text-xs text-gray-500 mt-1">
             Hold <code className="text-xs font-bold">Ctrl</code> to display your password temporarily.
@@ -152,9 +179,10 @@ const SignUp = () => {
 
         <button
           type="submit"
-          className="flex-1 bg-black text-white py-1.5 px-4 rounded hover:bg-gray-800 transition-colors cursor-pointer"
+          disabled={loading}
+          className="flex-1 bg-black text-white py-2.5 px-4 rounded-xl font-semibold text-sm hover:bg-gray-800 active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50 mt-1"
         >
-          Sign up
+          {loading ? 'Creating account...' : 'Create Account'}
         </button>
       </form>
     </div>

@@ -5,50 +5,52 @@ import { API_PATHS } from "../utils/apiPaths";
 export const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
-
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (user) return;
-
-        const accessToken = localStorage.getItem('token');
-        if (!accessToken) {
-            setLoading(false);
-            return;
-        }
-
         const fetchUser = async () => {
             try {
+                // Browser sends HttpOnly token cookie automatically with withCredentials: true
                 const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE);
-                setUser(response.data);
+                if (response.data) {
+                    setUser(response.data);
+                }
             } catch (error) {
-                console.error('User not authenticated', error);
-                clearUser();
+                // User is unauthenticated / guest
+                setUser(null);
             } finally {
                 setLoading(false);
             }
-        }
+        };
 
         fetchUser();
     }, []);
 
     const updateUser = (userData) => {
         setUser(userData);
-        localStorage.setItem('token', userData.token);
+        if (userData?.token) {
+            localStorage.setItem("token", userData.token);
+        }
         setLoading(false);
-    }
+    };
 
-    const clearUser = () => {
-        setUser(null);
-        localStorage.removeItem('token');
-    }
+    const clearUser = async () => {
+        try {
+            await axiosInstance.post(API_PATHS.AUTH.LOGOUT);
+        } catch {
+            // Silently ignore logout network errors
+        } finally {
+            setUser(null);
+            localStorage.removeItem("token");
+        }
+    };
 
     return (
         <UserContext.Provider value={{ user, loading, updateUser, clearUser }}>
             {children}
         </UserContext.Provider>
-    )
-}
+    );
+};
 
-export default UserProvider
+export default UserProvider;

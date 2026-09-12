@@ -42,8 +42,11 @@ app.use(
   })
 );
 
-// Standard JSON body parser
+const cookieParser = require("cookie-parser");
+
+// Standard JSON body parser & Cookie parser
 app.use(express.json());
+app.use(cookieParser());
 
 // Public Health Check (responds fast without waiting for DB)
 app.get("/", (req, res) => {
