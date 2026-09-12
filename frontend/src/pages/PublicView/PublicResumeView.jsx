@@ -11,11 +11,11 @@ import {
   LuMaximize2,
   LuCircleAlert,
 } from "react-icons/lu";
-import { useReactToPrint } from "react-to-print";
 import toast from "react-hot-toast";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
 import { A4_WIDTH_PX, A4_HEIGHT_PX } from "../ResumeUpdate/hooks/usePageCalculator";
 import axiosInstance from "../../utils/axiosInstance";
+import { API_PATHS } from "../../utils/apiPaths";
 import LOGO from "../../assets/logo.svg";
 
 const PublicResumeView = () => {
@@ -72,148 +72,43 @@ const PublicResumeView = () => {
     return () => window.removeEventListener("resize", calculateAutoFit);
   }, [isAutoFit]);
 
-  // Print & ATS Vector Export
-  const printPageStyle = `
-    @page {
-      size: A4 portrait;
-      margin: 0mm;
-    }
-    @media print {
-      html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-        background: #ffffff !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      .no-print, .public-toolbar {
-        display: none !important;
-      }
-      .a4-paper-sheet,
-      .a4-paper-sheet *,
-      .a4-print-sheet,
-      .a4-print-sheet * {
-        min-height: 0 !important;
-      }
-      .a4-paper-sheet,
-      .a4-print-sheet {
-        width: 210mm !important;
-        height: auto !important;
-        margin: 0 auto !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        border: none !important;
-        transform: none !important;
-      }
-      /* Allow sections, grids, and columns to break naturally across pages */
-      section,
-      article,
-      .resume-section,
-      .wysiwyg,
-      .main,
-      .sidebar,
-      .space-y-4,
-      .space-y-3,
-      .space-y-6,
-      .grid {
-        break-inside: auto !important;
-        page-break-inside: auto !important;
-        height: auto !important;
-      }
-      /* Prevent individual resume item entries from being sliced awkwardly across pages */
-      section > div > div,
-      section > div > div > div,
-      .resume-item,
-      .page-break-avoid,
-      .bronzor-section-content > div,
-      .nosepass-item,
-      li {
-        break-inside: avoid !important;
-        page-break-inside: avoid !important;
-      }
-      /* Keep section headings attached to their following content (no orphan headings) */
-      h1, h2, h3, h4, h5, h6,
-      .bronzor-section-title,
-      .nosepass-title-row,
-      .nosepass-summary-title {
-        break-after: avoid !important;
-        page-break-after: avoid !important;
-      }
-      /* Bronzor Print Pagination Overrides: convert monolithic grid row into block + float layout */
-      .bronzor-section {
-        display: block !important;
-        clear: both !important;
-        break-inside: auto !important;
-        page-break-inside: auto !important;
-        margin-bottom: 0.75rem !important;
-      }
-      .bronzor-section-title {
-        float: left !important;
-        width: 20% !important;
-        break-after: avoid !important;
-        page-break-after: avoid !important;
-      }
-      .bronzor-section-content {
-        margin-left: 20% !important;
-        width: 80% !important;
-        display: block !important;
-        break-inside: auto !important;
-        page-break-inside: auto !important;
-      }
-      .bronzor-section-content > div {
-        display: block !important;
-        break-inside: avoid !important;
-        page-break-inside: avoid !important;
-        margin-bottom: 0.75rem !important;
-      }
-      /* Nosepass Print Pagination Overrides */
-      .nosepass-section,
-      .nosepass-summary-section {
-        display: block !important;
-        clear: both !important;
-        break-inside: auto !important;
-        page-break-inside: auto !important;
-        margin-bottom: 0.75rem !important;
-      }
-      .nosepass-summary-title {
-        float: left !important;
-        width: 25% !important;
-        break-after: avoid !important;
-        page-break-after: avoid !important;
-      }
-      .nosepass-summary-content {
-        margin-left: 25% !important;
-        width: 75% !important;
-        display: block !important;
-        break-inside: auto !important;
-        page-break-inside: auto !important;
-      }
-      .nosepass-item {
-        break-inside: avoid !important;
-        page-break-inside: avoid !important;
-        margin-bottom: 0.75rem !important;
-      }
-      /* Prevent trailing margins from spawning phantom blank pages */
-      .a4-paper-sheet > *:last-child,
-      .a4-paper-sheet *:last-child {
-        margin-bottom: 0 !important;
-      }
-      a {
-        color: inherit !important;
-        text-decoration: none !important;
-      }
-    }
-  `;
+  const [isExporting, setIsExporting] = useState(false);
 
-  const reactToPrintFn = useReactToPrint({
-    contentRef: resumePrintRef,
-    documentTitle: resume?.title || "Candidate-Resume",
-    pageStyle: printPageStyle,
-  });
+  // 1-Click Server-Side Headless Vector PDF Download
+  const handleDownloadPdf = async () => {
+    if (!slug || isExporting) return;
+    setIsExporting(true);
+    const toastId = toast.loading("Generating vector PDF...", { id: "public-pdf" });
+
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.RESUME.EXPORT_PUBLIC_PDF(slug),
+        { responseType: "blob" }
+      );
+
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+
+      const safeTitle = (resume?.title || "Candidate-Resume")
+        .replace(/[^a-zA-Z0-9-_ ]/g, "")
+        .trim() || "Candidate-Resume";
+      link.download = `${safeTitle}.pdf`;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+
+      toast.success("Vector PDF downloaded successfully!", { id: toastId });
+    } catch (err) {
+      console.error("Public PDF export error:", err);
+      toast.error(err.response?.data?.message || "Failed to download vector PDF", { id: toastId });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -321,14 +216,19 @@ const PublicResumeView = () => {
               <span className="hidden sm:inline">{copied ? "Copied" : "Share"}</span>
             </button>
 
-            {/* Download Vector PDF */}
+            {/* Download Vector PDF (Headless Chromium) */}
             <button
               type="button"
-              onClick={reactToPrintFn}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg shadow-xs transition-colors cursor-pointer"
+              disabled={isExporting}
+              onClick={handleDownloadPdf}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg shadow-xs transition-colors cursor-pointer disabled:opacity-50"
             >
-              <LuDownload className="text-sm" />
-              <span>Download PDF</span>
+              {isExporting ? (
+                <div className="size-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <LuDownload className="text-sm" />
+              )}
+              <span>{isExporting ? "Exporting..." : "Download PDF"}</span>
             </button>
 
             {/* Platform Branding CTA */}

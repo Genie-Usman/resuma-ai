@@ -158,8 +158,9 @@ const EditResume = () => {
     setOpenThemeSelector,
     openPreviewModal,
     setOpenPreviewModal,
-    handlePrint,
-  } = useResumeExport(resumeDownloadRef, resumeData?.title);
+    isExporting,
+    handleDownloadVectorPdf,
+  } = useResumeExport(resumeId, resumeData?.title);
 
   // Snapshot initial loaded data
   useEffect(() => {
@@ -707,15 +708,20 @@ const EditResume = () => {
             <span>Save</span>
           </button>
 
-          {/* Export PDF (Primary Action) */}
+          {/* Export PDF (Primary Action - Direct 1-Click Vector PDF) */}
           <button
             type="button"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors cursor-pointer"
-            onClick={() => setOpenPreviewModal(true)}
-            title="Download PDF"
+            disabled={isExporting}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+            onClick={handleDownloadVectorPdf}
+            title="Download Vector PDF"
           >
-            <LuDownload className="text-xs" />
-            <span className="hidden sm:inline">Export PDF</span>
+            {isExporting ? (
+              <LuRefreshCw className="text-xs animate-spin" />
+            ) : (
+              <LuDownload className="text-xs" />
+            )}
+            <span className="hidden sm:inline">{isExporting ? "Exporting..." : "Export PDF"}</span>
           </button>
 
           {/* Delete */}
@@ -849,19 +855,19 @@ const EditResume = () => {
         onClose={() => setOpenPreviewModal(false)}
         title={resumeData?.title || "Resume Preview"}
         showActionBtn
-        actionBtnText="Download PDF"
-        actionBtnIcon={<LuDownload className="text-base" />}
-        onActionClick={handlePrint}
+        actionBtnText={isExporting ? "Generating Vector PDF..." : "Download Vector PDF"}
+        actionBtnIcon={isExporting ? <LuRefreshCw className="text-base animate-spin" /> : <LuDownload className="text-base" />}
+        onActionClick={handleDownloadVectorPdf}
         width="95vw"
         height="92vh"
         isPrint={true}
       >
         <div className="flex flex-col gap-3 max-w-5xl mx-auto w-full p-2">
-          {/* Print settings tip */}
-          <div className="p-3 bg-purple-50/90 border border-purple-200 rounded-xl text-xs text-purple-900 flex items-start gap-2.5 shadow-xs">
-            <LuInfo className="text-base text-purple-600 mt-0.5 shrink-0" />
+          {/* Vector PDF Export Tip */}
+          <div className="p-3 bg-emerald-50/90 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-start gap-2.5 shadow-xs">
+            <LuSparkles className="text-base text-emerald-600 mt-0.5 shrink-0" />
             <div>
-              <span className="font-semibold text-purple-950">Printing tip:</span> In the print dialog, select <strong>Save as PDF</strong> and make sure <strong>Background graphics</strong> is turned on so colors and formatting are saved.
+              <span className="font-semibold text-emerald-950">1-Click Vector Export:</span> Resuma AI uses server-side headless Chromium to generate clean, selectable vector documents with clickable links and crisp typography.
             </div>
           </div>
 

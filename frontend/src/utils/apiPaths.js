@@ -1,6 +1,8 @@
 export const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const API_PATHS = {
+    PING: '/api/ping',
+
     AUTH: {
         REGISTER: '/api/auth/register',
         LOGIN: '/api/auth/login',
@@ -15,6 +17,8 @@ export const API_PATHS = {
         DELETE: (id) => `/api/resume/${id}`,
         DUPLICATE: (id) => `/api/resume/${id}/duplicate`,
         UPLOAD_IMAGES: (id) => `/api/resume/${id}/upload-images`,
+        EXPORT_PDF: (id) => `/api/resume/${id}/export-pdf`,
+        EXPORT_PUBLIC_PDF: (slug) => `/api/resume/public/${slug}/export-pdf`,
     },
 
     IMAGE: {

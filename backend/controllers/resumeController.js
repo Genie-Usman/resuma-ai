@@ -4,6 +4,7 @@ const Resume = require('../models/Resume.js');
 const User = require('../models/User.js');
 const { getDefaultResumeData } = require('../utils/DefaultResume.js');
 const { slugify } = require('../utils/helper.js');
+const { generateVectorPdf } = require('../services/pdfService');
 
 const mongoose = require("mongoose");
 
@@ -168,7 +169,11 @@ const deleteResume = async (req, res) => {
       const thumbnailPath = path.join(uploadsFolder, path.basename(resume.thumbnailLink));
 
       if (fs.existsSync(thumbnailPath)) {
-        fs.unlinkSync(thumbnailPath);
+        try {
+          fs.unlinkSync(thumbnailPath);
+        } catch (e) {
+          console.warn("Could not delete local thumbnail:", e.message);
+        }
       }
     }
 
@@ -271,6 +276,75 @@ const getPublicResume = async (req, res) => {
   }
 };
 
+// @desc    Export Resume as Vector PDF via Headless Chromium
+// @route   GET /api/resume/:id/export-pdf
+// @access  Private
+const exportResumePdf = async (req, res) => {
+  try {
+    const resume = await Resume.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+    });
+
+    if (!resume) {
+      return res.status(404).json({ message: "Resume not found or unauthorized" });
+    }
+
+    const token = req.headers.authorization?.split(" ")[1] || "";
+
+    const pdfBuffer = await generateVectorPdf({
+      resumeId: resume._id.toString(),
+      token,
+      slug: resume.slug,
+      isPublic: false,
+    });
+
+    const safeTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "Resume";
+    const filename = `${safeTitle}.pdf`;
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(filename)}"`);
+    res.setHeader("Content-Length", pdfBuffer.length);
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error("Export PDF error:", error);
+    res.status(500).json({ message: "Failed to generate vector PDF", error: error.message });
+  }
+};
+
+// @desc    Export Public Resume as Vector PDF via Headless Chromium
+// @route   GET /api/resume/public/:slug/export-pdf
+// @access  Public
+const exportPublicResumePdf = async (req, res) => {
+  try {
+    const resume = await Resume.findOne({
+      slug: req.params.slug,
+      isPublic: { $ne: false },
+    });
+
+    if (!resume) {
+      return res.status(404).json({ message: "Resume not found or is set to private." });
+    }
+
+    const pdfBuffer = await generateVectorPdf({
+      resumeId: resume._id.toString(),
+      slug: resume.slug,
+      isPublic: true,
+    });
+
+    const safeTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "Resume";
+    const filename = `${safeTitle}.pdf`;
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(filename)}"`);
+    res.setHeader("Content-Length", pdfBuffer.length);
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error("Export public PDF error:", error);
+    res.status(500).json({ message: "Failed to generate vector PDF", error: error.message });
+  }
+};
+
 module.exports = {
   createResume,
   getUserResumes,
@@ -279,4 +353,6 @@ module.exports = {
   deleteResume,
   duplicateResume,
   getPublicResume,
+  exportResumePdf,
+  exportPublicResumePdf,
 };

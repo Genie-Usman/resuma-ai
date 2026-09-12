@@ -44,6 +44,12 @@ const uploadMedia = async (buffer, originalname = "upload.png", req = null, opti
         });
     }
 
+    // Serverless (Vercel) Fallback: File system is read-only except /tmp
+    if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+        const mimeType = originalname.endsWith(".png") ? "image/png" : "image/jpeg";
+        return `data:${mimeType};base64,${buffer.toString("base64")}`;
+    }
+
     // Local Disk Fallback
     const uploadsDir = path.join(__dirname, "..", "uploads");
     if (!fs.existsSync(uploadsDir)) {

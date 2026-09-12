@@ -97,20 +97,39 @@ async function run() {
       console.log("Saved dashboard_normalized.png");
     }
 
-    // Navigate to Resume Editor
+    // Navigate to Resume Editor for 6aa3333cfd6e3a393e20e3e0 (Azurill "Muhammad Usman Resume (Copy)")
+    console.log("Navigating to Azurill resume 6aa3333cfd6e3a393e20e3e0...");
     await send("Runtime.evaluate", {
-      expression: `window.location.href = '/resume/6aa2168dcd8942b6d43fd72e';`
+      expression: `window.location.href = '/resume/6aa3333cfd6e3a393e20e3e0';`
     });
 
     // Wait for Studio to load
     await new Promise(r => setTimeout(r, 4000));
 
-    // 3. Screenshot Edit Resume (shows standardized 64px header, logo, title, view switcher, action buttons, ProfileInfoCard)
-    const studioRes = await send("Page.captureScreenshot", { format: "png" });
-    if (studioRes?.result?.data) {
-      const destPath = path.join("C:\\Users\\Mani\\.gemini\\antigravity-ide\\brain\\07f0804c-f940-455e-8a58-300d0420605d", "edit_resume_normalized.png");
-      fs.writeFileSync(destPath, Buffer.from(studioRes.result.data, "base64"));
-      console.log("Saved edit_resume_normalized.png");
+    // Click Save button in Studio to regenerate thumbnail with new w-full centering fix
+    console.log("Triggering save in Studio for Azurill resume to regenerate thumbnail...");
+    await send("Runtime.evaluate", {
+      expression: `
+        const saveBtn = Array.from(document.querySelectorAll('button')).find(b => b.title && b.title.includes('Save resume progress'));
+        if (saveBtn) saveBtn.click();
+      `
+    });
+
+    // Wait 6 seconds for thumbnail generation and backend upload
+    await new Promise(r => setTimeout(r, 6000));
+
+    // Navigate back to Dashboard to inspect updated thumbnail
+    await send("Runtime.evaluate", {
+      expression: `window.location.href = '/dashboard';`
+    });
+
+    await new Promise(r => setTimeout(r, 4000));
+
+    const updatedDashboardRes = await send("Page.captureScreenshot", { format: "png" });
+    if (updatedDashboardRes?.result?.data) {
+      const destPath = path.join("C:\\Users\\Mani\\.gemini\\antigravity-ide\\brain\\07f0804c-f940-455e-8a58-300d0420605d", "dashboard_thumbnail_verified.png");
+      fs.writeFileSync(destPath, Buffer.from(updatedDashboardRes.result.data, "base64"));
+      console.log("Saved dashboard_thumbnail_verified.png");
     }
 
     await send("Page.close");

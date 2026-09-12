@@ -41,7 +41,7 @@ const mapSectionToComponent = (key, section, reactKey, themeColors) => {
 
     const Component = components[key];
     return Component ? (
-        <div key={reactKey}>
+        <div key={reactKey} className="w-full">
             <Component section={section} themeColors={themeColors} />
         </div>
     ) : null;
@@ -73,7 +73,7 @@ const Azurill = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
     return (
         <div
             ref={resumeRef}
-            className="p-5 space-y-3 min-h-0 print:min-h-0"
+            className="p-5 space-y-3 min-h-0 print:min-h-0 w-full"
             style={{
                 backgroundColor: themeColors[0],
                 color: themeColors[1],
@@ -87,15 +87,15 @@ const Azurill = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
                 <ResumeHeader basics={basics} themeColors={themeColors} />
             )}
 
-            <div className="grid grid-cols-3 gap-x-5 min-w-0">
-                <div className="sidebar group space-y-4 col-span-1 min-w-0 break-words">
+            <div className="grid grid-cols-3 gap-x-5 min-w-0 w-full">
+                <div className="sidebar group space-y-4 col-span-1 min-w-0 break-words w-full">
                     {sidebarIds.map((key) =>
                         mapSectionToComponent(key, sections[key], key, themeColors)
                     )}
                 </div>
 
                 <div
-                    className={`main group space-y-4 min-w-0 break-words ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"
+                    className={`main group space-y-4 min-w-0 break-words w-full ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"
                         }`}
                 >
                     {mainIds.map((key) =>
