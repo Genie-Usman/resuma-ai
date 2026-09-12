@@ -543,27 +543,25 @@ const EditResume = () => {
 
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col bg-slate-100 font-sans">
-      {/* 1. Studio Top Navigation Bar (Single Sleek 56px Bar - Never Wraps!) */}
-      <header className="h-14 shrink-0 bg-white border-b border-slate-200/80 px-3 sm:px-5 flex items-center justify-between z-30 shadow-2xs">
-        {/* Left: Back + Title + Real-time Save Status */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+      {/* 1. Studio Top Navigation Bar (Standardized 64px Bar - Cohesive Branding & Workspace Actions) */}
+      <header className="h-16 shrink-0 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between z-30 shadow-2xs">
+        {/* Left: Back button + Full Title + Real-time Save Status */}
+        <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={handleBackToDashboard}
             disabled={isNavigatingBack}
-            className="p-1.5 text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+            className="p-2 text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-colors cursor-pointer shrink-0 disabled:opacity-50"
             title="Save progress & Back to Dashboard"
           >
             {isNavigatingBack ? (
               <LuRefreshCw className="text-lg animate-spin text-purple-600" />
             ) : (
-              <LuArrowLeft className="text-lg" />
+              <LuArrowLeft className="text-xl text-slate-700" />
             )}
           </button>
 
-          <div className="h-4 w-px bg-slate-200 hidden sm:block shrink-0" />
-
           {/* Title with hover edit */}
-          <div className="flex items-center gap-2 min-w-0 max-w-[200px] sm:max-w-[300px] lg:max-w-[380px]">
+          <div className="flex items-center gap-2 min-w-0 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
             <TitleInput
               title={resumeData.title}
               setTitle={(value) => setResumeData((prev) => ({ ...prev, title: value }))}
@@ -571,7 +569,7 @@ const EditResume = () => {
           </div>
 
           {/* Real-time Save Status Pill */}
-          <div className="hidden md:flex items-center text-[11px] font-medium shrink-0">
+          <div className="hidden sm:flex items-center text-xs font-medium shrink-0">
             {isSaving || isNavigatingBack ? (
               <span className="flex items-center gap-1.5 text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/80">
                 <LuRefreshCw className="animate-spin text-xs text-amber-600" />
@@ -717,7 +715,7 @@ const EditResume = () => {
             title="Download PDF"
           >
             <LuDownload className="text-xs" />
-            <span>Export PDF</span>
+            <span className="hidden sm:inline">Export PDF</span>
           </button>
 
           {/* Delete */}
@@ -732,8 +730,8 @@ const EditResume = () => {
         </div>
       </header>
 
-      {/* 2. Studio Workspace Body (Full Height: calc(100vh - 56px)) */}
-      <main className="flex-1 h-[calc(100vh-56px)] flex overflow-hidden">
+      {/* 2. Studio Workspace Body (Full Height: calc(100vh - 64px)) */}
+      <main className="flex-1 h-[calc(100vh-64px)] flex overflow-hidden">
         {viewMode === "split" && (
           <div className="w-full h-full flex overflow-hidden">
             {/* Left: Section Navigation Sidebar */}

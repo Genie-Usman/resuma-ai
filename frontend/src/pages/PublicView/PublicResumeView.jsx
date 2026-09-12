@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
 import { A4_WIDTH_PX, A4_HEIGHT_PX } from "../ResumeUpdate/hooks/usePageCalculator";
 import axiosInstance from "../../utils/axiosInstance";
+import LOGO from "../../assets/logo.svg";
 
 const PublicResumeView = () => {
   const { slug } = useParams();
@@ -265,24 +266,24 @@ const PublicResumeView = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-100/90 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#fafafc] bg-[radial-gradient(ellipse_100%_45%_at_50%_-10%,rgba(147,40,231,0.07),rgba(255,255,255,0))] text-slate-800 antialiased flex flex-col font-sans">
       {/* Recruiter & Visitor Sticky Header */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-4 py-3 shadow-xs">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 py-3.5 shadow-xs">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 flex-wrap">
           {/* Left: Branding & Candidate Overview */}
           <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="flex items-center gap-2 text-purple-700 font-extrabold text-base tracking-tight hover:opacity-90"
+              className="flex items-center gap-2.5 hover:opacity-90 transition-opacity shrink-0"
               title="Resuma AI"
             >
-              <span className="w-7 h-7 rounded-lg bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
-                R
+              <img src={LOGO} alt="Resuma AI" className="w-[125px]" />
+              <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase bg-purple-50 text-purple-700 border border-purple-200/60">
+                Studio
               </span>
-              <span className="hidden sm:inline">Resuma AI</span>
             </Link>
 
-            <div className="h-5 w-px bg-gray-200 hidden sm:block" />
+            <div className="h-5 w-px bg-slate-200 hidden sm:block" />
 
             <div>
               <h1 className="text-xs md:text-sm font-bold text-gray-900 line-clamp-1">

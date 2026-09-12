@@ -68,7 +68,7 @@ const Kakuna = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = false
     return (
         <div
             ref={resumeRef}
-            className="p-4 space-y-4"
+            className="p-5 space-y-4"
             style={{
                 backgroundColor: themeColors[0],
                 color: themeColors[1],

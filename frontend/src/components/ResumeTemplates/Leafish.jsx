@@ -66,7 +66,7 @@ const Leafish = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
     return (
         <div
             ref={resumeRef}
-            className=""
+            className="p-5 space-y-4 min-h-0 print:min-h-0"
             style={{
                 backgroundColor: themeColors[0],
                 color: themeColors[1],
@@ -80,7 +80,7 @@ const Leafish = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
                 <ResumeHeader basics={basics} themeColors={themeColors} sections={sections} />
             )}
 
-            <div className="p-custom grid grid-cols-2 items-start space-x-6">
+            <div className="grid grid-cols-2 items-start space-x-6">
                 <div className={`main group grid gap-y-4 ${sidebarIds.length === 0 ? "col-span-2" : ""}`}>
                     {mainIds.map((key) =>
                         mapSectionToComponent(key, sections[key], key, themeColors)

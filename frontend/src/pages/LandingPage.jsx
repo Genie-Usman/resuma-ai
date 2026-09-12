@@ -23,8 +23,8 @@ const LandingPage = () => {
   }
 
   return (
-    <div className="w-full min-h-full bg-white">
-      <div className="container mx-auto px-4 py-6">
+    <div className="min-h-screen bg-[#fafafc] bg-[radial-gradient(ellipse_100%_45%_at_50%_-10%,rgba(147,40,231,0.07),rgba(255,255,255,0))] text-slate-800 antialiased selection:bg-purple-500 selection:text-white flex flex-col">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
 
         {/* Header */}
         <Header />

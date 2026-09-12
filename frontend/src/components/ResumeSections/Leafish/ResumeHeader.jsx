@@ -91,9 +91,9 @@ const ResumeHeader = ({ basics, themeColors, sections }) => {
                 {profileSection?.visible !== false && profiles.length > 0 && (
                     <div className="flex items-center gap-x-3 gap-y-0.5">
                         {profiles
-                            .filter((item) => item.visible)
+                            .filter((item) => item.visible !== false)
                             .map((item) => (
-                                <div className="flex items-center gap-x-2 min-w-0" key={item.id || item.url.href}>
+                                <div className="flex items-center gap-x-2 min-w-0" key={item.id || item.url?.href || item.username}>
                                     <BrandIcon
                                         slug={item.icon}
                                         className="size-4 shrink-0"
