@@ -5,6 +5,10 @@ import {
   LuMaximize2,
   LuScissors,
   LuLayers,
+  LuScrollText,
+  LuSlidersHorizontal,
+  LuChevronDown,
+  LuCheck,
 } from "react-icons/lu";
 import { usePageCalculator, A4_WIDTH_PX, A4_HEIGHT_PX } from "../hooks/usePageCalculator";
 import RenderResume from "../../../components/ResumeTemplates/RenderResume";
@@ -28,6 +32,28 @@ const ResumeCanvas = ({
   const [isAutoFit, setIsAutoFit] = useState(true);
   const [showGuides, setShowGuides] = useState(true);
   const [viewMode, setViewMode] = useState("continuous"); // "continuous" | "cards"
+  const [displayMenuOpen, setDisplayMenuOpen] = useState(false);
+  const displayMenuRef = useRef(null);
+
+  // Close display dropdown on outside click or Escape key
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (displayMenuRef.current && !displayMenuRef.current.contains(event.target)) {
+        setDisplayMenuOpen(false);
+      }
+    };
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setDisplayMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
 
   // Real-time pagination calculation
   const {
@@ -81,37 +107,130 @@ const ResumeCanvas = ({
       <div className="flex items-center justify-end gap-2 px-3.5 py-2 bg-white/95 backdrop-blur-md border-b border-slate-200/80 text-xs text-slate-700 select-none z-10 shrink-0">
         {/* Right: View & Zoom Controls */}
         <div className="flex items-center gap-1.5">
-          {/* Guide Cutoff Lines Toggle */}
-          <button
-            type="button"
-            onClick={() => setShowGuides((prev) => !prev)}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border font-medium transition-colors cursor-pointer ${
-              showGuides
-                ? "bg-purple-50 text-purple-700 border-purple-200"
-                : "bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100"
-            }`}
-            title="Toggle visual A4 page break lines"
-          >
-            <LuScissors className="text-xs" />
-            <span className="hidden sm:inline">Guides</span>
-          </button>
+          {/* Display & Layout Settings Dropdown */}
+          <div className="relative" ref={displayMenuRef}>
+            <button
+              type="button"
+              onClick={() => setDisplayMenuOpen((prev) => !prev)}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+                displayMenuOpen
+                  ? "bg-purple-50 text-purple-700 border-purple-300 shadow-xs"
+                  : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90 shadow-2xs"
+              }`}
+              title="Canvas display settings (layout mode, page guides)"
+            >
+              <LuSlidersHorizontal className="text-xs text-purple-600" />
+              <span>Display</span>
+              <LuChevronDown className={`text-[10px] text-slate-400 transition-transform duration-150 ${displayMenuOpen ? "rotate-180 text-purple-600" : ""}`} />
+            </button>
 
-          {/* View Mode: Continuous vs Multi-card */}
-          <button
-            type="button"
-            onClick={() => setViewMode((prev) => (prev === "continuous" ? "cards" : "continuous"))}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border font-medium transition-colors cursor-pointer ${
-              viewMode === "cards"
-                ? "bg-purple-50 text-purple-700 border-purple-200"
-                : "bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100"
-            }`}
-            title="Toggle between Continuous view and Visual Page Cards"
-          >
-            <LuLayers className="text-xs" />
-            <span className="hidden sm:inline">
-              {viewMode === "cards" ? "Cards" : "Scroll"}
-            </span>
-          </button>
+            {/* Display Dropdown Menu */}
+            {displayMenuOpen && (
+              <div className="absolute right-0 mt-1.5 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/90 p-1.5 z-30 text-slate-700 animate-in fade-in-0 zoom-in-95 duration-100">
+                {/* Section 1: Layout Mode (Radio selection) */}
+                <div className="px-2.5 pt-1 pb-1 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                  Document Layout
+                </div>
+
+                {/* Option 1: Continuous Scroll */}
+                <button
+                  type="button"
+                  onClick={() => setViewMode("continuous")}
+                  className={`w-full text-left px-2.5 py-1.5 text-xs flex items-center justify-between rounded-xl transition-colors cursor-pointer ${
+                    viewMode === "continuous"
+                      ? "bg-purple-50/80 text-purple-900 font-medium"
+                      : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <LuScrollText className={`text-sm ${viewMode === "continuous" ? "text-purple-600" : "text-slate-500"}`} />
+                    <span>Continuous Scroll</span>
+                  </span>
+                  <span
+                    className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
+                      viewMode === "continuous"
+                        ? "border-purple-600 bg-purple-600 text-white"
+                        : "border-slate-300 bg-white"
+                    }`}
+                  >
+                    {viewMode === "continuous" && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                  </span>
+                </button>
+
+                {/* Option 2: Page Cards */}
+                <button
+                  type="button"
+                  onClick={() => setViewMode("cards")}
+                  className={`w-full text-left px-2.5 py-1.5 text-xs flex items-center justify-between rounded-xl transition-colors cursor-pointer ${
+                    viewMode === "cards"
+                      ? "bg-purple-50/80 text-purple-900 font-medium"
+                      : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <LuLayers className={`text-sm ${viewMode === "cards" ? "text-purple-600" : "text-slate-500"}`} />
+                    <span>Page Cards</span>
+                  </span>
+                  <span
+                    className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
+                      viewMode === "cards"
+                        ? "border-purple-600 bg-purple-600 text-white"
+                        : "border-slate-300 bg-white"
+                    }`}
+                  >
+                    {viewMode === "cards" && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                  </span>
+                </button>
+
+                <div className="h-px bg-slate-100 my-1.5" />
+
+                {/* Section 2: Page Guides (Checkbox toggle) */}
+                <div className="px-2.5 pt-1 pb-1 text-[10px] font-bold tracking-wider text-slate-400 uppercase flex items-center justify-between">
+                  <span>Page Guides</span>
+                  {viewMode === "cards" && (
+                    <span className="text-[9px] font-normal lowercase tracking-normal text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                      continuous only
+                    </span>
+                  )}
+                </div>
+
+                {/* Toggle Cutoff Guides */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (viewMode === "continuous") {
+                      setShowGuides((prev) => !prev);
+                    }
+                  }}
+                  disabled={viewMode === "cards"}
+                  className={`w-full text-left px-2.5 py-1.5 text-xs flex items-center justify-between rounded-xl transition-colors ${
+                    viewMode === "cards"
+                      ? "opacity-45 cursor-not-allowed text-slate-400"
+                      : "text-slate-700 hover:bg-purple-50/60 hover:text-purple-900 cursor-pointer"
+                  }`}
+                  title={
+                    viewMode === "cards"
+                      ? "Cutoff guides only apply to continuous scroll mode"
+                      : "Toggle A4 page break cutoff lines"
+                  }
+                >
+                  <span className="flex items-center gap-2">
+                    <LuScissors className={`text-sm ${showGuides && viewMode === "continuous" ? "text-purple-600" : "text-slate-400"}`} />
+                    <span>Cutoff Guides</span>
+                  </span>
+                  <span
+                    className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
+                      showGuides && viewMode === "continuous"
+                        ? "bg-purple-600 border-purple-600 text-white"
+                        : "border-slate-300 bg-white"
+                    }`}
+                  >
+                    {showGuides && viewMode === "continuous" && <LuCheck className="text-[10px] stroke-[3]" />}
+                  </span>
+                </button>
+              </div>
+            )}
+          </div>
 
           <div className="h-4 w-px bg-slate-200 mx-1" />
 

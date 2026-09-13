@@ -189,8 +189,6 @@ const ResumeAuditModal = ({
                     strokeDashoffset={strokeOffset}
                     style={{ transition: "stroke-dashoffset 0.8s ease-in-out" }}
                   />
-                  {/* Center Pivot Indicator */}
-                  <circle cx="90" cy="90" r="4" fill="#334155" />
                 </svg>
 
                 {/* Score Number Display */}

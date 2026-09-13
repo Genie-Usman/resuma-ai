@@ -17,6 +17,10 @@ import {
   LuSparkles,
   LuUndo2,
   LuRedo2,
+  LuChevronDown,
+  LuPrinter,
+  LuFileJson,
+  LuEllipsis,
 } from "react-icons/lu";
 import toast from "react-hot-toast";
 
@@ -83,6 +87,10 @@ const EditResume = () => {
   const lastSavedDataRef = useRef(null);
   const initialLoadedRef = useRef(false);
   const autoSaveTimerRef = useRef(null);
+  const exportMenuRef = useRef(null);
+  const moreMenuRef = useRef(null);
+  const aiMenuRef = useRef(null);
+  const viewMenuRef = useRef(null);
 
   const [activePage, setActivePage] = useState("personal-info");
   const [newProfileImageFile, setNewProfileImageFile] = useState(null);
@@ -94,6 +102,44 @@ const EditResume = () => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isNavigatingBack, setIsNavigatingBack] = useState(false);
   const [viewMode, setViewMode] = useState("split"); // "split" | "edit" | "preview"
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [aiMenuOpen, setAiMenuOpen] = useState(false);
+  const [viewMenuOpen, setViewMenuOpen] = useState(false);
+
+  // Close dropdown menus on outside click or Escape key
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target)) {
+        setExportMenuOpen(false);
+      }
+      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target)) {
+        setMoreMenuOpen(false);
+      }
+      if (aiMenuRef.current && !aiMenuRef.current.contains(event.target)) {
+        setAiMenuOpen(false);
+      }
+      if (viewMenuRef.current && !viewMenuRef.current.contains(event.target)) {
+        setViewMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setExportMenuOpen(false);
+        setMoreMenuOpen(false);
+        setAiMenuOpen(false);
+        setViewMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
 
   // Modular Hooks
   const {
@@ -629,184 +675,461 @@ const EditResume = () => {
               </span>
             )}
           </div>
+        </div>
 
-          {/* Undo / Redo Actions */}
-          <div className="flex items-center gap-0.5 bg-slate-100/90 p-0.5 rounded-xl border border-slate-200/80 shrink-0">
+        {/* Right: Studio Action Buttons (All tools, View dropdown & Undo/Redo together) */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* 1. Undo / Redo Actions (Crisp segmented pill matching adjacent studio tools) */}
+          <div className="flex items-center bg-white border border-slate-200/90 shadow-2xs rounded-xl p-0.5 shrink-0 h-[34px]">
             <button
               type="button"
               onClick={undo}
               disabled={!canUndo}
-              className={`p-1.5 rounded-lg text-xs transition-all flex items-center justify-center ${
+              className={`w-7 h-7 rounded-lg text-xs transition-all flex items-center justify-center ${
                 canUndo
-                  ? "text-slate-700 hover:text-purple-700 hover:bg-white hover:shadow-2xs cursor-pointer active:scale-95"
-                  : "text-slate-300 cursor-not-allowed"
+                  ? "text-slate-700 hover:text-purple-700 hover:bg-purple-50 active:bg-purple-100/70 cursor-pointer active:scale-95"
+                  : "text-slate-300/80 cursor-not-allowed"
               }`}
               title="Undo (Ctrl+Z)"
               aria-label="Undo"
             >
-              <LuUndo2 className="text-sm" />
+              <LuUndo2 className="text-sm stroke-[2.2]" />
             </button>
+            <div className="h-3.5 w-px bg-slate-200/80 shrink-0" />
             <button
               type="button"
               onClick={redo}
               disabled={!canRedo}
-              className={`p-1.5 rounded-lg text-xs transition-all flex items-center justify-center ${
+              className={`w-7 h-7 rounded-lg text-xs transition-all flex items-center justify-center ${
                 canRedo
-                  ? "text-slate-700 hover:text-purple-700 hover:bg-white hover:shadow-2xs cursor-pointer active:scale-95"
-                  : "text-slate-300 cursor-not-allowed"
+                  ? "text-slate-700 hover:text-purple-700 hover:bg-purple-50 active:bg-purple-100/70 cursor-pointer active:scale-95"
+                  : "text-slate-300/80 cursor-not-allowed"
               }`}
               title="Redo (Ctrl+Y or Ctrl+Shift+Z)"
               aria-label="Redo"
             >
-              <LuRedo2 className="text-sm" />
+              <LuRedo2 className="text-sm stroke-[2.2]" />
             </button>
           </div>
-        </div>
 
-        {/* Center: View Switcher (Split | Form | Preview) */}
-        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/70 text-xs font-medium text-slate-600 shrink-0">
-          <button
-            type="button"
-            onClick={() => setViewMode("split")}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${
-              viewMode === "split"
-                ? "bg-white text-purple-700 shadow-xs font-semibold"
-                : "hover:text-slate-900"
-            }`}
-            title="Split: Side-by-side Form and Live Preview"
-          >
-            <LuColumns2 className="text-sm" />
-            <span className="hidden sm:inline">Split</span>
-          </button>
+          <div className="h-4 w-px bg-slate-200 shrink-0 hidden sm:block" />
 
-          <button
-            type="button"
-            onClick={() => setViewMode("edit")}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${
-              viewMode === "edit"
-                ? "bg-white text-purple-700 shadow-xs font-semibold"
-                : "hover:text-slate-900"
-            }`}
-            title="Form: Focused editing panel"
-          >
-            <LuPencil className="text-sm" />
-            <span className="hidden sm:inline">Form</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setViewMode("preview")}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${
-              viewMode === "preview"
-                ? "bg-white text-purple-700 shadow-xs font-semibold"
-                : "hover:text-slate-900"
-            }`}
-            title="Preview: Full A4 Canvas"
-          >
-            <LuEye className="text-sm" />
-            <span className="hidden sm:inline">Preview</span>
-          </button>
-        </div>
-
-        {/* Right: Studio Action Buttons (Single Row) */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Resume Audit Score Button */}
-          <button
-            type="button"
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-800 shadow-2xs transition-all cursor-pointer group"
-            onClick={() => setOpenAuditModal(true)}
-            title="Inspect Resume Quality & ATS Audit Score"
-          >
-            <span
-              className={`flex items-center justify-center w-5 h-5 rounded-lg text-[10px] font-black ${
-                liveAudit.overallScore >= 80
-                  ? "bg-emerald-100 text-emerald-700"
-                  : liveAudit.overallScore >= 65
-                  ? "bg-amber-100 text-amber-700"
-                  : "bg-rose-100 text-rose-700"
+          {/* 2. Workspace View Dropdown (Moved to the right side with other dropdowns) */}
+          <div className="relative" ref={viewMenuRef}>
+            <button
+              type="button"
+              onClick={() => {
+                setViewMenuOpen((prev) => !prev);
+                setExportMenuOpen(false);
+                setMoreMenuOpen(false);
+                setAiMenuOpen(false);
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold shadow-2xs transition-all cursor-pointer h-[34px] ${
+                viewMenuOpen
+                  ? "bg-purple-50 text-purple-700 border-purple-300 shadow-xs"
+                  : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90"
               }`}
+              title="Switch Workspace View (Split, Form, Preview)"
             >
-              {liveAudit.overallScore}
-            </span>
-            <span className="hidden sm:inline font-semibold text-slate-700 group-hover:text-purple-700 transition-colors">
-              Audit
-            </span>
-          </button>
+              {viewMode === "split" && <LuColumns2 className="text-sm text-purple-600 shrink-0" />}
+              {viewMode === "edit" && <LuPencil className="text-sm text-purple-600 shrink-0" />}
+              {viewMode === "preview" && <LuEye className="text-sm text-purple-600 shrink-0" />}
+              <span>
+                {viewMode === "split" ? "Split" : viewMode === "edit" ? "Form" : "Preview"}
+              </span>
+              <LuChevronDown
+                className={`text-xs transition-transform duration-200 text-slate-400 ${
+                  viewMenuOpen ? "rotate-180 text-purple-600" : ""
+                }`}
+              />
+            </button>
 
-          {/* AI Job Match */}
-          <button
-            type="button"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-xl shadow-xs transition-all cursor-pointer"
-            onClick={() => setOpenJobMatchModal(true)}
-            title="Compare with job description"
-          >
-            <LuSparkles className="text-xs" />
-            <span className="hidden lg:inline">Job Match</span>
-          </button>
+            {/* Floating View Menu */}
+            {viewMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-1.5 z-50 text-slate-700 animate-in fade-in-0 zoom-in-95 duration-100">
+                <div className="px-3.5 py-1 border-b border-slate-100 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                  Workspace View
+                </div>
 
-          {/* Theme */}
-          <button
-            type="button"
-            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 rounded-xl border border-slate-200/90 shadow-2xs transition-colors cursor-pointer"
-            onClick={() => setOpenThemeSelector(true)}
-            title="Change template and colors"
-          >
-            <LuPalette className="text-xs text-slate-500" />
-            <span className="hidden xl:inline">Theme</span>
-          </button>
+                {/* Split */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewMode("split");
+                    setViewMenuOpen(false);
+                  }}
+                  className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                    viewMode === "split" ? "bg-purple-50 text-purple-700 font-semibold" : "hover:bg-slate-50 text-slate-700"
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <LuColumns2 className="text-sm" />
+                    <span>Split View</span>
+                  </span>
+                  {viewMode === "split" && <LuCheck className="text-xs text-purple-600" />}
+                </button>
 
-          {/* Share */}
-          <button
-            type="button"
-            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100/70 rounded-xl border border-purple-200/70 transition-colors cursor-pointer"
-            onClick={() => setOpenShareModal(true)}
-            title="Share resume link"
-          >
-            <LuShare2 className="text-xs" />
-            <span className="hidden xl:inline">Share</span>
-          </button>
+                {/* Form */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewMode("edit");
+                    setViewMenuOpen(false);
+                  }}
+                  className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                    viewMode === "edit" ? "bg-purple-50 text-purple-700 font-semibold" : "hover:bg-slate-50 text-slate-700"
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <LuPencil className="text-sm" />
+                    <span>Form View</span>
+                  </span>
+                  {viewMode === "edit" && <LuCheck className="text-xs text-purple-600" />}
+                </button>
 
-          {/* Explicit Save Button */}
-          <button
-            type="button"
-            disabled={isSaving || isNavigatingBack}
-            onClick={handleManualSave}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100/80 rounded-xl border border-purple-200/80 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
-            title="Save resume progress"
-          >
-            {isSaving || isNavigatingBack ? (
-              <LuRefreshCw className="text-xs animate-spin text-purple-600" />
-            ) : (
-              <LuSave className="text-xs" />
+                {/* Preview */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewMode("preview");
+                    setViewMenuOpen(false);
+                  }}
+                  className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                    viewMode === "preview" ? "bg-purple-50 text-purple-700 font-semibold" : "hover:bg-slate-50 text-slate-700"
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <LuEye className="text-sm" />
+                    <span>Preview View</span>
+                  </span>
+                  {viewMode === "preview" && <LuCheck className="text-xs text-purple-600" />}
+                </button>
+              </div>
             )}
-            <span>Save</span>
-          </button>
+          </div>
+          {/* 1. Smart AI & Audit Dropdown Menu */}
+          <div className="relative" ref={aiMenuRef}>
+            <button
+              type="button"
+              onClick={() => {
+                setAiMenuOpen((prev) => !prev);
+                setExportMenuOpen(false);
+                setMoreMenuOpen(false);
+              }}
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
+                aiMenuOpen
+                  ? "bg-purple-50 text-purple-700 border-purple-300 shadow-xs"
+                  : "bg-white hover:bg-slate-50 text-slate-800 border-slate-200/90 shadow-2xs"
+              }`}
+              title="AI Tools & ATS Quality Audit"
+            >
+              <LuSparkles className="text-xs text-purple-600 shrink-0" />
+              <span
+                className={`flex items-center justify-center w-5 h-5 rounded-lg text-[10px] font-black shrink-0 ${
+                  liveAudit.overallScore >= 80
+                    ? "bg-emerald-100 text-emerald-700"
+                    : liveAudit.overallScore >= 65
+                    ? "bg-amber-100 text-amber-700"
+                    : "bg-rose-100 text-rose-700"
+                }`}
+              >
+                {liveAudit.overallScore}
+              </span>
+              <span className="hidden sm:inline font-semibold text-slate-700">
+                AI & Audit
+              </span>
+              <LuChevronDown
+                className={`text-xs transition-transform duration-200 text-slate-400 ${
+                  aiMenuOpen ? "rotate-180 text-purple-600" : ""
+                }`}
+              />
+            </button>
 
-          {/* Export PDF (Primary Action - Direct 1-Click Vector PDF) */}
-          <button
-            type="button"
-            disabled={isExporting}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50"
-            onClick={handleDownloadVectorPdf}
-            title="Download Vector PDF"
-          >
-            {isExporting ? (
-              <LuRefreshCw className="text-xs animate-spin" />
-            ) : (
-              <LuDownload className="text-xs" />
+            {/* Floating AI & Audit Popover */}
+            {aiMenuOpen && (
+              <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 text-slate-700 animate-in fade-in-0 zoom-in-95 duration-100">
+                {/* Header with mini score summary */}
+                <div className="px-3.5 pb-2 border-b border-slate-100 flex items-center justify-between">
+                  <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                    AI Intelligence Suite
+                  </span>
+                  <span
+                    className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
+                      liveAudit.overallScore >= 80
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
+                        : liveAudit.overallScore >= 65
+                        ? "bg-amber-50 text-amber-700 border border-amber-200/60"
+                        : "bg-rose-50 text-rose-700 border border-rose-200/60"
+                    }`}
+                  >
+                    {liveAudit.grade || "ATS Score"}: {liveAudit.overallScore}/100
+                  </span>
+                </div>
+
+                {/* 1. Full ATS Audit Item */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAiMenuOpen(false);
+                    setOpenAuditModal(true);
+                  }}
+                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-emerald-50/80 hover:text-emerald-950 transition-colors cursor-pointer group"
+                >
+                  <span
+                    className={`p-2 rounded-xl text-sm font-black shrink-0 ${
+                      liveAudit.overallScore >= 80
+                        ? "bg-emerald-100 text-emerald-700 group-hover:bg-emerald-200"
+                        : "bg-amber-100 text-amber-700 group-hover:bg-amber-200"
+                    }`}
+                  >
+                    <LuTarget className="text-sm" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-slate-800 group-hover:text-emerald-900 flex items-center justify-between">
+                      <span>ATS Resume Audit</span>
+                      <span className="text-[9px] font-semibold text-emerald-600 group-hover:underline">View Report →</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 truncate">
+                      6-pillar check ({liveAudit.issues?.length || 0} issues detected)
+                    </p>
+                  </div>
+                </button>
+
+                {/* 2. Job Description Match */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAiMenuOpen(false);
+                    setOpenJobMatchModal(true);
+                  }}
+                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-purple-50/80 hover:text-purple-950 transition-colors cursor-pointer group"
+                >
+                  <span className="p-2 rounded-xl bg-purple-100/90 text-purple-700 group-hover:bg-purple-200 transition-colors shrink-0">
+                    <LuSparkles className="text-sm" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-slate-800 group-hover:text-purple-900 flex items-center justify-between">
+                      <span>AI Job Match</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-md">Gemini</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 truncate">
+                      Target role keywords & match score
+                    </p>
+                  </div>
+                </button>
+
+                {/* Contextual helper tip */}
+                <div className="mx-3 mt-1.5 px-2.5 py-1.5 bg-slate-50 rounded-xl border border-slate-100 text-[10px] text-slate-500 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
+                  <span>Use AI rewrite directly on any bullet point</span>
+                </div>
+              </div>
             )}
-            <span className="hidden sm:inline">{isExporting ? "Exporting..." : "Export PDF"}</span>
-          </button>
+          </div>
 
-          {/* Delete */}
-          <button
-            type="button"
-            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-            onClick={handleDeleteResume}
-            title="Delete this resume"
-          >
-            <LuTrash2 className="text-sm" />
-          </button>
+          {/* 2. Export Dropdown Menu (Primary Action) */}
+          <div className="relative" ref={exportMenuRef}>
+            <button
+              type="button"
+              disabled={isExporting}
+              onClick={() => {
+                setExportMenuOpen((prev) => !prev);
+                setAiMenuOpen(false);
+                setMoreMenuOpen(false);
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-50"
+              title="Export Options (Vector PDF, Print, JSON)"
+            >
+              {isExporting ? (
+                <LuRefreshCw className="text-xs animate-spin" />
+              ) : (
+                <LuDownload className="text-xs" />
+              )}
+              <span className="hidden sm:inline">{isExporting ? "Exporting..." : "Export"}</span>
+              <LuChevronDown className={`text-xs transition-transform duration-200 ${exportMenuOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            {/* Floating Export Menu */}
+            {exportMenuOpen && (
+              <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-1.5 z-50 text-slate-700 animate-in fade-in-0 zoom-in-95 duration-100">
+                <div className="px-3.5 py-1 border-b border-slate-100 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                  Export Options
+                </div>
+
+                {/* Direct Vector PDF */}
+                <button
+                  type="button"
+                  disabled={isExporting}
+                  onClick={() => {
+                    setExportMenuOpen(false);
+                    handleDownloadVectorPdf();
+                  }}
+                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-emerald-50/80 hover:text-emerald-950 transition-colors cursor-pointer group disabled:opacity-50"
+                >
+                  <span className="p-2 rounded-xl bg-emerald-100/90 text-emerald-700 group-hover:bg-emerald-200 transition-colors shrink-0">
+                    <LuDownload className="text-sm" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-slate-800 group-hover:text-emerald-900 flex items-center justify-between">
+                      <span>Download PDF</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md">Vector</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 truncate">Crisp, ATS-ready vector document</p>
+                  </div>
+                </button>
+
+                {/* Browser Print Preview */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setExportMenuOpen(false);
+                    setOpenPreviewModal(true);
+                  }}
+                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-purple-50/80 hover:text-purple-950 transition-colors cursor-pointer group"
+                >
+                  <span className="p-2 rounded-xl bg-purple-100/90 text-purple-700 group-hover:bg-purple-200 transition-colors shrink-0">
+                    <LuPrinter className="text-sm" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-slate-800 group-hover:text-purple-900">
+                      Print / System PDF
+                    </div>
+                    <p className="text-[11px] text-slate-500 truncate">Open browser print preview</p>
+                  </div>
+                </button>
+
+                {/* Export JSON Resume */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setExportMenuOpen(false);
+                    handleExportJson();
+                  }}
+                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-indigo-50/80 hover:text-indigo-950 transition-colors cursor-pointer group"
+                >
+                  <span className="p-2 rounded-xl bg-indigo-100/90 text-indigo-700 group-hover:bg-indigo-200 transition-colors shrink-0">
+                    <LuFileJson className="text-sm" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-slate-800 group-hover:text-indigo-900 flex items-center justify-between">
+                      <span>JSON Resume</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md">v1.0</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 truncate">Open-standard schema backup</p>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* 3. More Actions Dropdown Menu (•••) */}
+          <div className="relative" ref={moreMenuRef}>
+            <button
+              type="button"
+              onClick={() => {
+                setMoreMenuOpen((prev) => !prev);
+                setExportMenuOpen(false);
+                setAiMenuOpen(false);
+              }}
+              className={`p-2 rounded-xl border transition-all cursor-pointer flex items-center justify-center ${
+                moreMenuOpen
+                  ? "bg-slate-100 text-purple-700 border-purple-300 shadow-xs"
+                  : "bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border-slate-200/90 shadow-2xs"
+              }`}
+              title="More studio options (Theme, Share, Save, Delete)"
+              aria-label="More options"
+            >
+              <LuEllipsis className="text-base" />
+            </button>
+
+            {/* Floating More Menu */}
+            {moreMenuOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-1.5 z-50 text-slate-700 animate-in fade-in-0 zoom-in-95 duration-100">
+                <div className="px-3.5 py-1 border-b border-slate-100 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                  Studio Utilities
+                </div>
+
+                {/* Change Theme */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMoreMenuOpen(false);
+                    setOpenThemeSelector(true);
+                  }}
+                  className="w-full text-left px-3.5 py-2 text-xs flex items-center gap-2.5 hover:bg-purple-50/80 hover:text-purple-900 transition-colors cursor-pointer group"
+                >
+                  <span className="p-1.5 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors">
+                    <LuPalette className="text-sm" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-slate-800 group-hover:text-purple-900">Change Theme</div>
+                    <p className="text-[10px] text-slate-500">12 templates & custom palette</p>
+                  </div>
+                </button>
+
+                {/* Share Public Link */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMoreMenuOpen(false);
+                    setOpenShareModal(true);
+                  }}
+                  className="w-full text-left px-3.5 py-2 text-xs flex items-center gap-2.5 hover:bg-purple-50/80 hover:text-purple-900 transition-colors cursor-pointer group"
+                >
+                  <span className="p-1.5 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors">
+                    <LuShare2 className="text-sm" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-slate-800 group-hover:text-purple-900">Share Publicly</div>
+                    <p className="text-[10px] text-slate-500">Recruiter link & permissions</p>
+                  </div>
+                </button>
+
+                {/* Manual Save Snapshot */}
+                <button
+                  type="button"
+                  disabled={isSaving || isNavigatingBack}
+                  onClick={() => {
+                    setMoreMenuOpen(false);
+                    handleManualSave();
+                  }}
+                  className="w-full text-left px-3.5 py-2 text-xs flex items-center gap-2.5 hover:bg-purple-50/80 hover:text-purple-900 transition-colors cursor-pointer group disabled:opacity-50"
+                >
+                  <span className="p-1.5 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors">
+                    {isSaving ? (
+                      <LuRefreshCw className="text-sm animate-spin text-purple-600" />
+                    ) : (
+                      <LuSave className="text-sm" />
+                    )}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-slate-800 group-hover:text-purple-900">Save Snapshot</div>
+                    <p className="text-[10px] text-slate-500">Update cloud thumbnail now</p>
+                  </div>
+                </button>
+
+                <div className="border-t border-slate-100 my-1" />
+
+                {/* Delete Resume */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMoreMenuOpen(false);
+                    handleDeleteResume();
+                  }}
+                  className="w-full text-left px-3.5 py-2 text-xs flex items-center gap-2.5 hover:bg-rose-50/80 hover:text-rose-900 transition-colors cursor-pointer group"
+                >
+                  <span className="p-1.5 rounded-lg bg-rose-50 text-rose-600 group-hover:bg-rose-100 transition-colors">
+                    <LuTrash2 className="text-sm" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-rose-700 group-hover:text-rose-900">Delete Resume</div>
+                    <p className="text-[10px] text-rose-500">Permanently delete document</p>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
