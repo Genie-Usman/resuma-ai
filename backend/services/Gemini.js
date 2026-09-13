@@ -1,6 +1,16 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+let genAIInstance = null;
+const getGenAI = () => {
+    if (!genAIInstance) {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            throw new Error("GEMINI_API_KEY environment variable is not defined.");
+        }
+        genAIInstance = new GoogleGenerativeAI(apiKey);
+    }
+    return genAIInstance;
+};
 
 const TONE_DIRECTIVES = {
     formal: `
@@ -267,7 +277,7 @@ const generateWithFallback = async (prompt) => {
     let lastError = null;
     for (const modelName of candidateModels) {
         try {
-            const model = genAI.getGenerativeModel({ model: modelName });
+            const model = getGenAI().getGenerativeModel({ model: modelName });
             const result = await model.generateContent(prompt);
             let responseText = await result.response.text();
 

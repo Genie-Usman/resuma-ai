@@ -112,7 +112,7 @@ app.use(
 );
 
 // Start Server (standalone server for local development or container hosting)
-if (!process.env.VERCEL) {
+if (require.main === module && !process.env.VERCEL) {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
