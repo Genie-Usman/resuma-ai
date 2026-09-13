@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const puppeteer = require("puppeteer-core");
 
 /**
  * Automatically detects Google Chrome or Chromium executable on Windows, Linux, and macOS.
@@ -44,6 +43,10 @@ function getChromeExecutablePath() {
  * and local development via automatic system Chrome detection.
  */
 async function launchHeadlessBrowser() {
+  // Dynamically import ESM-only puppeteer-core (prevents ERR_REQUIRE_ESM on Node 20 cold-starts)
+  const puppeteerModule = await import("puppeteer-core");
+  const puppeteer = puppeteerModule.default || puppeteerModule;
+
   const isVercel = Boolean(
     process.env.VERCEL ||
     process.env.AWS_LAMBDA_FUNCTION_VERSION ||
@@ -51,7 +54,8 @@ async function launchHeadlessBrowser() {
   );
 
   if (isVercel) {
-    const chromium = require("@sparticuz/chromium-min");
+    const chromiumModule = await import("@sparticuz/chromium-min");
+    const chromium = chromiumModule.default || chromiumModule;
 
     const arch = process.arch === "arm64" ? "arm64" : "x64";
     const defaultPackUrl = `https://github.com/Sparticuz/chromium/releases/download/v153.0.0/chromium-v153.0.0-pack.${arch}.tar`;
