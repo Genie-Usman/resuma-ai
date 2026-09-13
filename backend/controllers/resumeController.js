@@ -302,10 +302,12 @@ const exportResumePdf = async (req, res) => {
     const safeTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "Resume";
     const filename = `${safeTitle}.pdf`;
 
+    const binaryBuffer = Buffer.isBuffer(pdfBuffer) ? pdfBuffer : Buffer.from(pdfBuffer);
+
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(filename)}"`);
-    res.setHeader("Content-Length", pdfBuffer.length);
-    res.send(pdfBuffer);
+    res.setHeader("Content-Length", binaryBuffer.length);
+    res.end(binaryBuffer);
   } catch (error) {
     console.error("Export PDF error:", error);
     res.status(500).json({ message: "Failed to generate vector PDF", error: error.message });
@@ -334,11 +336,12 @@ const exportPublicResumePdf = async (req, res) => {
 
     const safeTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "Resume";
     const filename = `${safeTitle}.pdf`;
+    const binaryBuffer = Buffer.isBuffer(pdfBuffer) ? pdfBuffer : Buffer.from(pdfBuffer);
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(filename)}"`);
-    res.setHeader("Content-Length", pdfBuffer.length);
-    res.send(pdfBuffer);
+    res.setHeader("Content-Length", binaryBuffer.length);
+    res.end(binaryBuffer);
   } catch (error) {
     console.error("Export public PDF error:", error);
     res.status(500).json({ message: "Failed to generate vector PDF", error: error.message });

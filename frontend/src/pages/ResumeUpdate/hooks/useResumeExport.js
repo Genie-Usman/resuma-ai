@@ -30,9 +30,21 @@ export const useResumeExport = (resumeId, documentTitle = "Resume") => {
         API_PATHS.RESUME.EXPORT_PDF(resumeId),
         { responseType: "blob" }
       );
+      let blobData = response.data;
+
+      // Defensive recovery: detect if backend or serverless gateway serialized binary buffer to JSON byte map
+      if (blobData instanceof Blob) {
+        const previewText = await blobData.slice(0, 10).text();
+        if (previewText.startsWith('{"0":') || previewText.startsWith('{"typ')) {
+          const fullText = await blobData.text();
+          const parsed = JSON.parse(fullText);
+          const bytes = parsed.data ? parsed.data : Object.values(parsed);
+          blobData = new Uint8Array(bytes);
+        }
+      }
 
       // Create blob download trigger
-      const blob = new Blob([response.data], { type: "application/pdf" });
+      const blob = new Blob([blobData], { type: "application/pdf" });
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = downloadUrl;

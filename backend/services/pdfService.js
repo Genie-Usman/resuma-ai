@@ -162,7 +162,7 @@ async function generateVectorPdf({ resumeId, token, slug, isPublic = false }) {
       },
     });
 
-    return pdfBuffer;
+    return Buffer.isBuffer(pdfBuffer) ? pdfBuffer : Buffer.from(pdfBuffer);
   } finally {
     if (page) {
       await page.close().catch(() => {});
