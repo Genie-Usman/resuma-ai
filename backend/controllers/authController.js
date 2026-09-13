@@ -164,7 +164,13 @@ const getUserProfile = async (req, res) => {
 // @route   GET /api/auth/google
 // @access  Public
 const googleAuth = (req, res) => {
-    const frontendUrl = getFrontendUrl();
+    let callerOrigin = null;
+    if (req.headers.referer) {
+        try {
+            callerOrigin = new URL(req.headers.referer).origin;
+        } catch {}
+    }
+    const frontendUrl = (callerOrigin || getFrontendUrl()).replace(/\/+$/, "");
     const clientId = process.env.GOOGLE_CLIENT_ID;
 
     if (!clientId || !process.env.GOOGLE_CLIENT_SECRET) {
@@ -179,6 +185,7 @@ const googleAuth = (req, res) => {
     googleAuthUrl.searchParams.set("scope", "openid profile email");
     googleAuthUrl.searchParams.set("access_type", "offline");
     googleAuthUrl.searchParams.set("prompt", "select_account");
+    googleAuthUrl.searchParams.set("state", encodeURIComponent(frontendUrl));
 
     res.redirect(googleAuthUrl.toString());
 };
@@ -187,11 +194,20 @@ const googleAuth = (req, res) => {
 // @route   GET /api/auth/google/callback
 // @access  Public
 const googleCallback = async (req, res) => {
-    const frontendUrl = getFrontendUrl();
-    const { code, error } = req.query;
+    const { code, error, state } = req.query;
+
+    let targetFrontendUrl = getFrontendUrl();
+    if (state) {
+        try {
+            const decoded = decodeURIComponent(state);
+            if (decoded.startsWith("http://") || decoded.startsWith("https://")) {
+                targetFrontendUrl = decoded.replace(/\/+$/, "");
+            }
+        } catch {}
+    }
 
     if (error || !code) {
-        return res.redirect(`${frontendUrl}/auth/login?oauth_error=${encodeURIComponent(error || "access_denied")}`);
+        return res.redirect(`${targetFrontendUrl}/auth/login?oauth_error=${encodeURIComponent(error || "access_denied")}`);
     }
 
     try {
@@ -216,7 +232,7 @@ const googleCallback = async (req, res) => {
 
         if (!tokenResponse.ok || !tokenData.access_token) {
             console.error("Google token exchange error:", tokenData);
-            return res.redirect(`${frontendUrl}/auth/login?oauth_error=token_exchange_failed`);
+            return res.redirect(`${targetFrontendUrl}/auth/login?oauth_error=token_exchange_failed`);
         }
 
         // Fetch user profile from Google
@@ -227,7 +243,7 @@ const googleCallback = async (req, res) => {
         const googleUser = await userinfoResponse.json();
 
         if (!googleUser.email) {
-            return res.redirect(`${frontendUrl}/auth/login?oauth_error=email_not_provided`);
+            return res.redirect(`${targetFrontendUrl}/auth/login?oauth_error=email_not_provided`);
         }
 
         // Find or create user
@@ -250,10 +266,10 @@ const googleCallback = async (req, res) => {
         const token = generateToken(user._id);
         setTokenCookie(res, token);
 
-        res.redirect(`${frontendUrl}/dashboard?oauth=success`);
+        res.redirect(`${targetFrontendUrl}/dashboard?oauth=success&token=${encodeURIComponent(token)}`);
     } catch (err) {
         console.error("Google OAuth callback exception:", err);
-        res.redirect(`${frontendUrl}/auth/login?oauth_error=internal_error`);
+        res.redirect(`${targetFrontendUrl}/auth/login?oauth_error=internal_error`);
     }
 };
 
@@ -265,7 +281,13 @@ const googleCallback = async (req, res) => {
 // @route   GET /api/auth/linkedin
 // @access  Public
 const linkedinAuth = (req, res) => {
-    const frontendUrl = getFrontendUrl();
+    let callerOrigin = null;
+    if (req.headers.referer) {
+        try {
+            callerOrigin = new URL(req.headers.referer).origin;
+        } catch {}
+    }
+    const frontendUrl = (callerOrigin || getFrontendUrl()).replace(/\/+$/, "");
     const clientId = process.env.LINKEDIN_CLIENT_ID;
 
     if (!clientId || !process.env.LINKEDIN_CLIENT_SECRET) {
@@ -278,6 +300,7 @@ const linkedinAuth = (req, res) => {
     linkedinAuthUrl.searchParams.set("client_id", clientId);
     linkedinAuthUrl.searchParams.set("redirect_uri", redirectUri);
     linkedinAuthUrl.searchParams.set("scope", "openid profile email");
+    linkedinAuthUrl.searchParams.set("state", encodeURIComponent(frontendUrl));
 
     res.redirect(linkedinAuthUrl.toString());
 };
@@ -286,11 +309,20 @@ const linkedinAuth = (req, res) => {
 // @route   GET /api/auth/linkedin/callback
 // @access  Public
 const linkedinCallback = async (req, res) => {
-    const frontendUrl = getFrontendUrl();
-    const { code, error, error_description } = req.query;
+    const { code, error, error_description, state } = req.query;
+
+    let targetFrontendUrl = getFrontendUrl();
+    if (state) {
+        try {
+            const decoded = decodeURIComponent(state);
+            if (decoded.startsWith("http://") || decoded.startsWith("https://")) {
+                targetFrontendUrl = decoded.replace(/\/+$/, "");
+            }
+        } catch {}
+    }
 
     if (error || !code) {
-        return res.redirect(`${frontendUrl}/auth/login?oauth_error=${encodeURIComponent(error_description || error || "access_denied")}`);
+        return res.redirect(`${targetFrontendUrl}/auth/login?oauth_error=${encodeURIComponent(error_description || error || "access_denied")}`);
     }
 
     try {
@@ -315,7 +347,7 @@ const linkedinCallback = async (req, res) => {
 
         if (!tokenResponse.ok || !tokenData.access_token) {
             console.error("LinkedIn token exchange error:", tokenData);
-            return res.redirect(`${frontendUrl}/auth/login?oauth_error=token_exchange_failed`);
+            return res.redirect(`${targetFrontendUrl}/auth/login?oauth_error=token_exchange_failed`);
         }
 
         // Fetch user profile from LinkedIn OpenID UserInfo
@@ -326,7 +358,7 @@ const linkedinCallback = async (req, res) => {
         const linkedinUser = await userinfoResponse.json();
 
         if (!linkedinUser.email) {
-            return res.redirect(`${frontendUrl}/auth/login?oauth_error=email_not_provided`);
+            return res.redirect(`${targetFrontendUrl}/auth/login?oauth_error=email_not_provided`);
         }
 
         // Find or create user
@@ -349,10 +381,10 @@ const linkedinCallback = async (req, res) => {
         const token = generateToken(user._id);
         setTokenCookie(res, token);
 
-        res.redirect(`${frontendUrl}/dashboard?oauth=success`);
+        res.redirect(`${targetFrontendUrl}/dashboard?oauth=success&token=${encodeURIComponent(token)}`);
     } catch (err) {
         console.error("LinkedIn OAuth callback exception:", err);
-        res.redirect(`${frontendUrl}/auth/login?oauth_error=internal_error`);
+        res.redirect(`${targetFrontendUrl}/auth/login?oauth_error=internal_error`);
     }
 };
 

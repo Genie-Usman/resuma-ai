@@ -9,6 +9,16 @@ const UserProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Extract token from OAuth redirect query fallback if present (e.g. cross-domain third-party cookie restrictions)
+        const params = new URLSearchParams(window.location.search);
+        const urlToken = params.get("token");
+        if (urlToken) {
+            localStorage.setItem("token", urlToken);
+            params.delete("token");
+            const newSearch = params.toString() ? `?${params.toString()}` : "";
+            window.history.replaceState({}, document.title, window.location.pathname + newSearch);
+        }
+
         const fetchUser = async () => {
             try {
                 // Browser sends HttpOnly token cookie automatically with withCredentials: true
