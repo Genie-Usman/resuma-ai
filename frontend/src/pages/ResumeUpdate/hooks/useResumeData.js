@@ -345,6 +345,41 @@ export const useResumeData = (resumeId) => {
     [recordSnapshot]
   );
 
+  // Update Density Scale in metadata.typography.density
+  const updateDensity = useCallback(
+    (density) => {
+      recordSnapshot(true);
+      setResumeDataState((prev) => {
+        if (!prev) return prev;
+        const currentTypography = prev.data?.metadata?.typography || {};
+
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            metadata: {
+              ...prev.data?.metadata,
+              density,
+              typography: {
+                ...currentTypography,
+                density,
+                lineHeight: density === "compact" ? 1.3 : density === "spacious" ? 1.65 : 1.5,
+              },
+            },
+          },
+        };
+      });
+      const label =
+        density === "compact"
+          ? "Compact (0.92x)"
+          : density === "spacious"
+          ? "Spacious (1.05x)"
+          : "Standard (1.0x)";
+      toast.success(`Density: ${label}`, { id: "density-toast", duration: 1200 });
+    },
+    [recordSnapshot]
+  );
+
   // Undo Handler
   const undo = useCallback(() => {
     if (pastRef.current.length === 0) return;
@@ -514,6 +549,7 @@ export const useResumeData = (resumeId) => {
     toggleSectionVisibility,
     reorderSections,
     updateFontFamily,
+    updateDensity,
     saveResume,
     uploadImagesAndSave,
     // History Actions & State

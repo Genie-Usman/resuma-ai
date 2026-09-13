@@ -132,9 +132,21 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
     }
   };
 
+  const activeDensity =
+    safeMetadata?.typography?.density ||
+    safeMetadata?.density ||
+    "normal";
+
+  const densityClass =
+    activeDensity === "compact"
+      ? "resume-density-compact"
+      : activeDensity === "spacious"
+      ? "resume-density-spacious"
+      : "resume-density-normal";
+
   return (
     <div
-      className="w-full h-full resume-font-root"
+      className={`w-full h-full resume-font-root ${densityClass}`}
       style={{
         fontFamily: `"${activeFont}", ${getFontFallback(safeMetadata?.typography?.font?.category)}`,
       }}

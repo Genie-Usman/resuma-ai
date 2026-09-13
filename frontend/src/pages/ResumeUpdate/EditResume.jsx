@@ -155,6 +155,7 @@ const EditResume = () => {
     toggleSectionVisibility,
     reorderSections,
     updateFontFamily,
+    updateDensity,
     saveResume,
     uploadImagesAndSave,
     undo,
@@ -1168,6 +1169,8 @@ const EditResume = () => {
                   canvasRef={resumeRef}
                   onUpdateFont={updateFontFamily}
                   activeFont={resumeData?.data?.metadata?.typography?.font?.family || resumeData?.data?.metadata?.fontFamily}
+                  onUpdateDensity={updateDensity}
+                  activeDensity={resumeData?.data?.metadata?.typography?.density || resumeData?.data?.metadata?.density || "normal"}
                 />
               )}
             </div>
@@ -1210,6 +1213,8 @@ const EditResume = () => {
                 canvasRef={resumeRef}
                 onUpdateFont={updateFontFamily}
                 activeFont={resumeData?.data?.metadata?.typography?.font?.family || resumeData?.data?.metadata?.fontFamily}
+                onUpdateDensity={updateDensity}
+                activeDensity={resumeData?.data?.metadata?.typography?.density || resumeData?.data?.metadata?.density || "normal"}
               />
             )}
           </div>

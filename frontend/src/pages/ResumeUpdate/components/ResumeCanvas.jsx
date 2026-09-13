@@ -11,6 +11,9 @@ import {
   LuCheck,
   LuType,
   LuSearch,
+  LuMoveVertical,
+  LuFoldVertical,
+  LuUnfoldVertical,
 } from "react-icons/lu";
 import { usePageCalculator, A4_WIDTH_PX, A4_HEIGHT_PX } from "../hooks/usePageCalculator";
 import RenderResume from "../../../components/ResumeTemplates/RenderResume";
@@ -33,6 +36,8 @@ const ResumeCanvas = ({
   canvasRef, // Forwarded ref for thumbnail capture or export
   onUpdateFont,
   activeFont,
+  onUpdateDensity,
+  activeDensity,
 }) => {
   const containerRef = useRef(null);
   const sheetContentRef = useRef(null);
@@ -44,6 +49,15 @@ const ResumeCanvas = ({
   const [viewMode, setViewMode] = useState("continuous"); // "continuous" | "cards"
   const [displayMenuOpen, setDisplayMenuOpen] = useState(false);
   const displayMenuRef = useRef(null);
+
+  // Density State
+  const currentDensity =
+    activeDensity ||
+    resumeData?.metadata?.typography?.density ||
+    resumeData?.metadata?.density ||
+    "normal";
+  const [densityMenuOpen, setDensityMenuOpen] = useState(false);
+  const densityMenuRef = useRef(null);
 
   // Google Fonts State
   const currentFont =
@@ -84,11 +98,15 @@ const ResumeCanvas = ({
       if (fontMenuRef.current && !fontMenuRef.current.contains(event.target)) {
         setFontMenuOpen(false);
       }
+      if (densityMenuRef.current && !densityMenuRef.current.contains(event.target)) {
+        setDensityMenuOpen(false);
+      }
     };
     const handleEscape = (event) => {
       if (event.key === "Escape") {
         setDisplayMenuOpen(false);
         setFontMenuOpen(false);
+        setDensityMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -285,7 +303,122 @@ const ResumeCanvas = ({
             )}
           </div>
 
-          {/* 2. Display & Layout Settings Dropdown */}
+          {/* 2. Density & Spacing Scale Selector */}
+          <div className="relative" ref={densityMenuRef}>
+            <button
+              type="button"
+              onClick={() => {
+                setDensityMenuOpen((prev) => !prev);
+                setFontMenuOpen(false);
+                setDisplayMenuOpen(false);
+              }}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+                densityMenuOpen
+                  ? "bg-purple-50 text-purple-700 border-purple-300 shadow-xs"
+                  : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90 shadow-2xs"
+              }`}
+              title="Adjust resume spacing density (Compact, Standard, Spacious)"
+            >
+              <LuMoveVertical className="text-xs text-purple-600 shrink-0" />
+              <span className="capitalize font-medium">{currentDensity}</span>
+              <LuChevronDown className={`text-[10px] text-slate-400 transition-transform duration-150 ${densityMenuOpen ? "rotate-180 text-purple-600" : ""}`} />
+            </button>
+
+            {/* Density Popover Menu */}
+            {densityMenuOpen && (
+              <div className="absolute right-0 mt-1.5 w-60 bg-white rounded-2xl shadow-xl border border-slate-200/90 p-1.5 z-40 text-slate-700 animate-in fade-in-0 zoom-in-95 duration-100">
+                <div className="px-2.5 pt-1 pb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                  Spacing Density
+                </div>
+
+                {/* Option 1: Compact */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onUpdateDensity) onUpdateDensity("compact");
+                    setDensityMenuOpen(false);
+                  }}
+                  className={`w-full text-left px-2.5 py-2 text-xs flex items-center justify-between rounded-xl transition-colors cursor-pointer ${
+                    currentDensity === "compact"
+                      ? "bg-purple-50 text-purple-900 font-semibold"
+                      : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="flex flex-col min-w-0 pr-2">
+                    <div className="flex items-center gap-1.5">
+                      <LuFoldVertical className="text-xs text-purple-600 shrink-0" />
+                      <span className="font-semibold text-slate-800">Compact</span>
+                      <span className="text-[9px] bg-purple-100 text-purple-700 px-1 py-0.2 rounded font-bold">0.92x</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 mt-0.5">
+                      Tight margins & line height (fits 1 page)
+                    </span>
+                  </div>
+                  {currentDensity === "compact" && (
+                    <LuCheck className="text-xs text-purple-600 stroke-[2.5] shrink-0" />
+                  )}
+                </button>
+
+                {/* Option 2: Standard */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onUpdateDensity) onUpdateDensity("normal");
+                    setDensityMenuOpen(false);
+                  }}
+                  className={`w-full text-left px-2.5 py-2 text-xs flex items-center justify-between rounded-xl transition-colors cursor-pointer ${
+                    currentDensity === "normal"
+                      ? "bg-purple-50 text-purple-900 font-semibold"
+                      : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="flex flex-col min-w-0 pr-2">
+                    <div className="flex items-center gap-1.5">
+                      <LuMoveVertical className="text-xs text-purple-600 shrink-0" />
+                      <span className="font-semibold text-slate-800">Standard</span>
+                      <span className="text-[9px] bg-slate-100 text-slate-600 px-1 py-0.2 rounded font-bold">1.0x</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 mt-0.5">
+                      Balanced, clean professional spacing
+                    </span>
+                  </div>
+                  {currentDensity === "normal" && (
+                    <LuCheck className="text-xs text-purple-600 stroke-[2.5] shrink-0" />
+                  )}
+                </button>
+
+                {/* Option 3: Spacious */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onUpdateDensity) onUpdateDensity("spacious");
+                    setDensityMenuOpen(false);
+                  }}
+                  className={`w-full text-left px-2.5 py-2 text-xs flex items-center justify-between rounded-xl transition-colors cursor-pointer ${
+                    currentDensity === "spacious"
+                      ? "bg-purple-50 text-purple-900 font-semibold"
+                      : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="flex flex-col min-w-0 pr-2">
+                    <div className="flex items-center gap-1.5">
+                      <LuUnfoldVertical className="text-xs text-purple-600 shrink-0" />
+                      <span className="font-semibold text-slate-800">Spacious</span>
+                      <span className="text-[9px] bg-purple-100 text-purple-700 px-1 py-0.2 rounded font-bold">1.05x</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 mt-0.5">
+                      Airy lines & larger gaps (fills page)
+                    </span>
+                  </div>
+                  {currentDensity === "spacious" && (
+                    <LuCheck className="text-xs text-purple-600 stroke-[2.5] shrink-0" />
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* 3. Display & Layout Settings Dropdown */}
           <div className="relative" ref={displayMenuRef}>
             <button
               type="button"
