@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
+import { loadGoogleFont, getFontFallback, DEFAULT_FONT } from '../../utils/googleFonts';
 import Azurill from './Azurill';
 import Bronzor from './Bronzor';
 import Chikorita from './Chikorita';
@@ -96,6 +97,14 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
     return formatted;
   }, [sections, safeMetadata]);
 
+  const activeFont = safeMetadata?.typography?.font?.family || safeMetadata?.fontFamily || DEFAULT_FONT;
+
+  useEffect(() => {
+    if (activeFont) {
+      loadGoogleFont(activeFont);
+    }
+  }, [activeFont]);
+
   const sharedProps = {
     basics,
     sections: safeSections,
@@ -105,21 +114,34 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
     colorPalette: themeColors
   };
 
-  switch (templateId) {
-    case 'azurill': return <Azurill {...sharedProps} />;
-    case 'bronzor': return <Bronzor {...sharedProps} />;
-    case 'chikorita': return <Chikorita {...sharedProps} />;
-    case 'ditto': return <Ditto {...sharedProps} />;
-    case 'gengar': return <Gengar {...sharedProps} />;
-    case 'glalie': return <Glalie {...sharedProps} />;
-    case 'kakuna': return <Kakuna {...sharedProps} />;
-    case 'leafish': return <Leafish {...sharedProps} />;
-    case 'nosepass': return <Nosepass {...sharedProps} />;
-    case 'onyx': return <Onyx {...sharedProps} />;
-    case 'pikachu': return <Pikachu {...sharedProps} />;
-    case 'rhyhorn': return <Rhyhorn {...sharedProps} />;
-    default: return <Azurill {...sharedProps} />;
-  }
+  const renderTemplateComponent = () => {
+    switch (templateId) {
+      case 'azurill': return <Azurill {...sharedProps} />;
+      case 'bronzor': return <Bronzor {...sharedProps} />;
+      case 'chikorita': return <Chikorita {...sharedProps} />;
+      case 'ditto': return <Ditto {...sharedProps} />;
+      case 'gengar': return <Gengar {...sharedProps} />;
+      case 'glalie': return <Glalie {...sharedProps} />;
+      case 'kakuna': return <Kakuna {...sharedProps} />;
+      case 'leafish': return <Leafish {...sharedProps} />;
+      case 'nosepass': return <Nosepass {...sharedProps} />;
+      case 'onyx': return <Onyx {...sharedProps} />;
+      case 'pikachu': return <Pikachu {...sharedProps} />;
+      case 'rhyhorn': return <Rhyhorn {...sharedProps} />;
+      default: return <Azurill {...sharedProps} />;
+    }
+  };
+
+  return (
+    <div
+      className="w-full h-full resume-font-root"
+      style={{
+        fontFamily: `"${activeFont}", ${getFontFallback(safeMetadata?.typography?.font?.category)}`,
+      }}
+    >
+      {renderTemplateComponent()}
+    </div>
+  );
 };
 
 export default RenderResume;

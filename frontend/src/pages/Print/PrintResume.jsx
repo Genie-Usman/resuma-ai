@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
 import { A4_WIDTH_PX } from "../ResumeUpdate/hooks/usePageCalculator";
 import axiosInstance from "../../utils/axiosInstance";
+import { loadGoogleFont } from "../../utils/googleFonts";
 
 const PrintResume = ({ isPublic = false }) => {
   const { resumeId, slug } = useParams();
@@ -36,6 +37,13 @@ const PrintResume = ({ isPublic = false }) => {
         if (res.data?.title) {
           document.title = res.data.title;
         }
+
+        // Preload active Google Font for PDF export
+        const fontToLoad =
+          data?.data?.metadata?.typography?.font?.family ||
+          data?.metadata?.typography?.font?.family ||
+          "Inter";
+        loadGoogleFont(fontToLoad);
 
         // Wait for fonts & DOM paint
         if (document.fonts && document.fonts.ready) {

@@ -312,6 +312,39 @@ export const useResumeData = (resumeId) => {
     [recordSnapshot]
   );
 
+  // Update Font Family in metadata.typography.font
+  const updateFontFamily = useCallback(
+    (fontFamily, category = "sans-serif") => {
+      recordSnapshot(true);
+      setResumeDataState((prev) => {
+        if (!prev) return prev;
+        const currentTypography = prev.data?.metadata?.typography || {};
+        const currentFont = currentTypography.font || {};
+
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            metadata: {
+              ...prev.data?.metadata,
+              fontFamily,
+              typography: {
+                ...currentTypography,
+                font: {
+                  ...currentFont,
+                  family: fontFamily,
+                  category,
+                },
+              },
+            },
+          },
+        };
+      });
+      toast.success(`Font changed to ${fontFamily}`, { id: "font-change-toast", duration: 1200 });
+    },
+    [recordSnapshot]
+  );
+
   // Undo Handler
   const undo = useCallback(() => {
     if (pastRef.current.length === 0) return;
@@ -480,6 +513,7 @@ export const useResumeData = (resumeId) => {
     removeArrayItem,
     toggleSectionVisibility,
     reorderSections,
+    updateFontFamily,
     saveResume,
     uploadImagesAndSave,
     // History Actions & State

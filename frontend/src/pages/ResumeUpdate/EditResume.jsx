@@ -154,6 +154,7 @@ const EditResume = () => {
     removeArrayItem,
     toggleSectionVisibility,
     reorderSections,
+    updateFontFamily,
     saveResume,
     uploadImagesAndSave,
     undo,
@@ -1165,6 +1166,8 @@ const EditResume = () => {
                   templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
                   colorPalette={themeColorPalette}
                   canvasRef={resumeRef}
+                  onUpdateFont={updateFontFamily}
+                  activeFont={resumeData?.data?.metadata?.typography?.font?.family || resumeData?.data?.metadata?.fontFamily}
                 />
               )}
             </div>
@@ -1205,6 +1208,8 @@ const EditResume = () => {
                 templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
                 colorPalette={themeColorPalette}
                 canvasRef={resumeRef}
+                onUpdateFont={updateFontFamily}
+                activeFont={resumeData?.data?.metadata?.typography?.font?.family || resumeData?.data?.metadata?.fontFamily}
               />
             )}
           </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   LuZoomIn,
   LuZoomOut,
@@ -9,9 +9,17 @@ import {
   LuSlidersHorizontal,
   LuChevronDown,
   LuCheck,
+  LuType,
+  LuSearch,
 } from "react-icons/lu";
 import { usePageCalculator, A4_WIDTH_PX, A4_HEIGHT_PX } from "../hooks/usePageCalculator";
 import RenderResume from "../../../components/ResumeTemplates/RenderResume";
+import {
+  DEFAULT_FONT,
+  CURATED_FONTS,
+  loadGoogleFont,
+  fetchGoogleFontsList,
+} from "../../../utils/googleFonts";
 
 /**
  * ResumeCanvas Component
@@ -23,6 +31,8 @@ const ResumeCanvas = ({
   templateId,
   colorPalette,
   canvasRef, // Forwarded ref for thumbnail capture or export
+  onUpdateFont,
+  activeFont,
 }) => {
   const containerRef = useRef(null);
   const sheetContentRef = useRef(null);
@@ -35,16 +45,50 @@ const ResumeCanvas = ({
   const [displayMenuOpen, setDisplayMenuOpen] = useState(false);
   const displayMenuRef = useRef(null);
 
-  // Close display dropdown on outside click or Escape key
+  // Google Fonts State
+  const currentFont =
+    activeFont ||
+    resumeData?.metadata?.typography?.font?.family ||
+    resumeData?.metadata?.fontFamily ||
+    DEFAULT_FONT;
+  const [fontMenuOpen, setFontMenuOpen] = useState(false);
+  const [fontSearch, setFontSearch] = useState("");
+  const [fontCategory, setFontCategory] = useState("all");
+  const [availableFonts, setAvailableFonts] = useState(CURATED_FONTS);
+  const fontMenuRef = useRef(null);
+
+  // Preload active font
+  useEffect(() => {
+    if (currentFont) {
+      loadGoogleFont(currentFont);
+    }
+  }, [currentFont]);
+
+  // Fetch full Google Fonts catalog when menu opens
+  useEffect(() => {
+    if (fontMenuOpen) {
+      fetchGoogleFontsList().then((fonts) => {
+        if (Array.isArray(fonts) && fonts.length > 0) {
+          setAvailableFonts(fonts);
+        }
+      });
+    }
+  }, [fontMenuOpen]);
+
+  // Close dropdowns on outside click or Escape key
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (displayMenuRef.current && !displayMenuRef.current.contains(event.target)) {
         setDisplayMenuOpen(false);
       }
+      if (fontMenuRef.current && !fontMenuRef.current.contains(event.target)) {
+        setFontMenuOpen(false);
+      }
     };
     const handleEscape = (event) => {
       if (event.key === "Escape") {
         setDisplayMenuOpen(false);
+        setFontMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -98,6 +142,16 @@ const ResumeCanvas = ({
     calculateAutoFit();
   };
 
+  // Filter fonts by search query and category tab
+  const filteredFonts = useMemo(() => {
+    const query = fontSearch.toLowerCase().trim();
+    return availableFonts.filter((f) => {
+      const matchesCategory = fontCategory === "all" || f.category === fontCategory;
+      const matchesSearch = !query || f.family.toLowerCase().includes(query);
+      return matchesCategory && matchesSearch;
+    });
+  }, [availableFonts, fontCategory, fontSearch]);
+
   return (
     <div
       ref={containerRef}
@@ -107,7 +161,131 @@ const ResumeCanvas = ({
       <div className="flex items-center justify-end gap-2 px-3.5 py-2 bg-white/95 backdrop-blur-md border-b border-slate-200/80 text-xs text-slate-700 select-none z-10 shrink-0">
         {/* Right: View & Zoom Controls */}
         <div className="flex items-center gap-1.5">
-          {/* Display & Layout Settings Dropdown */}
+          {/* 1. Google Font Selector Dropdown */}
+          <div className="relative" ref={fontMenuRef}>
+            <button
+              type="button"
+              onClick={() => {
+                setFontMenuOpen((prev) => !prev);
+                setDisplayMenuOpen(false);
+              }}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+                fontMenuOpen
+                  ? "bg-purple-50 text-purple-700 border-purple-300 shadow-xs"
+                  : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90 shadow-2xs"
+              }`}
+              title="Change resume Google Font"
+            >
+              <LuType className="text-xs text-purple-600 shrink-0" />
+              <span className="max-w-[85px] sm:max-w-[105px] truncate font-medium">{currentFont}</span>
+              <LuChevronDown className={`text-[10px] text-slate-400 transition-transform duration-150 ${fontMenuOpen ? "rotate-180 text-purple-600" : ""}`} />
+            </button>
+
+            {/* Floating Font Menu Popover */}
+            {fontMenuOpen && (
+              <div className="absolute right-0 mt-1.5 w-72 bg-white rounded-2xl shadow-xl border border-slate-200/90 p-2 z-40 text-slate-700 animate-in fade-in-0 zoom-in-95 duration-100">
+                {/* Search Bar */}
+                <div className="relative mb-2">
+                  <LuSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
+                  <input
+                    type="text"
+                    value={fontSearch}
+                    onChange={(e) => setFontSearch(e.target.value)}
+                    placeholder="Search 1,900+ Google Fonts..."
+                    className="w-full pl-8 pr-2.5 py-1.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:bg-white transition-colors"
+                    autoFocus
+                  />
+                  {fontSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setFontSearch("")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 hover:text-slate-600"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {/* Category Filter Pills */}
+                <div className="flex items-center gap-1 mb-2 pb-1 border-b border-slate-100 text-[10px]">
+                  {[
+                    { id: "all", label: "All" },
+                    { id: "sans-serif", label: "Sans" },
+                    { id: "serif", label: "Serif" },
+                    { id: "monospace", label: "Mono" },
+                  ].map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setFontCategory(cat.id)}
+                      className={`px-2 py-0.5 rounded-md font-medium transition-colors cursor-pointer ${
+                        fontCategory === cat.id
+                          ? "bg-purple-100 text-purple-700"
+                          : "text-slate-500 hover:bg-slate-100"
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                  <span className="ml-auto text-[9px] text-slate-400">
+                    {filteredFonts.length} fonts
+                  </span>
+                </div>
+
+                {/* Font List with Live Previews */}
+                <div className="max-h-60 overflow-y-auto space-y-0.5 custom-scrollbar pr-0.5">
+                  {filteredFonts.length === 0 ? (
+                    <div className="py-6 text-center text-xs text-slate-400">
+                      No fonts matching "{fontSearch}"
+                    </div>
+                  ) : (
+                    filteredFonts.slice(0, 60).map((font) => (
+                      <button
+                        key={font.family}
+                        type="button"
+                        onMouseEnter={() => loadGoogleFont(font.family)}
+                        onClick={() => {
+                          loadGoogleFont(font.family);
+                          if (onUpdateFont) {
+                            onUpdateFont(font.family, font.category);
+                          }
+                          setFontMenuOpen(false);
+                        }}
+                        className={`w-full text-left px-2.5 py-1.5 text-xs flex items-center justify-between rounded-xl transition-colors cursor-pointer ${
+                          currentFont === font.family
+                            ? "bg-purple-50 text-purple-900 font-semibold"
+                            : "text-slate-700 hover:bg-slate-50"
+                        }`}
+                      >
+                        <div className="flex flex-col min-w-0 pr-2">
+                          <span
+                            className="text-[13px] truncate"
+                            style={{ fontFamily: font.family }}
+                          >
+                            {font.family}
+                          </span>
+                          <span className="text-[9px] text-slate-400 capitalize">
+                            {font.category}
+                          </span>
+                        </div>
+                        {currentFont === font.family && (
+                          <LuCheck className="text-xs text-purple-600 stroke-[2.5] shrink-0" />
+                        )}
+                      </button>
+                    ))
+                  )}
+                </div>
+
+                {filteredFonts.length > 60 && (
+                  <div className="pt-1.5 border-t border-slate-100 text-[10px] text-center text-slate-400">
+                    Type to search through all 1,900+ Google Fonts
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* 2. Display & Layout Settings Dropdown */}
           <div className="relative" ref={displayMenuRef}>
             <button
               type="button"
