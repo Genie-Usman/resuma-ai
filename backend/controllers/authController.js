@@ -38,7 +38,8 @@ const getBackendUrl = (req) => {
     if (process.env.BACKEND_URL) {
         return process.env.BACKEND_URL.replace(/\/+$/, "");
     }
-    return `${req.protocol}://${req.get("host")}`.replace(/\/+$/, "");
+    const proto = req.headers["x-forwarded-proto"] || req.protocol || "http";
+    return `${proto}://${req.get("host")}`.replace(/\/+$/, "");
 };
 
 // @desc    Register a new User
