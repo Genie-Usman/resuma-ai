@@ -5,7 +5,7 @@ const User = require('../models/User.js');
 const { getDefaultResumeData } = require('../utils/DefaultResume.js');
 const { slugify } = require('../utils/helper.js');
 const { generateVectorPdf } = require('../services/pdfService');
-
+const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
 // @desc    Create a new Resume
@@ -290,13 +290,27 @@ const exportResumePdf = async (req, res) => {
       return res.status(404).json({ message: "Resume not found or unauthorized" });
     }
 
-    const token = req.headers.authorization?.split(" ")[1] || "";
+    const token =
+      req.headers.authorization?.split(" ")[1] ||
+      req.cookies?.token ||
+      (process.env.JWT_SECRET && req.user?._id
+        ? jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: "1h" })
+        : "");
+
+    let detectedOrigin = req.headers.origin;
+    if (!detectedOrigin && req.headers.referer) {
+      try {
+        detectedOrigin = new URL(req.headers.referer).origin;
+      } catch {}
+    }
+    const frontendUrl = (process.env.FRONTEND_URL || detectedOrigin || "http://localhost:5173").replace(/\/+$/, "");
 
     const pdfBuffer = await generateVectorPdf({
       resumeId: resume._id.toString(),
       token,
       slug: resume.slug,
       isPublic: false,
+      frontendUrl,
     });
 
     const safeTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "Resume";
@@ -328,10 +342,19 @@ const exportPublicResumePdf = async (req, res) => {
       return res.status(404).json({ message: "Resume not found or is set to private." });
     }
 
+    let detectedOrigin = req.headers.origin;
+    if (!detectedOrigin && req.headers.referer) {
+      try {
+        detectedOrigin = new URL(req.headers.referer).origin;
+      } catch {}
+    }
+    const frontendUrl = (process.env.FRONTEND_URL || detectedOrigin || "http://localhost:5173").replace(/\/+$/, "");
+
     const pdfBuffer = await generateVectorPdf({
       resumeId: resume._id.toString(),
       slug: resume.slug,
       isPublic: true,
+      frontendUrl,
     });
 
     const safeTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "Resume";

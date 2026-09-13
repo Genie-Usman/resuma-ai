@@ -108,7 +108,7 @@ async function launchHeadlessBrowser() {
  * Generates a pixel-perfect, 100% vector PDF using Headless Chromium.
  * Navigates to the dedicated print view, waits for fonts & assets, and renders vector PDF.
  */
-async function generateVectorPdf({ resumeId, token, slug, isPublic = false }) {
+async function generateVectorPdf({ resumeId, token, slug, isPublic = false, frontendUrl = "" }) {
   const browser = await launchHeadlessBrowser();
   let page = null;
 
@@ -122,13 +122,13 @@ async function generateVectorPdf({ resumeId, token, slug, isPublic = false }) {
       deviceScaleFactor: 2,
     });
 
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const baseUrl = (frontendUrl || process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/+$/, "");
     let targetUrl;
 
     if (isPublic && slug) {
-      targetUrl = `${frontendUrl}/print/public/${slug}`;
+      targetUrl = `${baseUrl}/print/public/${slug}`;
     } else {
-      targetUrl = `${frontendUrl}/print/${resumeId}?token=${encodeURIComponent(token)}`;
+      targetUrl = `${baseUrl}/print/${resumeId}?token=${encodeURIComponent(token || "")}`;
     }
 
     // Emulate print media so CSS print overrides and @page rules activate
