@@ -46,7 +46,11 @@ const SignUp = () => {
       } else if (oauthError === 'access_denied') {
         toast.error('Authentication was canceled.', { id: 'oauth-error' });
       } else {
-        toast.error(`Authentication failed (${oauthError}).`, { id: 'oauth-error' });
+        const cleanMsg = oauthError
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .replace(/&amp;/g, '&');
+        toast.error(`Authentication failed (${cleanMsg}).`, { id: 'oauth-error' });
       }
     }
   }, [searchParams, navigate]);
