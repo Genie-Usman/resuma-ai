@@ -5,7 +5,7 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
 
     return (
         <section id={section.id} className="grid">
-            <h4 className="font-bold" style={{ color: themeColors[2] }}>{section.name}</h4>
+            <h4 className="font-bold" style={{ color: themeColors[2] }}>{section.title || section.name}</h4>
 
             <div
                 className="grid gap-x-6 gap-y-3 min-w-0"

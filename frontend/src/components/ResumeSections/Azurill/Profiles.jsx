@@ -9,18 +9,18 @@ const Profiles = ({ section, themeColors }) => {
 
   return (
     <section id={section.id} className="grid min-w-0 break-words w-full">
-      {/* Main Section Header */}
+      {/* Main Name */}
       <div className="mb-2 hidden font-bold group-[.main]:block" style={{ color: themeColors[2] }}>
-        <h4>{section.name}</h4>
+        <h4>{section.title || section.name}</h4>
       </div>
 
-      {/* Sidebar Section Header */}
+      {/* Sidebar Name */}
       <div
-        className="w-full mx-auto mb-2.5 hidden items-center justify-center gap-x-2 text-center font-bold group-[.sidebar]:flex"
+        className="w-full mx-auto mb-2 hidden items-center justify-center gap-x-2 text-center font-bold group-[.sidebar]:flex"
         style={{ color: themeColors[2] }}
       >
         <span className="heading-dot size-1.5 rounded-full border shrink-0 inline-block align-middle" style={{ borderColor: themeColors[2] }} />
-        <h4 className="leading-tight">{section.name}</h4>
+        <h4 className="leading-tight">{section.title || section.name}</h4>
         <span className="heading-dot size-1.5 rounded-full border shrink-0 inline-block align-middle" style={{ borderColor: themeColors[2] }} />
       </div>
 

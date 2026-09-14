@@ -127,13 +127,20 @@ const ContentDrawer = ({
 
   // Ordered list of all available sections for stepper navigation
   const orderedSectionKeys = useMemo(() => {
+    const isRealSection = (k) => {
+      if (!k || k === "personal-info") return false;
+      // Filter out legacy empty custom object placeholder
+      if (k === "custom" && !sections[k]?.isCustom && !sections[k]?.type) return false;
+      return Boolean(sections[k]);
+    };
+
     const keys = ["personal-info"];
     if (sections.summary) keys.push("summary");
 
     if (isTwoColumn) {
       const [c0, c1] = extractLayoutColumns(layout, sections, templateId);
       const combined = [...(c0 || []), ...(c1 || [])].filter(
-        (k) => k !== "personal-info" && k !== "summary" && sections[k]
+        (k) => k !== "personal-info" && k !== "summary" && isRealSection(k)
       );
       // Deduplicate
       combined.forEach((k) => {
@@ -142,7 +149,7 @@ const ContentDrawer = ({
     } else {
       const [c0] = extractLayoutColumns(layout, sections, templateId);
       (c0 || []).forEach((k) => {
-        if (k !== "personal-info" && k !== "summary" && sections[k] && !keys.includes(k)) {
+        if (k !== "personal-info" && k !== "summary" && isRealSection(k) && !keys.includes(k)) {
           keys.push(k);
         }
       });
@@ -150,7 +157,7 @@ const ContentDrawer = ({
 
     // Append any remaining valid sections from data
     Object.keys(sections || {}).forEach((k) => {
-      if (sections[k] && !keys.includes(k)) {
+      if (isRealSection(k) && !keys.includes(k)) {
         keys.push(k);
       }
     });
@@ -190,7 +197,7 @@ const ContentDrawer = ({
         {mode === "form" ? (
           <>
             {/* Left: Breadcrumb / Switch to All Sections */}
-            <div className="flex items-center gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
               <button
                 type="button"
                 onClick={() => setMode("sections")}
@@ -198,25 +205,27 @@ const ContentDrawer = ({
                 title="View all sections and drag to reorder"
               >
                 <LuListTree className="text-xs text-purple-600" />
-                <span className="hidden sm:inline">Sections</span>
+                <span>Sections</span>
               </button>
 
               <div className="h-4 w-px bg-slate-200 shrink-0" />
 
               {/* Section Selector Dropdown */}
-              <div className="relative" ref={dropdownRef}>
+              <div className="relative min-w-0 flex-1 max-w-[140px] sm:max-w-[170px]" ref={dropdownRef}>
                 <button
                   type="button"
                   onClick={() => setDropdownOpen((prev) => !prev)}
-                  className={`flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer border max-w-[200px] truncate ${
+                  className={`w-full flex items-center justify-between gap-1.5 px-2 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer border truncate ${
                     dropdownOpen
                       ? "bg-purple-50 text-purple-900 border-purple-300"
                       : "bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200/80"
                   }`}
                   title="Switch to another section"
                 >
-                  <ActiveIcon className="text-xs text-purple-600 shrink-0" />
-                  <span className="truncate">{activeLabel}</span>
+                  <div className="flex items-center gap-1.5 min-w-0 truncate">
+                    <ActiveIcon className="text-xs text-purple-600 shrink-0" />
+                    <span className="truncate">{activeLabel}</span>
+                  </div>
                   <LuChevronDown
                     className={`text-xs text-slate-400 transition-transform shrink-0 ${
                       dropdownOpen ? "rotate-180 text-purple-600" : ""
@@ -312,23 +321,17 @@ const ContentDrawer = ({
                 <button
                   type="button"
                   onClick={() => onToggleVisibility(activePage)}
-                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer border shadow-2xs mr-1 ${
+                  className={`p-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer border shadow-2xs ${
                     sections[activePage]?.visible === false
                       ? "text-amber-800 bg-amber-50 hover:bg-amber-100 border-amber-300"
                       : "text-slate-600 hover:text-purple-700 hover:bg-purple-50 bg-white border-slate-200/90 hover:border-purple-200"
                   }`}
-                  title={sections[activePage]?.visible === false ? "Show section on resume" : "Hide section on resume"}
+                  title={sections[activePage]?.visible === false ? "Section is hidden on resume (click to show)" : "Section is visible on resume (click to hide)"}
                 >
                   {sections[activePage]?.visible === false ? (
-                    <>
-                      <LuEyeOff className="text-xs text-amber-600 stroke-[2.2]" />
-                      <span className="hidden sm:inline">Hidden</span>
-                    </>
+                    <LuEyeOff className="text-sm text-amber-600 stroke-[2.2]" />
                   ) : (
-                    <>
-                      <LuEye className="text-xs text-slate-500 stroke-[2.2]" />
-                      <span className="hidden sm:inline">Visible</span>
-                    </>
+                    <LuEye className="text-sm text-slate-500 stroke-[2.2]" />
                   )}
                 </button>
               )}

@@ -273,31 +273,13 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item, label }) 
 
     return (
         <div className='w-full'>
-            {sectionId === "summary" && (
-                /* Standalone Professional Summary Header */
-                <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3 mb-3">
-                    <div className="min-w-0 flex-1">
-                        <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-                            Professional Summary
-                        </h2>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                            Write a brief overview of your background, key strengths, and career goals.
-                        </p>
-                    </div>
-                    <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
-                        <LuFileText className="w-3.5 h-3.5 text-purple-600" />
-                        Summary
-                    </span>
-                </div>
-            )}
-
             {/* Compact Studio Header: Label on Left, AI Actions on Right */}
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                <label className="studio-label mb-0 text-slate-700 font-semibold">
-                    {label || (sectionId === "summary" ? "Summary" : "Bullet Points & Achievements")}
+            <div className="flex items-center justify-between gap-2 mb-2">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-0">
+                    {label || (sectionId === "summary" ? "Summary Text" : "Responsibilities & Accomplishments")}
                 </label>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 shrink-0">
                     {/* Improve with AI Button */}
                     <button
                         type="button"
@@ -319,7 +301,7 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item, label }) 
                         type="button"
                         disabled={loading || improving}
                         onClick={handleGenerateSummary}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 disabled:opacity-50 rounded-lg border border-slate-200/90 shadow-2xs transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 disabled:opacity-50 rounded-lg border border-slate-200/90 shadow-2xs transition-colors cursor-pointer"
                         title="Generate a full professional summary tailored to the selected tone"
                     >
                         {loading ? (
@@ -332,11 +314,8 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item, label }) 
                 </div>
             </div>
 
-            {/* Tone Selector: Clean segmented pills, wrapping naturally with no scrollbars */}
-            <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-100/80 rounded-lg border border-slate-200/70 mb-2.5 text-xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1.5 shrink-0 select-none">
-                    Tone:
-                </span>
+            {/* Tone Selector: Exact 4-column equal grid - fits perfectly without wrapping */}
+            <div className="grid grid-cols-4 gap-1 p-1 bg-slate-100/90 rounded-xl border border-slate-200/70 mb-2.5">
                 {AI_TONES.map((t) => {
                     const Icon = t.icon;
                     const isSelected = selectedTone === t.id;
@@ -346,14 +325,14 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item, label }) 
                             type="button"
                             onClick={() => setSelectedTone(t.id)}
                             title={t.description}
-                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer whitespace-nowrap ${
+                            className={`flex items-center justify-center gap-1 py-1 px-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer truncate ${
                                 isSelected
                                     ? "bg-white text-purple-700 shadow-2xs font-semibold"
                                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
                             }`}
                         >
                             <Icon className={`text-[12px] shrink-0 ${isSelected ? "text-purple-600" : "text-slate-400"}`} />
-                            <span>{t.label}</span>
+                            <span className="truncate">{t.label}</span>
                         </button>
                     );
                 })}

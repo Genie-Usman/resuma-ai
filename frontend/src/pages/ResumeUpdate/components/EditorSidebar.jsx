@@ -160,13 +160,17 @@ const EditorSidebar = ({
   const [mainKeys, sidebarKeys] = useMemo(() => {
     if (!isTwoColumn) return [[], []];
 
-    const [c0, c1] = extractLayoutColumns(layout, sections, templateId);
-    const validSections = Object.keys(sections || {}).filter(
-      (k) => k !== "personal-info" && sections[k]
-    );
+    const isRealSection = (k) => {
+      if (!k || k === "personal-info") return false;
+      if (k === "custom" && !sections[k]?.isCustom && !sections[k]?.type) return false;
+      return Boolean(sections[k]);
+    };
 
-    const safeMain = c0.filter((k) => k !== "personal-info" && sections[k]);
-    const safeSidebar = c1.filter((k) => k !== "personal-info" && sections[k]);
+    const [c0, c1] = extractLayoutColumns(layout, sections, templateId);
+    const validSections = Object.keys(sections || {}).filter(isRealSection);
+
+    const safeMain = c0.filter(isRealSection);
+    const safeSidebar = c1.filter(isRealSection);
 
     // Make sure any section in `sections` that isn't in either column gets categorized
     validSections.forEach((k) => {
@@ -186,12 +190,16 @@ const EditorSidebar = ({
   const flatKeys = useMemo(() => {
     if (isTwoColumn) return [];
 
-    const [c0] = extractLayoutColumns(layout, sections, templateId);
-    const validSections = Object.keys(sections || {}).filter(
-      (k) => k !== "personal-info" && sections[k]
-    );
+    const isRealSection = (k) => {
+      if (!k || k === "personal-info") return false;
+      if (k === "custom" && !sections[k]?.isCustom && !sections[k]?.type) return false;
+      return Boolean(sections[k]);
+    };
 
-    const safeFlat = (c0 || []).filter((k) => k !== "personal-info" && sections[k]);
+    const [c0] = extractLayoutColumns(layout, sections, templateId);
+    const validSections = Object.keys(sections || {}).filter(isRealSection);
+
+    const safeFlat = (c0 || []).filter(isRealSection);
 
     // Ensure any valid section not yet in the list is appended
     validSections.forEach((k) => {

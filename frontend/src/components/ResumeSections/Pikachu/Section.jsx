@@ -8,7 +8,7 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
             <h4
                 className="mb-2 border-b text-base font-bold"
                 style={{ color: themeColors[1], borderColor: themeColors[2] }}>
-                {section.name}
+                {section.title || section.name}
             </h4>
 
             <div

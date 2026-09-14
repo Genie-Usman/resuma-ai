@@ -8,7 +8,7 @@ const Summary = ({ section, themeColors }) => {
   return (
     <section id={section.id} className="grid grid-cols-5 border-t pt-2.5 bronzor-section">
       <div className="bronzor-section-title">
-        <h4 className="text-base font-bold" style={{ color: themeColors[1] }}>{section.name}</h4>
+        <h4 className="text-base font-bold" style={{ color: themeColors[1] }}>{section.title || section.name}</h4>
       </div>
 
       <div

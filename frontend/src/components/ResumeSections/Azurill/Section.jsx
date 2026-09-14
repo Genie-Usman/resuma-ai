@@ -9,7 +9,7 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
 
       {/* Main Name */}
       <div className="mb-2 hidden font-bold group-[.main]:block" style={{ color: themeColors[2] }}>
-        <h4>{section.name}</h4>
+        <h4>{section.title || section.name}</h4>
       </div>
 
       {/* Sidebar Name */}
@@ -18,7 +18,7 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
         style={{ color: themeColors[2] }}
       >
         <span className="heading-dot size-1.5 rounded-full border shrink-0 inline-block align-middle" style={{ borderColor: themeColors[2] }} />
-        <h4 className="leading-tight">{section.name}</h4>
+        <h4 className="leading-tight">{section.title || section.name}</h4>
         <span className="heading-dot size-1.5 rounded-full border shrink-0 inline-block align-middle" style={{ borderColor: themeColors[2] }} />
       </div>
 

@@ -35,7 +35,7 @@ const Section = ({ section, children, urlKey, dateKey, summaryKey, keywordsKey, 
             <div className="grid grid-cols-4 gap-x-6 items-start nosepass-title-row">
                 <div className="text-right pt-1">
                     <h4 className="font-medium" style={{ color: themeColors[2] }}>
-                        {section.name}
+                        {section.title || section.name}
                     </h4>
                 </div>
                 <div className="col-span-3 relative">

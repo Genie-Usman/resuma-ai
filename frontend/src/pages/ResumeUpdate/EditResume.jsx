@@ -260,6 +260,17 @@ const EditResume = () => {
     }
   }, [isLoading, resumeData]);
 
+  // Auto-correct invalid or legacy empty "custom" activePage
+  useEffect(() => {
+    if (
+      activePage === "custom" &&
+      !resumeData?.data?.sections?.custom?.isCustom &&
+      !resumeData?.data?.sections?.custom?.type
+    ) {
+      setActivePage("personal-info");
+    }
+  }, [activePage, resumeData]);
+
   // Background debounced auto-save (1.5s debounce)
   useEffect(() => {
     if (!initialLoadedRef.current || isLoading || isDeleting || isNavigatingBack) return;
@@ -492,7 +503,6 @@ const EditResume = () => {
               title={sections.summary?.name || "Professional Summary"}
               subtitle="A concise overview of your background, key achievements, and career goals."
               icon={LuPencil}
-              badge="Summary"
               isVisible={sections.summary?.visible !== false}
               onToggleVisibility={() => toggleSectionVisibility("summary")}
               sectionKey="summary"

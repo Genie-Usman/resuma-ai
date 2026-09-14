@@ -7,7 +7,7 @@ const Summary = ({ section, themeColors }) => {
 
   return (
     <section id={section.id}>
-      <h4 className="mb-2 text-base font-bold" style={{ color: themeColors[1] }}>{section.name}</h4>
+      <h4 className="mb-2 text-base font-bold" style={{ color: themeColors[1] }}>{section.title || section.name}</h4>
 
       <div
         dangerouslySetInnerHTML={{ __html: section.content }}

@@ -8,7 +8,7 @@ const Summary = ({ section, themeColors }) => {
     return (
         <section id={section.id} className="grid grid-cols-4 gap-x-6 nosepass-summary-section">
             <div className="text-right nosepass-summary-title">
-                <h4 className="font-medium" style={{ color: themeColors[2] }}>{section.name}</h4>
+                <h4 className="font-medium" style={{ color: themeColors[2] }}>{section.title || section.name}</h4>
             </div>
 
             <div className="col-span-3 nosepass-summary-content">

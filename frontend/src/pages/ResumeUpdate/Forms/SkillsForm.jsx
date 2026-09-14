@@ -46,7 +46,6 @@ const SkillsForm = ({
         title={title || "Technical & Core Skills"}
         subtitle="Add your skills grouped by category (e.g. Languages, Frameworks, Tools)."
         icon={LuSparkles}
-        badge="Skills"
         isVisible={isVisible}
         onToggleVisibility={onToggleVisibility}
         sectionKey="skills"
@@ -61,12 +60,12 @@ const SkillsForm = ({
             className="group relative bg-white border border-slate-200/80 hover:border-slate-300 rounded-2xl p-4 sm:p-5 shadow-2xs transition-all space-y-4"
           >
             {/* Header */}
-            <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-purple-100 text-purple-700 text-xs font-bold flex items-center justify-center">
+            <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <span className="w-5 h-5 rounded-full bg-purple-100 text-purple-700 text-xs font-bold flex items-center justify-center shrink-0">
                   {index + 1}
                 </span>
-                <span className="text-xs font-semibold text-slate-700 truncate max-w-[240px] sm:max-w-xs">
+                <span className="text-xs font-semibold text-slate-700 truncate min-w-0">
                   {item.name || `Skill Category #${index + 1}`}
                 </span>
               </div>
@@ -75,7 +74,7 @@ const SkillsForm = ({
                 <button
                   type="button"
                   onClick={() => removeArrayItem(index)}
-                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer shrink-0"
                   title="Remove Skill"
                 >
                   <LuTrash2 className="w-4 h-4" />

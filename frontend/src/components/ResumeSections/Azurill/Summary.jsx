@@ -9,7 +9,7 @@ const Summary = ({ section, themeColors }) => {
     <section id={section.id}>
       {/* Section Header */}
       <div className="mb-2 font-bold" style={{ color: themeColors[2] }}>
-        <h4>{section.name}</h4>
+        <h4>{section.title || section.name}</h4>
       </div>
 
       {/* Main Content */}

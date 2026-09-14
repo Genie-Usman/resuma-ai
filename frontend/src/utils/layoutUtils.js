@@ -87,6 +87,20 @@ export const extractLayoutColumns = (rawLayout, sections = {}, templateId = null
     let c0 = Array.isArray(page0[0]) ? page0[0].filter((k) => typeof k === "string" && k !== "personal-info") : [];
     let c1 = Array.isArray(page0[1]) ? page0[1].filter((k) => typeof k === "string" && k !== "personal-info") : [];
 
+    // Auto-include any sections from the sections object missing from layout
+    Object.keys(sections || {}).forEach((key) => {
+      if (key === "personal-info" || key === "custom") return;
+      if (!c0.includes(key) && !c1.includes(key)) {
+        const sec = sections[key];
+        const isSidebar = sec?.column === "sidebar" || DEFAULT_SIDEBAR_SECTIONS.has(key);
+        if (isTwoCol && isSidebar) {
+          c1.push(key);
+        } else {
+          c0.push(key);
+        }
+      }
+    });
+
     // For 1-column templates: combine sequentially into col0, col1 is empty
     if (!isTwoCol) {
       let combined = [];
@@ -121,6 +135,20 @@ export const extractLayoutColumns = (rawLayout, sections = {}, templateId = null
   ) {
     let c0 = Array.isArray(rawLayout[0]) ? rawLayout[0].filter((k) => typeof k === "string" && k !== "personal-info") : [];
     let c1 = Array.isArray(rawLayout[1]) ? rawLayout[1].filter((k) => typeof k === "string" && k !== "personal-info") : [];
+
+    // Auto-include any sections from the sections object missing from layout
+    Object.keys(sections || {}).forEach((key) => {
+      if (key === "personal-info" || key === "custom") return;
+      if (!c0.includes(key) && !c1.includes(key)) {
+        const sec = sections[key];
+        const isSidebar = sec?.column === "sidebar" || DEFAULT_SIDEBAR_SECTIONS.has(key);
+        if (isTwoCol && isSidebar) {
+          c1.push(key);
+        } else {
+          c0.push(key);
+        }
+      }
+    });
 
     if (!isTwoCol) {
       let combined = [];

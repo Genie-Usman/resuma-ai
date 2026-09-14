@@ -13,10 +13,18 @@ const SUGGESTIONS = [
 ];
 
 const TEMPLATES = [
-  { id: "azurill", name: "Azurill", subtitle: "Modern Clean" },
-  { id: "bronzor", name: "Bronzor", subtitle: "Executive Minimal" },
-  { id: "chikorita", name: "Chikorita", subtitle: "Creative Classic" },
-  { id: "ditto", name: "Ditto", subtitle: "Compact Tech" },
+  { id: "azurill", name: "Azurill", subtitle: "Modern Clean Dot", cols: "2-Col" },
+  { id: "bronzor", name: "Bronzor", subtitle: "Executive Minimal", cols: "1-Col" },
+  { id: "chikorita", name: "Chikorita", subtitle: "Forest Bleed Sidebar", cols: "2-Col" },
+  { id: "ditto", name: "Ditto", subtitle: "Cyan Header Bar", cols: "2-Col" },
+  { id: "gengar", name: "Gengar", subtitle: "Dark Indigo Contrast", cols: "2-Col" },
+  { id: "glalie", name: "Glalie", subtitle: "Tinted Sage Contact", cols: "2-Col" },
+  { id: "kakuna", name: "Kakuna", subtitle: "Centered Editorial", cols: "1-Col" },
+  { id: "leafish", name: "Leafish", subtitle: "Dual-Tier Warm Banner", cols: "2-Col" },
+  { id: "nosepass", name: "Nosepass", subtitle: "Europass Split Date", cols: "1-Col" },
+  { id: "onyx", name: "Onyx", subtitle: "Crimson Corporate", cols: "1-Col" },
+  { id: "pikachu", name: "Pikachu", subtitle: "Warm Amber Card", cols: "2-Col" },
+  { id: "rhyhorn", name: "Rhyhorn", subtitle: "Clean Border Divider", cols: "1-Col" },
 ];
 
 const CreateResumeForm = ({ onClose }) => {
@@ -125,7 +133,7 @@ const CreateResumeForm = ({ onClose }) => {
           <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
             Starter Template
           </label>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-56 overflow-y-auto p-1 border border-slate-100 rounded-xl bg-slate-50/50">
             {TEMPLATES.map((tmpl) => {
               const isSelected = selectedTemplate === tmpl.id;
               return (
@@ -133,25 +141,27 @@ const CreateResumeForm = ({ onClose }) => {
                   key={tmpl.id}
                   type="button"
                   onClick={() => setSelectedTemplate(tmpl.id)}
-                  className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                  className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
                     isSelected
-                      ? "border-purple-500 bg-purple-50/50 shadow-2xs ring-2 ring-purple-500/20"
+                      ? "border-purple-500 bg-purple-50/70 shadow-2xs ring-2 ring-purple-500/20"
                       : "border-slate-200 hover:border-slate-300 bg-white"
                   }`}
                 >
-                  <div>
-                    <span className="text-xs font-bold text-slate-800 block capitalize">
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-xs font-bold text-slate-800 capitalize truncate">
                       {tmpl.name}
                     </span>
-                    <span className="text-[10px] text-slate-400 block">
-                      {tmpl.subtitle}
+                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
+                      tmpl.cols === "2-Col" 
+                        ? "bg-blue-50 text-blue-600 border border-blue-200/60" 
+                        : "bg-emerald-50 text-emerald-600 border border-emerald-200/60"
+                    }`}>
+                      {tmpl.cols}
                     </span>
                   </div>
-                  {isSelected && (
-                    <div className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center shrink-0">
-                      <LuCheck className="text-xs" />
-                    </div>
-                  )}
+                  <span className="text-[10px] text-slate-400 block truncate">
+                    {tmpl.subtitle}
+                  </span>
                 </button>
               );
             })}

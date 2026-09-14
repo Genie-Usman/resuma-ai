@@ -19,7 +19,7 @@ const Section = ({
         className="mb-2 border-b pb-0.5 text-sm font-bold"
         style={{ color: isSidebar ? themeColors[0] : themeColors[1] }}
       >
-        {section.name}
+        {section.title || section.name}
       </h4>
 
       <div

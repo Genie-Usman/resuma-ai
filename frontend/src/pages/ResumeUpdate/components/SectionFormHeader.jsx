@@ -323,8 +323,8 @@ const SectionFormHeader = ({
           )}
         </div>
 
-        {/* Section Category Badge */}
-        {badge && (
+        {/* Section Archetype Badge - displayed for custom section archetypes */}
+        {badge && sectionKey?.startsWith("custom_") && (
           <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
             {Icon && <Icon className="w-3.5 h-3.5 text-purple-600" />}
             {badge}
