@@ -1,8 +1,10 @@
 import { LuLink, LuMapPin, LuPhone } from 'react-icons/lu';
 import { MdAlternateEmail } from 'react-icons/md';
+import ResumeQrCode from '../ResumeQrCode';
 
-const ResumeHeader = ({ basics, themeColors }) => {
-    const borderRadius = basics.picture.borderRadius;
+const ResumeHeader = ({ basics, themeColors, profiles, sections }) => {
+    const resolvedProfiles = profiles || sections?.profiles?.items || [];
+    const borderRadius = basics?.picture?.borderRadius || 0;
 
     const isValidUrl = (v) => typeof v === "string" && v.startsWith("http");
 
@@ -11,11 +13,12 @@ const ResumeHeader = ({ basics, themeColors }) => {
             className="summary group px-6 pb-7 pt-6"
             style={{ borderRadius: `calc(${borderRadius}px - 2px)`, backgroundColor: themeColors[2], color: themeColors[1] }}
         >
-            <div className="col-span-2 space-y-2.5">
-                <div>
-                    <h2 className="text-2xl font-bold" style={{ color: themeColors[0] }}>{basics.name}</h2>
-                    <p style={{ color: themeColors[0] }}>{basics.headline}</p>
-                </div>
+            <div className="flex items-center justify-between gap-4">
+                <div className="flex-1 space-y-2.5 min-w-0">
+                    <div>
+                        <h2 className="text-2xl font-bold" style={{ color: themeColors[0] }}>{basics.name}</h2>
+                        <p style={{ color: themeColors[0] }}>{basics.headline}</p>
+                    </div>
 
                 <hr className="opacity-50" style={{ borderColor: themeColors[0] }} />
 
@@ -81,7 +84,18 @@ const ResumeHeader = ({ basics, themeColors }) => {
                     )}
                 </div>
             </div>
+
+            <ResumeQrCode
+                qrCode={basics?.qrCode}
+                basics={basics}
+                profiles={resolvedProfiles}
+                themeColors={themeColors}
+                align="right"
+                inverted={true}
+                className="shrink-0"
+            />
         </div>
+    </div>
     );
 };
 

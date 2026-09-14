@@ -39,12 +39,14 @@ import ContentDrawer from "./components/drawers/ContentDrawer.jsx";
 import TemplatesDrawer from "./components/drawers/TemplatesDrawer.jsx";
 import DesignDrawer from "./components/drawers/DesignDrawer.jsx";
 import AiAuditDrawer from "./components/drawers/AiAuditDrawer.jsx";
+import SectionFormHeader from "./components/SectionFormHeader.jsx";
 import JobMatchModal from "./components/JobMatchModal.jsx";
 import ResumeAuditModal from "./components/ResumeAuditModal.jsx";
 import ShareModal from "./components/ShareModal.jsx";
 import ThemeSelector from "./ThemeSelector.jsx";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
-import { RESUME_TEMPLATES } from "../../constants";
+import { RESUME_TEMPLATES, isTwoColumnTemplate } from "../../constants";
+import AddCustomSectionModal from "./components/AddCustomSectionModal.jsx";
 import { exportToJsonResume } from "../../utils/jsonResumeAdapter";
 import { runResumeAudit } from "../../utils/resumeAuditEngine";
 import axiosInstance from "../../utils/axiosInstance";
@@ -65,6 +67,7 @@ import ReferenceForm from "./Forms/ReferenceForm";
 import LanguageForm from "./Forms/LanguageForm";
 import InterestForm from "./Forms/InterestForm";
 import PublicationsForm from "./Forms/PublicationsForm";
+import CustomSectionForm from "./Forms/CustomSectionForm";
 
 // Defaults
 import {
@@ -108,6 +111,7 @@ const EditResume = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [isAddSectionModalOpen, setIsAddSectionModalOpen] = useState(false);
 
   // Close dropdown menus on outside click or Escape key
   useEffect(() => {
@@ -147,7 +151,10 @@ const EditResume = () => {
     addArrayItem,
     removeArrayItem,
     toggleSectionVisibility,
+    updateSectionTitle,
     reorderSections,
+    addCustomSection,
+    removeCustomSection,
     updateFontFamily,
     updateDensity,
     updatePageMargin,
@@ -306,6 +313,16 @@ const EditResume = () => {
     resumeData?.template ||
     RESUME_TEMPLATES[0].id;
 
+  // Custom Section Creation (Roadmap Item 3.1)
+  const handleAddCustomSection = ({ name, type, column }) => {
+    const newSectionId = addCustomSection({ name, type, column });
+    if (newSectionId) {
+      setActivePage(newSectionId);
+      setActiveTab("content");
+      setIsDrawerOpen(true);
+    }
+  };
+
   // Quick-add missing skill from Job Match analysis
   const handleAddMissingSkill = (skillName) => {
     setResumeData((prev) => {
@@ -437,18 +454,50 @@ const EditResume = () => {
     if (!resumeData?.data || !resumeData.data.basics) return null;
     const sections = resumeData.data.sections || {};
 
+    // Roadmap 3.1: Custom Section Form Dispatcher
+    if (sections[activePage]?.isCustom || activePage?.startsWith("custom_")) {
+      const customSection = sections[activePage] || {};
+      return (
+        <CustomSectionForm
+          sectionId={activePage}
+          section={customSection}
+          updateArrayItem={(index, key, value) => updateArrayItem(activePage, index, key, value)}
+          addArrayItem={(defaultItem) => addArrayItem(activePage, defaultItem)}
+          removeArrayItem={(index) => removeArrayItem(activePage, index)}
+          isVisible={customSection.visible !== false}
+          onToggleVisibility={() => toggleSectionVisibility(activePage)}
+          onRenameTitle={(newTitle, isFinal) => updateSectionTitle(activePage, newTitle, isFinal)}
+          onRemoveSection={(customId) => {
+            removeCustomSection(customId);
+            setActivePage("personal-info");
+          }}
+        />
+      );
+    }
+
     switch (activePage) {
       case "personal-info":
         return (
           <PersonalInfoForm
             profileData={resumeData.data.basics}
             updateSection={(key, value) => updateSection("basics", key, value)}
+            profiles={sections.profiles?.items || []}
           />
         );
 
       case "summary":
         return (
-          <div className="p-1 sm:p-2">
+          <div className="p-1 sm:p-2 space-y-6">
+            <SectionFormHeader
+              title={sections.summary?.name || "Professional Summary"}
+              subtitle="A concise overview of your background, key achievements, and career goals."
+              icon={LuPencil}
+              badge="Summary"
+              isVisible={sections.summary?.visible !== false}
+              onToggleVisibility={() => toggleSectionVisibility("summary")}
+              sectionKey="summary"
+              onRenameTitle={(newTitle, isFinal) => updateSectionTitle("summary", newTitle, isFinal)}
+            />
             <SummarySectionForm
               sectionId="summary"
               item={{
@@ -483,6 +532,10 @@ const EditResume = () => {
             addArrayItem={() => addArrayItem("profiles", defaultProfileItem)}
             removeArrayItem={(index) => removeArrayItem("profiles", index)}
             setResumeData={setResumeData}
+            isVisible={sections.profiles?.visible !== false}
+            onToggleVisibility={() => toggleSectionVisibility("profiles")}
+            title={sections.profiles?.name}
+            onRenameTitle={(newTitle, isFinal) => updateSectionTitle("profiles", newTitle, isFinal)}
           />
         );
 
@@ -494,6 +547,10 @@ const EditResume = () => {
             addArrayItem={() => addArrayItem("experience", defaultExperienceItem)}
             removeArrayItem={(index) => removeArrayItem("experience", index)}
             setResumeData={setResumeData}
+            isVisible={sections.experience?.visible !== false}
+            onToggleVisibility={() => toggleSectionVisibility("experience")}
+            title={sections.experience?.name}
+            onRenameTitle={(newTitle, isFinal) => updateSectionTitle("experience", newTitle, isFinal)}
           />
         );
 
@@ -505,6 +562,10 @@ const EditResume = () => {
             addArrayItem={() => addArrayItem("education", defaultEducationItem)}
             removeArrayItem={(index) => removeArrayItem("education", index)}
             setResumeData={setResumeData}
+            isVisible={sections.education?.visible !== false}
+            onToggleVisibility={() => toggleSectionVisibility("education")}
+            title={sections.education?.name}
+            onRenameTitle={(newTitle, isFinal) => updateSectionTitle("education", newTitle, isFinal)}
           />
         );
 
@@ -516,6 +577,10 @@ const EditResume = () => {
             addArrayItem={() => addArrayItem("skills", defaultSkillsItem)}
             removeArrayItem={(index) => removeArrayItem("skills", index)}
             setResumeData={setResumeData}
+            isVisible={sections.skills?.visible !== false}
+            onToggleVisibility={() => toggleSectionVisibility("skills")}
+            title={sections.skills?.name}
+            onRenameTitle={(newTitle, isFinal) => updateSectionTitle("skills", newTitle, isFinal)}
           />
         );
 
@@ -527,6 +592,10 @@ const EditResume = () => {
             addArrayItem={() => addArrayItem("projects", defaultProjectsItem)}
             removeArrayItem={(index) => removeArrayItem("projects", index)}
             setResumeData={setResumeData}
+            isVisible={sections.projects?.visible !== false}
+            onToggleVisibility={() => toggleSectionVisibility("projects")}
+            title={sections.projects?.name}
+            onRenameTitle={(newTitle, isFinal) => updateSectionTitle("projects", newTitle, isFinal)}
           />
         );
 
@@ -538,6 +607,10 @@ const EditResume = () => {
             addArrayItem={() => addArrayItem("certifications", defaultCertificationsItem)}
             removeArrayItem={(index) => removeArrayItem("certifications", index)}
             setResumeData={setResumeData}
+            isVisible={sections.certifications?.visible !== false}
+            onToggleVisibility={() => toggleSectionVisibility("certifications")}
+            title={sections.certifications?.name}
+            onRenameTitle={(newTitle, isFinal) => updateSectionTitle("certifications", newTitle, isFinal)}
           />
         );
 
@@ -549,6 +622,10 @@ const EditResume = () => {
             addArrayItem={() => addArrayItem("awards", defaultAwardItem)}
             removeArrayItem={(index) => removeArrayItem("awards", index)}
             setResumeData={setResumeData}
+            isVisible={sections.awards?.visible !== false}
+            onToggleVisibility={() => toggleSectionVisibility("awards")}
+            title={sections.awards?.name}
+            onRenameTitle={(newTitle, isFinal) => updateSectionTitle("awards", newTitle, isFinal)}
           />
         );
 
@@ -560,6 +637,10 @@ const EditResume = () => {
             addArrayItem={() => addArrayItem("languages", defaultLanguageItem)}
             removeArrayItem={(index) => removeArrayItem("languages", index)}
             setResumeData={setResumeData}
+            isVisible={sections.languages?.visible !== false}
+            onToggleVisibility={() => toggleSectionVisibility("languages")}
+            title={sections.languages?.name}
+            onRenameTitle={(newTitle, isFinal) => updateSectionTitle("languages", newTitle, isFinal)}
           />
         );
 
@@ -571,6 +652,10 @@ const EditResume = () => {
             addArrayItem={() => addArrayItem("interests", defaultInterestItem)}
             removeArrayItem={(index) => removeArrayItem("interests", index)}
             setResumeData={setResumeData}
+            isVisible={sections.interests?.visible !== false}
+            onToggleVisibility={() => toggleSectionVisibility("interests")}
+            title={sections.interests?.name}
+            onRenameTitle={(newTitle, isFinal) => updateSectionTitle("interests", newTitle, isFinal)}
           />
         );
 
@@ -582,6 +667,10 @@ const EditResume = () => {
             addArrayItem={() => addArrayItem("publications", defaultPublicationItem)}
             removeArrayItem={(index) => removeArrayItem("publications", index)}
             setResumeData={setResumeData}
+            isVisible={sections.publications?.visible !== false}
+            onToggleVisibility={() => toggleSectionVisibility("publications")}
+            title={sections.publications?.name}
+            onRenameTitle={(newTitle, isFinal) => updateSectionTitle("publications", newTitle, isFinal)}
           />
         );
 
@@ -593,6 +682,10 @@ const EditResume = () => {
             addArrayItem={() => addArrayItem("volunteer", defaultVolunteerItem)}
             removeArrayItem={(index) => removeArrayItem("volunteer", index)}
             setResumeData={setResumeData}
+            isVisible={sections.volunteer?.visible !== false}
+            onToggleVisibility={() => toggleSectionVisibility("volunteer")}
+            title={sections.volunteer?.name}
+            onRenameTitle={(newTitle, isFinal) => updateSectionTitle("volunteer", newTitle, isFinal)}
           />
         );
 
@@ -604,6 +697,10 @@ const EditResume = () => {
             addArrayItem={() => addArrayItem("references", defaultReferenceItem)}
             removeArrayItem={(index) => removeArrayItem("references", index)}
             setResumeData={setResumeData}
+            isVisible={sections.references?.visible !== false}
+            onToggleVisibility={() => toggleSectionVisibility("references")}
+            title={sections.references?.name}
+            onRenameTitle={(newTitle, isFinal) => updateSectionTitle("references", newTitle, isFinal)}
           />
         );
 
@@ -898,6 +995,7 @@ const EditResume = () => {
                 onToggleVisibility={toggleSectionVisibility}
                 onReorderSections={reorderSections}
                 onExportJson={handleExportJson}
+                onOpenAddSectionModal={() => setIsAddSectionModalOpen(true)}
                 isSaving={isSaving}
                 onClose={() => setIsDrawerOpen(false)}
               >
@@ -1109,6 +1207,14 @@ const EditResume = () => {
         cancelText="Cancel"
         isLoading={isDeleting}
         isDestructive={true}
+      />
+
+      {/* Add Custom Section Modal (Roadmap Item 3.1) */}
+      <AddCustomSectionModal
+        isOpen={isAddSectionModalOpen}
+        onClose={() => setIsAddSectionModalOpen(false)}
+        onAddSection={handleAddCustomSection}
+        isTwoColumn={isTwoColumnTemplate(currentTemplateId)}
       />
 
       {/* Off-screen canvas for reliable 100% fidelity A4 thumbnail capture */}

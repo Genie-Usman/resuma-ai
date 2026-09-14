@@ -94,6 +94,52 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
       };
     }
 
+    // Sanitize custom sections (Roadmap 3.1)
+    Object.keys(formatted).forEach((k) => {
+      const sec = formatted[k];
+      if (sec && (sec.isCustom || k.startsWith("custom_")) && Array.isArray(sec.items)) {
+        if (sec.type === "timeline") {
+          formatted[k] = {
+            ...sec,
+            items: sec.items.map((item) => {
+              if (!item) return item;
+              return {
+                ...item,
+                company: item.company || item.organization || item.subtitle || "",
+                position: item.position || item.title || item.role || "",
+                date: (item.date || "").replace(/(\s*[-–—]\s*Present)+/gi, " - Present"),
+                summary: (item.summary || "").replace(/([^\n>])\s*•/g, "$1<br>• "),
+              };
+            }),
+          };
+        } else if (sec.type === "simple_list") {
+          formatted[k] = {
+            ...sec,
+            items: sec.items.map((item) => {
+              if (!item) return item;
+              return {
+                ...item,
+                name: item.name || item.title || "",
+                awarder: item.awarder || item.issuer || item.subtitle || "",
+              };
+            }),
+          };
+        } else if (sec.type === "publications") {
+          formatted[k] = {
+            ...sec,
+            items: sec.items.map((item) => {
+              if (!item) return item;
+              return {
+                ...item,
+                name: item.name || item.title || "",
+                publisher: item.publisher || item.journal || item.organization || "",
+              };
+            }),
+          };
+        }
+      }
+    });
+
     return formatted;
   }, [sections, safeMetadata]);
 

@@ -3,11 +3,11 @@ import Picture from '../Picture';
 import { MdAlternateEmail } from 'react-icons/md';
 import BrandIcon from '../../shared/BrandIcon';
 import { Link } from '../../../utils/helper';
+import ResumeQrCode from '../ResumeQrCode';
 
-const ResumeHeader = ({ sections, basics, themeColors }) => {
+const ResumeHeader = ({ sections, basics, themeColors, profiles: propProfiles }) => {
     const profileSection = sections?.profiles;
-    const profiles = profileSection?.items || [];
-
+    const profiles = propProfiles || profileSection?.items || [];
 
     const isValidUrl = (v) => typeof v === "string" && v.startsWith("http");
 
@@ -95,6 +95,15 @@ const ResumeHeader = ({ sections, basics, themeColors }) => {
                         ))}
                 </div>
             )}
+
+            <ResumeQrCode
+                qrCode={basics?.qrCode}
+                basics={basics}
+                profiles={profiles}
+                themeColors={themeColors}
+                align="right"
+                className="shrink-0 ml-2"
+            />
         </div>
     );
 };

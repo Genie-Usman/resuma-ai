@@ -1,9 +1,9 @@
 import { stripHtml } from "../../../utils/helper";
 
 const Summary = ({ section, themeColors }) => {
-  if (!section || !section.content || stripHtml(section.content)?.trim() === "") {
-  return null;
-}
+  if (!section || section.visible === false || !section.content || stripHtml(section.content)?.trim() === "") {
+    return null;
+  }
 
   return (
     <section id={section.id}>

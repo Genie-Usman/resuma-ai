@@ -1,9 +1,10 @@
 import { LuLink, LuMapPin, LuPhone } from 'react-icons/lu';
 import Picture from '../Picture';
 import { MdAlternateEmail } from 'react-icons/md';
+import ResumeQrCode from '../ResumeQrCode';
 
-const ResumeHeader = ({ basics, themeColors }) => {
-
+const ResumeHeader = ({ basics, themeColors, profiles, sections }) => {
+    const resolvedProfiles = profiles || sections?.profiles?.items || [];
     const isValidUrl = (v) => typeof v === "string" && v.startsWith("http");
 
     return (
@@ -12,11 +13,12 @@ const ResumeHeader = ({ basics, themeColors }) => {
                 <Picture picture={basics.picture} className='ml-auto' />
             </div>
 
-            <div className="col-span-3 space-y-2">
-                <div>
-                    <div className="text-2xl font-bold">{basics.name}</div>
-                    <div className="text-base">{basics.headline}</div>
-                </div>
+            <div className="col-span-3 flex justify-between items-start gap-4">
+                <div className="space-y-2 min-w-0 flex-1">
+                    <div>
+                        <div className="text-2xl font-bold">{basics.name}</div>
+                        <div className="text-base">{basics.headline}</div>
+                    </div>
 
                 <div className="space-y-1 text-sm">
                     {basics.location && (
@@ -68,10 +70,19 @@ const ResumeHeader = ({ basics, themeColors }) => {
                         </div>
                     )}
                 </div>
-
             </div>
+
+            <ResumeQrCode
+                qrCode={basics?.qrCode}
+                basics={basics}
+                profiles={resolvedProfiles}
+                themeColors={themeColors}
+                align="right"
+                className="shrink-0"
+            />
         </div>
+    </div>
     );
 };
 
-export default ResumeHeader
+export default ResumeHeader;

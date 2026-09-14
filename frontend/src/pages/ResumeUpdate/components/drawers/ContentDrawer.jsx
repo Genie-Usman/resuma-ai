@@ -22,6 +22,11 @@ import {
   LuUsers,
   LuArrowRight,
   LuArrowLeft,
+  LuEye,
+  LuEyeOff,
+  LuPlus,
+  LuClock,
+  LuListChecks,
 } from "react-icons/lu";
 import EditorSidebar from "../EditorSidebar";
 import { extractLayoutColumns } from "../../../../utils/layoutUtils";
@@ -42,6 +47,20 @@ const SECTION_ICONS = {
   publications: LuBookOpen,
   volunteer: LuHeartHandshake,
   references: LuUsers,
+};
+
+const CUSTOM_TYPE_ICONS = {
+  timeline: LuClock,
+  simple_list: LuListChecks,
+  publications: LuBookOpen,
+  language_matrix: LuLanguages,
+};
+
+const getSectionIcon = (key, sec) => {
+  if (sec?.isCustom || (key && key.startsWith("custom_"))) {
+    return CUSTOM_TYPE_ICONS[sec?.type] || LuClock;
+  }
+  return SECTION_ICONS[key] || LuSparkles;
 };
 
 const SECTION_LABELS = {
@@ -75,6 +94,7 @@ const ContentDrawer = ({
   onToggleVisibility,
   onReorderSections,
   onExportJson,
+  onOpenAddSectionModal,
   isSaving = false,
   onClose,
   children,
@@ -159,8 +179,9 @@ const ContentDrawer = ({
     }
   };
 
-  const ActiveIcon = SECTION_ICONS[activePage] || LuSparkles;
-  const activeLabel = SECTION_LABELS[activePage] || activePage;
+  const activeSection = sections[activePage];
+  const ActiveIcon = getSectionIcon(activePage, activeSection);
+  const activeLabel = activeSection?.name || SECTION_LABELS[activePage] || activePage;
 
   return (
     <aside className="w-full h-full bg-white flex flex-col select-none">
@@ -205,61 +226,113 @@ const ContentDrawer = ({
 
                 {/* Dropdown Menu */}
                 {dropdownOpen && (
-                  <div className="absolute left-0 mt-2 w-64 max-h-[380px] overflow-y-auto custom-scrollbar bg-white rounded-2xl shadow-xl border border-slate-200/90 py-1.5 z-50 animate-in fade-in-0 zoom-in-95 duration-100">
+                  <div className="absolute left-0 mt-2 w-64 max-h-[380px] overflow-y-auto custom-scrollbar bg-white rounded-2xl shadow-xl border border-slate-200/90 py-1.5 z-50 animate-in fade-in-0 zoom-in-95 duration-100 flex flex-col">
                     <div className="px-3.5 py-1 border-b border-slate-100 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                       Jump to Section
                     </div>
-                    {orderedSectionKeys.map((key) => {
-                      const Icon = SECTION_ICONS[key] || LuSparkles;
-                      const label = SECTION_LABELS[key] || key;
-                      const isSelected = activePage === key;
-                      const count =
-                        key === "personal-info"
-                          ? null
-                          : Array.isArray(sections[key]?.items)
-                          ? sections[key].items.length
-                          : null;
+                    <div className="flex-1 overflow-y-auto">
+                      {orderedSectionKeys.map((key) => {
+                        const sec = sections[key];
+                        const Icon = getSectionIcon(key, sec);
+                        const label = sec?.name || SECTION_LABELS[key] || key;
+                        const isSelected = activePage === key;
+                        const isHidden = key !== "personal-info" && sections[key]?.visible === false;
+                        const count =
+                          key === "personal-info"
+                            ? null
+                            : Array.isArray(sections[key]?.items)
+                            ? sections[key].items.length
+                            : null;
 
-                      return (
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => {
+                              setActivePage(key);
+                              setDropdownOpen(false);
+                            }}
+                            className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                              isSelected
+                                ? "bg-purple-50 text-purple-900 font-semibold"
+                                : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                            } ${isHidden ? "opacity-75" : ""}`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <Icon
+                                className={`text-sm shrink-0 ${
+                                  isSelected ? "text-purple-600" : isHidden ? "text-amber-500" : "text-slate-400"
+                                }`}
+                              />
+                              <span className="truncate">{label}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              {isHidden && (
+                                <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/80">
+                                  <LuEyeOff className="text-[10px]" />
+                                  <span>Hidden</span>
+                                </span>
+                              )}
+                              {count !== null && count > 0 && !isHidden && (
+                                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-600">
+                                  {count}
+                                </span>
+                              )}
+                              {isSelected && <LuCheck className="text-xs text-purple-600" />}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Add Custom Section action button at bottom of dropdown */}
+                    {onOpenAddSectionModal && (
+                      <div className="p-1.5 border-t border-slate-100 bg-slate-50/80 sticky bottom-0 z-10 mt-1">
                         <button
-                          key={key}
                           type="button"
                           onClick={() => {
-                            setActivePage(key);
                             setDropdownOpen(false);
+                            onOpenAddSectionModal();
                           }}
-                          className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                            isSelected
-                              ? "bg-purple-50 text-purple-900 font-semibold"
-                              : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
-                          }`}
+                          className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200/80 transition-colors cursor-pointer shadow-2xs"
                         >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <Icon
-                              className={`text-sm shrink-0 ${
-                                isSelected ? "text-purple-600" : "text-slate-400"
-                              }`}
-                            />
-                            <span className="truncate">{label}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            {count !== null && count > 0 && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-600">
-                                {count}
-                              </span>
-                            )}
-                            {isSelected && <LuCheck className="text-xs text-purple-600" />}
-                          </div>
+                          <LuPlus className="text-sm" />
+                          <span>Add Custom Section</span>
                         </button>
-                      );
-                    })}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Right: Step Steppers & Close */}
+            {/* Right: Visibility Quick-Toggle, Steppers & Close */}
             <div className="flex items-center gap-1 shrink-0">
+              {activePage !== "personal-info" && onToggleVisibility && (
+                <button
+                  type="button"
+                  onClick={() => onToggleVisibility(activePage)}
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer border shadow-2xs mr-1 ${
+                    sections[activePage]?.visible === false
+                      ? "text-amber-800 bg-amber-50 hover:bg-amber-100 border-amber-300"
+                      : "text-slate-600 hover:text-purple-700 hover:bg-purple-50 bg-white border-slate-200/90 hover:border-purple-200"
+                  }`}
+                  title={sections[activePage]?.visible === false ? "Show section on resume" : "Hide section on resume"}
+                >
+                  {sections[activePage]?.visible === false ? (
+                    <>
+                      <LuEyeOff className="text-xs text-amber-600 stroke-[2.2]" />
+                      <span className="hidden sm:inline">Hidden</span>
+                    </>
+                  ) : (
+                    <>
+                      <LuEye className="text-xs text-slate-500 stroke-[2.2]" />
+                      <span className="hidden sm:inline">Visible</span>
+                    </>
+                  )}
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={handlePrev}
@@ -357,6 +430,7 @@ const ContentDrawer = ({
             onToggleVisibility={onToggleVisibility}
             onReorderSections={onReorderSections}
             onExportJson={onExportJson}
+            onOpenAddSectionModal={onOpenAddSectionModal}
             isSaving={isSaving}
           />
         )}

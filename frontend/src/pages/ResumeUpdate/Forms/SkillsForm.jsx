@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { LuPlus, LuTrash2, LuWrench } from "react-icons/lu";
+import { LuPlus, LuTrash2, LuSparkles } from "react-icons/lu";
 import { defaultSkillsItem } from "../../../constants";
 import RatingInput from "../../../components/Inputs/RatingInput";
+import SectionFormHeader from "../components/SectionFormHeader";
 
 const SkillsForm = ({
   skills,
@@ -9,6 +10,10 @@ const SkillsForm = ({
   addArrayItem,
   removeArrayItem,
   setResumeData,
+  isVisible,
+  onToggleVisibility,
+  title,
+  onRenameTitle,
 }) => {
   // Ensure at least one skills item exists
   useEffect(() => {
@@ -37,16 +42,16 @@ const SkillsForm = ({
   return (
     <div className="p-1 sm:p-2 space-y-6">
       {/* Header */}
-      <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-            Skills
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Add your skills grouped by category (e.g. Languages, Tools).
-          </p>
-        </div>
-      </div>
+      <SectionFormHeader
+        title={title || "Technical & Core Skills"}
+        subtitle="Add your skills grouped by category (e.g. Languages, Frameworks, Tools)."
+        icon={LuSparkles}
+        badge="Skills"
+        isVisible={isVisible}
+        onToggleVisibility={onToggleVisibility}
+        sectionKey="skills"
+        onRenameTitle={onRenameTitle}
+      />
 
       {/* Skills Group Cards */}
       <div className="space-y-4">

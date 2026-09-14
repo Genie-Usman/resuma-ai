@@ -26,12 +26,12 @@ const Modal = ({
       onClick={onClose}
     >
       <div
-        className="relative mx-auto bg-white rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.25)] border border-slate-100 flex flex-col overflow-hidden w-full transition-all"
+        className="relative mx-auto bg-white rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.25)] border border-slate-100 flex flex-col overflow-hidden w-full max-h-[calc(100vh-2.5rem)] transition-all"
         style={{
           width,
           height,
           maxWidth,
-          maxHeight,
+          maxHeight: maxHeight || 'calc(100vh - 2.5rem)',
         }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -80,7 +80,7 @@ const Modal = ({
         )}
 
         {/* Modal Body */}
-        <div className={`flex-1 overflow-auto ${isPrint || noPadding ? 'p-0 bg-white' : 'p-6 bg-white'} custom-scrollbar`}>
+        <div className={`flex-1 ${noPadding ? 'p-0 bg-white overflow-hidden flex flex-col min-h-0' : isPrint ? 'p-0 bg-white overflow-auto custom-scrollbar' : 'p-6 bg-white overflow-auto custom-scrollbar'}`}>
           {children}
         </div>
       </div>

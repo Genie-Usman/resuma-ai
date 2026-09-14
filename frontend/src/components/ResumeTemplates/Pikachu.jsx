@@ -40,7 +40,20 @@ const mapSectionToComponent = (key, section, reactKey, themeColors) => {
 
     if (usesItems.includes(key) && !section.items?.length) return null;
 
-    const Component = components[key];
+    let Component = components[key];
+
+    // Roadmap 3.1: Custom Section Archetype Dispatcher
+    if (!Component && (section?.isCustom || (key && key.startsWith("custom_")))) {
+        if (!section?.items?.length) return null;
+        const typeMap = {
+            timeline: components.experience,
+            simple_list: components.awards,
+            publications: components.publications,
+            language_matrix: components.languages,
+        };
+        Component = typeMap[section.type] || components.experience;
+    }
+
     return Component ? (
         <div key={reactKey}>
             <Component section={section} themeColors={themeColors} />
@@ -93,7 +106,7 @@ const Pikachu = ({ basics = {}, sections = {}, metadata = {}, isFirstPage = fals
             </div>
             <div className={`main group space-y-4 ${sidebarIds.length > 0 ? "col-span-2" : "col-span-3"}`}>
                 {isFirstPage && (
-                    <ResumeHeader basics={basics} themeColors={themeColors} />
+                    <ResumeHeader basics={basics} themeColors={themeColors} profiles={sections?.profiles?.items} sections={sections} />
                 )}
 
                 {mainIds.map((key) =>

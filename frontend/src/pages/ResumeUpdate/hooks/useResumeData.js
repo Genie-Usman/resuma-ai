@@ -5,7 +5,11 @@ import { getDefaultResumeData } from "../../../utils/DefaultResume";
 import { captureElementAsImage, dataURLToFile, waitForImageToLoad } from "../../../utils/helper";
 import uploadImage from "../../../utils/uploadImage";
 import toast from "react-hot-toast";
-import { reorderLayoutColumns } from "../../../utils/layoutUtils";
+import {
+  reorderLayoutColumns,
+  extractLayoutColumns,
+  isTwoColumnTemplate,
+} from "../../../utils/layoutUtils";
 
 export const useResumeData = (resumeId) => {
   const [resumeData, setResumeDataState] = useState(getDefaultResumeData());
@@ -254,7 +258,8 @@ export const useResumeData = (resumeId) => {
         const currentSection = prev.data.sections[sectionKey];
         if (!currentSection) return prev;
 
-        const newVisibility = !currentSection.visible;
+        const isCurrentlyVisible = currentSection.visible !== false;
+        const newVisibility = !isCurrentlyVisible;
         toast(
           newVisibility
             ? `Shown: ${currentSection.name || sectionKey}`
@@ -278,6 +283,190 @@ export const useResumeData = (resumeId) => {
             },
           },
         };
+      });
+    },
+    [recordSnapshot]
+  );
+
+  // Update Section Title / Name (e.g. sections.experience.name = "Clinical Practice")
+  const updateSectionTitle = useCallback(
+    (sectionKey, newTitle, isFinal = false) => {
+      // Debounce snapshot during live typing; record full snapshot on save/final
+      recordSnapshot(isFinal);
+
+      setResumeDataState((prev) => {
+        if (!prev || !prev.data?.sections) return prev;
+        const currentSection = prev.data.sections[sectionKey];
+        if (!currentSection) return prev;
+
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            sections: {
+              ...prev.data.sections,
+              [sectionKey]: {
+                ...currentSection,
+                name: newTitle !== undefined ? newTitle : currentSection.name,
+              },
+            },
+          },
+        };
+      });
+
+      if (isFinal && newTitle && typeof newTitle === "string" && newTitle.trim()) {
+        toast.success(`Section renamed to "${newTitle.trim()}"`, {
+          id: `rename-section-${sectionKey}`,
+          duration: 1400,
+          icon: "✏️",
+        });
+      }
+    },
+    [recordSnapshot]
+  );
+
+  // Add Custom Section (Roadmap Item 3.1)
+  const addCustomSection = useCallback(
+    ({ name, type = "timeline", column = "main" }) => {
+      recordSnapshot(true);
+      const customId = `custom_${Date.now()}`;
+      const trimmedName = (name || "").trim() || "Custom Section";
+
+      // Default sample item according to archetype
+      let sampleItem = {};
+      if (type === "timeline") {
+        sampleItem = {
+          id: `item_${Date.now()}_1`,
+          position: "Role / Position",
+          company: "Organization / Institution",
+          location: "Location / Remote",
+          date: "2023 - Present",
+          summary: "<p>Highlight your key responsibilities, leadership, and achievements...</p>",
+        };
+      } else if (type === "simple_list") {
+        sampleItem = {
+          id: `item_${Date.now()}_1`,
+          name: "Item / Credential Name",
+          awarder: "Issuing Authority / Organization",
+          date: "2023",
+          url: "",
+          summary: "",
+        };
+      } else if (type === "publications") {
+        sampleItem = {
+          id: `item_${Date.now()}_1`,
+          name: "Publication Title / Research Paper",
+          publisher: "Journal, Conference, or Publisher",
+          date: "2023",
+          url: "",
+          summary: "<p>Abstract or key contributions of the publication.</p>",
+        };
+      } else if (type === "language_matrix") {
+        sampleItem = {
+          id: `item_${Date.now()}_1`,
+          name: "Skill or Language",
+          level: 80,
+          description: "Fluent",
+        };
+      } else {
+        sampleItem = {
+          id: `item_${Date.now()}_1`,
+          position: "Title",
+          company: "Organization",
+          date: "2023",
+          summary: "",
+        };
+      }
+
+      setResumeDataState((prev) => {
+        if (!prev) return prev;
+        const currentSections = prev.data?.sections || {};
+        const newSection = {
+          id: customId,
+          name: trimmedName,
+          type,
+          visible: true,
+          columns: 1,
+          isCustom: true,
+          items: [sampleItem],
+        };
+
+        // Layout placement
+        const activeTemplate = prev.data?.metadata?.template || prev.template || "azurill";
+        const currentLayout = prev.data?.metadata?.layout;
+        const [c0, c1] = extractLayoutColumns(currentLayout, currentSections, activeTemplate);
+
+        let newCol0 = [...c0];
+        let newCol1 = [...c1];
+
+        if (column === "sidebar" && isTwoColumnTemplate(activeTemplate)) {
+          newCol1.push(customId);
+        } else {
+          newCol0.push(customId);
+        }
+
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            sections: {
+              ...currentSections,
+              [customId]: newSection,
+            },
+            metadata: {
+              ...prev.data?.metadata,
+              layout: [[newCol0, newCol1]],
+            },
+          },
+        };
+      });
+
+      toast.success(`Created section "${trimmedName}"`, {
+        icon: "✨",
+        duration: 2000,
+      });
+
+      return customId;
+    },
+    [recordSnapshot]
+  );
+
+  // Remove Custom Section (Roadmap Item 3.1)
+  const removeCustomSection = useCallback(
+    (customId) => {
+      recordSnapshot(true);
+      let removedName = "";
+
+      setResumeDataState((prev) => {
+        if (!prev || !prev.data?.sections) return prev;
+        const currentSections = { ...prev.data.sections };
+        if (!currentSections[customId]) return prev;
+
+        removedName = currentSections[customId].name || "Custom Section";
+        delete currentSections[customId];
+
+        // Clean from layout
+        const activeTemplate = prev.data?.metadata?.template || prev.template || "azurill";
+        const [c0, c1] = extractLayoutColumns(prev.data?.metadata?.layout, currentSections, activeTemplate);
+        const newCol0 = c0.filter((k) => k !== customId);
+        const newCol1 = c1.filter((k) => k !== customId);
+
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            sections: currentSections,
+            metadata: {
+              ...prev.data?.metadata,
+              layout: [[newCol0, newCol1]],
+            },
+          },
+        };
+      });
+
+      toast(`Removed section "${removedName}"`, {
+        icon: "🗑️",
+        duration: 2000,
       });
     },
     [recordSnapshot]
@@ -708,6 +897,9 @@ export const useResumeData = (resumeId) => {
     addArrayItem,
     removeArrayItem,
     toggleSectionVisibility,
+    updateSectionTitle,
+    addCustomSection,
+    removeCustomSection,
     reorderSections,
     updateFontFamily,
     updateDensity,

@@ -3,10 +3,11 @@ import Picture from '../Picture';
 import { MdAlternateEmail } from 'react-icons/md';
 import { hexToRgba, Link } from '../../../utils/helper';
 import BrandIcon from '../../shared/BrandIcon';
+import ResumeQrCode from '../ResumeQrCode';
 
-const ResumeHeader = ({ basics, themeColors, sections }) => {
+const ResumeHeader = ({ basics, themeColors, sections, profiles: propProfiles }) => {
     const profileSection = sections?.profiles;
-    const profiles = profileSection?.items || [];
+    const profiles = propProfiles || profileSection?.items || [];
 
     const summary = sections?.summary;
 
@@ -18,7 +19,7 @@ const ResumeHeader = ({ basics, themeColors, sections }) => {
                 className="p-6 flex items-center space-x-8"
                 style={{ backgroundColor: hexToRgba(themeColors[2], 0.2) }}
             >
-                <div className="space-y-3">
+                <div className="space-y-3 flex-1 min-w-0">
                     <div>
                         <div className="text-3xl font-bold">{basics.name}</div>
                         <div className="text-base font-medium" style={{ color: themeColors[2] }} >{basics.headline}</div>
@@ -34,6 +35,15 @@ const ResumeHeader = ({ basics, themeColors, sections }) => {
                 </div>
 
                 <Picture picture={basics.picture} size={120}/>
+
+                <ResumeQrCode
+                    qrCode={basics?.qrCode}
+                    basics={basics}
+                    profiles={profiles}
+                    themeColors={themeColors}
+                    align="right"
+                    className="shrink-0"
+                />
             </div>
 
             <div className="px-6 py-5 space-y-3" style={{ backgroundColor: hexToRgba(themeColors[2], 0.4) }}>

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { LuBriefcase, LuPlus, LuTrash2 } from "react-icons/lu";
 import SummarySectionForm from "./SummarySectionForm";
 import { defaultExperienceItem } from "../../../constants";
+import SectionFormHeader from "../components/SectionFormHeader";
 
 const ExperienceForm = ({
   experience,
@@ -9,6 +10,10 @@ const ExperienceForm = ({
   addArrayItem,
   removeArrayItem,
   setResumeData,
+  isVisible,
+  onToggleVisibility,
+  title,
+  onRenameTitle,
 }) => {
   // Ensure at least one experience item exists
   useEffect(() => {
@@ -37,20 +42,16 @@ const ExperienceForm = ({
   return (
     <div className="p-1 sm:p-2 space-y-6">
       {/* Header */}
-      <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-            Work Experience
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Add your recent roles, responsibilities, and achievements.
-          </p>
-        </div>
-        <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
-          <LuBriefcase className="w-3.5 h-3.5 text-purple-600" />
-          Experience
-        </span>
-      </div>
+      <SectionFormHeader
+        title={title || "Work Experience"}
+        subtitle="Add your recent roles, responsibilities, and achievements."
+        icon={LuBriefcase}
+        badge="Experience"
+        isVisible={isVisible}
+        onToggleVisibility={onToggleVisibility}
+        sectionKey="experience"
+        onRenameTitle={onRenameTitle}
+      />
 
       {/* Experience Item Cards */}
       <div className="space-y-4">

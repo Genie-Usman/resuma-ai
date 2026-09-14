@@ -2,12 +2,17 @@ import { useEffect } from "react";
 import { LuAward, LuPlus, LuTrash2 } from "react-icons/lu";
 import { defaultCertificationsItem } from "../../../constants";
 import SummarySectionForm from "./SummarySectionForm";
+import SectionFormHeader from "../components/SectionFormHeader";
 
 const CertificationsForm = ({
   certifications,
   updateArrayItem,
   addArrayItem,
   removeArrayItem,
+  isVisible,
+  onToggleVisibility,
+  title,
+  onRenameTitle,
 }) => {
   useEffect(() => {
     document.title = "Resuma AI - Certifications";
@@ -16,20 +21,16 @@ const CertificationsForm = ({
   return (
     <div className="p-1 sm:p-2 space-y-6">
       {/* Header */}
-      <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-            Certifications & Licenses
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Accredited qualifications, professional credentials, and vendor certifications.
-          </p>
-        </div>
-        <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
-          <LuAward className="w-3.5 h-3.5 text-purple-600" />
-          Credentials
-        </span>
-      </div>
+      <SectionFormHeader
+        title={title || "Certifications & Licenses"}
+        subtitle="Accredited qualifications, professional credentials, and vendor certifications."
+        icon={LuAward}
+        badge="Credentials"
+        isVisible={isVisible}
+        onToggleVisibility={onToggleVisibility}
+        sectionKey="certifications"
+        onRenameTitle={onRenameTitle}
+      />
 
       {/* Certification Cards */}
       <div className="space-y-4">

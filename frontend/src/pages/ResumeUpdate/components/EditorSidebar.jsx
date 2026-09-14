@@ -28,6 +28,9 @@ import {
   LuHeartHandshake,
   LuUsers,
   LuFileJson,
+  LuPlus,
+  LuClock,
+  LuListChecks,
 } from "react-icons/lu";
 import SortableSectionItem from "./SortableSectionItem";
 import {
@@ -50,6 +53,20 @@ const SECTION_ICONS = {
   publications: LuBookOpen,
   volunteer: LuHeartHandshake,
   references: LuUsers,
+};
+
+const CUSTOM_TYPE_ICONS = {
+  timeline: LuClock,
+  simple_list: LuListChecks,
+  publications: LuBookOpen,
+  language_matrix: LuLanguages,
+};
+
+const getSectionIcon = (key, sec) => {
+  if (sec?.isCustom || (key && key.startsWith("custom_"))) {
+    return CUSTOM_TYPE_ICONS[sec?.type] || LuClock;
+  }
+  return SECTION_ICONS[key] || LuSparkles;
 };
 
 /**
@@ -124,6 +141,7 @@ const EditorSidebar = ({
   onToggleVisibility,
   onReorderSections,
   onExportJson,
+  onOpenAddSectionModal,
   isSaving,
 }) => {
   const [activeId, setActiveId] = useState(null);
@@ -232,9 +250,29 @@ const EditorSidebar = ({
         const newSidebar = arrayMove(sidebarKeys, oldIndex, newIndex);
         onReorderSections([mainKeys, newSidebar], templateId);
       }
+    } else if (inMain && overSidebar) {
+      // Move from Main column into Sidebar column
+      const newMain = mainKeys.filter((k) => k !== activeId);
+      const overIndex = sidebarKeys.indexOf(overId);
+      const newSidebar = [...sidebarKeys];
+      if (overId === "sidebar-column" || overIndex === -1) {
+        newSidebar.push(activeId);
+      } else {
+        newSidebar.splice(overIndex, 0, activeId);
+      }
+      onReorderSections([newMain, newSidebar], templateId);
+    } else if (inSidebar && overMain) {
+      // Move from Sidebar column into Main column
+      const newSidebar = sidebarKeys.filter((k) => k !== activeId);
+      const overIndex = mainKeys.indexOf(overId);
+      const newMain = [...mainKeys];
+      if (overId === "main-column" || overIndex === -1) {
+        newMain.push(activeId);
+      } else {
+        newMain.splice(overIndex, 0, activeId);
+      }
+      onReorderSections([newMain, newSidebar], templateId);
     }
-    // Note: Cross-column drops (inMain -> overSidebar or inSidebar -> overMain) are intentionally ignored
-    // to preserve template column layout integrity and prevent broken resume layouts.
   };
 
   // Active section data for DragOverlay preview
@@ -283,6 +321,18 @@ const EditorSidebar = ({
           onDragEnd={handleDragEnd}
           autoScroll={false}
         >
+          {/* Add Custom Section Action Button */}
+          {onOpenAddSectionModal && (
+            <button
+              type="button"
+              onClick={onOpenAddSectionModal}
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200/80 transition-all cursor-pointer shadow-2xs mb-3"
+            >
+              <LuPlus className="text-sm" />
+              <span>Add Custom Section</span>
+            </button>
+          )}
+
           {/* ========================================================= */}
           {/* 1-COLUMN TEMPLATES: Single Unified Drag-and-Drop Column   */}
           {/* ========================================================= */}
@@ -306,7 +356,7 @@ const EditorSidebar = ({
                 ) : (
                   flatKeys.map((key) => {
                     const sec = sections[key];
-                    const IconComponent = SECTION_ICONS[key] || LuSparkles;
+                    const IconComponent = getSectionIcon(key, sec);
                     const count = Array.isArray(sec?.items) ? sec.items.length : undefined;
 
                     return (
@@ -354,7 +404,7 @@ const EditorSidebar = ({
                   ) : (
                     mainKeys.map((key) => {
                       const sec = sections[key];
-                      const IconComponent = SECTION_ICONS[key] || LuSparkles;
+                      const IconComponent = getSectionIcon(key, sec);
                       const count = Array.isArray(sec?.items) ? sec.items.length : undefined;
 
                       return (
@@ -396,7 +446,7 @@ const EditorSidebar = ({
                   ) : (
                     sidebarKeys.map((key) => {
                       const sec = sections[key];
-                      const IconComponent = SECTION_ICONS[key] || LuSparkles;
+                      const IconComponent = getSectionIcon(key, sec);
                       const count = Array.isArray(sec?.items) ? sec.items.length : undefined;
 
                       return (
@@ -431,7 +481,10 @@ const EditorSidebar = ({
                     }`}
                   />
                 )}
-                {ActiveIcon && <ActiveIcon className="text-sm text-purple-600" />}
+                {(() => {
+                  const Icon = getSectionIcon(activeId, activeSection);
+                  return <Icon className="text-sm text-purple-600" />;
+                })()}
                 <span className="capitalize">{activeSection.name || activeId}</span>
               </div>
             ) : null}

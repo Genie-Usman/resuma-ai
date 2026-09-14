@@ -116,39 +116,70 @@ A comprehensive guide and specification document outlining planned customization
   * **Puppeteer Vector PDF Sync**: Puppeteer headless export passes `format: "Letter"` or `"A4"` with `@page { size: letter portrait }` or `A4 portrait` in `PrintResume.jsx` ensuring 100% WYSIWYG vector fidelity.
   * **Undo/Redo & Auto-Save**: Managed in `metadata.page.format` via `updatePaperFormat` with single-keystroke `Ctrl+Z` / `Ctrl+Y` rollback.
 
-### 2.3 Section Visibility (Soft-Hide / Archive)
+### 2.3 Section Visibility (Soft-Hide / Archive) ✅ COMPLETED
 * **Goal**: Let users hide sections without permanently deleting content.
-* **UI**: An eye toggle (`LuEye` / `LuEyeOff`) next to each section header in the edit form.
+* **UI**:
+  * **Section Form Header**: An eye toggle (`LuEye` / `LuEyeOff`) with real-time "Visible" / "Hidden" badge next to each section header in the edit form.
+  * **Drawer Header Quick-Toggle**: An eye toggle button in the ContentDrawer top bar next to step steppers for instant one-click toggling without scrolling.
+  * **Jump Menu Status**: Visual `LuEyeOff` "Hidden" pill next to hidden sections in the section picker dropdown.
+  * **Hidden State Alert**: A calm amber notification banner directly above hidden section forms with a one-click "Show Section" recovery button.
+  * **Drag-and-Drop Overview**: Interactive `LuEye` / `LuEyeOff` buttons for each section card in the sections reordering list.
+* **Template & Canvas Integration**:
+  * All 12 templates automatically soft-hide invisible sections (`section.visible === false`) on live canvas, preview modal, browser print, and headless vector PDF exports.
+  * Preserves 100% of underlying user data (descriptions, dates, links, bullets) when toggled off.
 * **Use Case**: Quickly toggling off "Publications" or "Online Profiles" when tailoring a resume for a traditional corporate role, then turning it back on for a tech role.
 
-### 2.4 Section Title Renaming
+### 2.4 Section Title Renaming ✅ COMPLETED
 * **Goal**: Provide flexibility for unconventional career profiles.
 * **Capability**: Click on any section title in the editor to rename it:
   * *"Work Experience"* ➔ *"Professional Experience"*, *"Relevant Experience"*, or *"Clinical Practice"*
   * *"Projects"* ➔ *"Open Source & Key Projects"*, *"Case Studies"*, or *"Portfolio"*
   * *"Online Profiles"* ➔ *"Links & Repositories"*
+* **UI & Interaction**:
+  * **Click-to-Rename**: Hovering over any section title reveals an interactive pencil icon and subtle highlight. Clicking activates an inline input with auto-focus and auto-select.
+  * **Keyboard & Button Controls**: Save with `Enter` or the check button; cancel with `Escape` or the cancel button.
+  * **Curated 1-Click Suggestions**: Displays tailored, industry-standard alternative title chips below the input (e.g. *Clinical Practice*, *Open Source & Key Projects*, *Links & Repositories*, *Academic Background*, *Executive Summary*).
+* **Cross-Studio Propagation**:
+  * Updates `data.sections[sectionKey].name` on every keystroke in real time with debounced undo history snapshots.
+  * Live resume canvas re-renders immediately character-by-character as the user types (just like form inputs).
+  * Automatically propagates across all 12 resume templates, live canvas, preview modal, browser print, and headless PDF export.
+  * Synchronized with ContentDrawer top bar breadcrumbs, section selector dropdown, and drag-and-drop overview list.
+  * Full snapshot history tracking with clean `Ctrl+Z` / `Ctrl+Y` undo/redo and revert on `Escape` / Cancel.
 
 ---
 
 ## 3. Content Flexibility & Custom Sections
 
-### 3.1 Custom / Additional Sections
-* **Goal**: Support specialized professions (academics, lawyers, freelancers, nurses).
-* **Section Types**:
-  * **Standard Timeline** (Organization, Role, Dates, Description, Bullets) — e.g., *Volunteer Work, Leadership, Freelance Engagements*.
-  * **Simple List** (Title, Issuer, Date, Credential URL) — e.g., *Certifications, Awards & Honors, Patents*.
-  * **Publication List** (Paper Title, Journal/Conference, Year, DOI/Link) — e.g., *Publications, Speaking Engagements*.
-  * **Language Matrix** (Language name + visual proficiency dots/bars: *Native, Fluent, Professional, Conversational*).
+### 3.1 Custom / Additional Sections ✅ COMPLETED
+* **Goal**: Support specialized professions (academics, lawyers, freelancers, nurses, researchers).
+* **Supported Archetypes**:
+  * **Standard Timeline** (Organization, Role, Dates, Location, Rich Bullets) — e.g., *Volunteer Work, Leadership, Teaching, Clinical Practice, Freelance Engagements*.
+  * **Simple List** (Title, Issuing Authority, Date, Credential URL) — e.g., *Patents & Inventions, Certifications & Licenses, Honors & Grants, Memberships*.
+  * **Publication List** (Paper Title, Journal/Conference, Year, DOI/Link, Abstract) — e.g., *Publications & Research, Speaking Engagements, Whitepapers*.
+  * **Language Matrix** (Language or Competency Name + 5-tier Visual Proficiency Scale: *Native, Fluent, Professional, Intermediate, Basic*).
+* **Studio Capabilities & Integration**:
+  * **Creation Modal (`AddCustomSectionModal`)**: 10 instant presets, 4 visual archetype cards with color-coded badges, and Main vs. Sidebar column placement picker for two-column templates.
+  * **Live Form Editor (`CustomSectionForm`)**: Dynamic item cards, rich bullets via TipTap, numeric and dot proficiency ratings, live keystroke updates to preview, inline title renaming, and section deletion.
+  * **Universal Template Support**: All 12 templates (`Azurill`, `Bronzor`, `Chikorita`, `Ditto`, `Gengar`, `Glalie`, `Kakuna`, `Leafish`, `Nosepass`, `Onyx`, `Pikachu`, `Rhyhorn`) dynamically dispatch custom archetypes to matching component styles.
+  * **Layout & Organization**: Seamlessly integrated into `ContentDrawer` and `EditorSidebar` with custom archetype icons, drag-and-drop reordering, and visibility toggling.
 
-### 3.2 Discreet QR Code Generator
+
+### 3.2 Discreet QR Code Generator ✅ COMPLETED
 * **Goal**: Bridge the physical paper resume and digital portfolio.
-* **Capability**:
-  * Generate a crisp vector QR code in the contact details header.
-  * Options to point to:
-    * LinkedIn Profile URL
-    * GitHub Profile URL
-    * Personal Portfolio / Website
-  * Toggleable size (discreet 18mm x 18mm with optional subtitle *"Scan for Portfolio"*).
+* **Capabilities Delivered**:
+  * **Crisp Vector SVG Engine**: Generates 100% sharp vector SVG `<path>` QR codes embedded directly into DOM for print, zoom, and headless PDF export.
+  * **Dynamic Destination Resolution**:
+    * Personal Portfolio / Website (auto-synced from `basics.url.href`)
+    * LinkedIn Profile URL (auto-synced from Social Profiles)
+    * GitHub Profile URL (auto-synced from Social Profiles)
+    * Custom URL with inline input and real-time validation
+  * **Size Calibration**:
+    * Discreet 18mm (~68px - recommended unobtrusive recruiter scan)
+    * Standard 22mm (~84px)
+    * Prominent 26mm (~100px)
+  * **High Optical Contrast & Subtitles**: High-contrast white badge border guarantees reliable camera scanning across light and dark template headers. Optional uppercase micro-subtitle (*"Scan for Portfolio"*, *"Scan for LinkedIn"*, *"Scan to Connect"*, or custom).
+  * **Universal Template Integration**: Integrated across all 12 resume template headers (`Azurill`, `Bronzor`, `Chikorita`, `Ditto`, `Gengar`, `Glalie`, `Kakuna`, `Leafish`, `Nosepass`, `Onyx`, `Pikachu`, `Rhyhorn`).
+  * **Live Editor Card**: Interactive live camera preview in `PersonalInfoForm` with active destination indicator, size toggle, and real-time preview feedback.
 
 ### 3.3 Flexible Date Formatting
 * **Goal**: Allow users to adhere to regional or company date norms.

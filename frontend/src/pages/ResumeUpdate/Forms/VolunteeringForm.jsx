@@ -1,9 +1,19 @@
 import { useEffect } from "react";
-import { LuPlus, LuTrash2, LuUsers } from "react-icons/lu";
+import { LuPlus, LuTrash2, LuHeartHandshake } from "react-icons/lu";
 import { defaultVolunteerItem } from "../../../constants";
 import SummarySectionForm from "./SummarySectionForm";
+import SectionFormHeader from "../components/SectionFormHeader";
 
-const VolunteeringForm = ({ volunteer, updateArrayItem, addArrayItem, removeArrayItem }) => {
+const VolunteeringForm = ({
+  volunteer,
+  updateArrayItem,
+  addArrayItem,
+  removeArrayItem,
+  isVisible,
+  onToggleVisibility,
+  title,
+  onRenameTitle,
+}) => {
   useEffect(() => {
     document.title = "Resuma AI - Volunteering";
   }, []);
@@ -11,20 +21,16 @@ const VolunteeringForm = ({ volunteer, updateArrayItem, addArrayItem, removeArra
   return (
     <div className="p-1 sm:p-2 space-y-6">
       {/* Header */}
-      <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-            Volunteering & Leadership
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Non-profit work, community involvement, mentorship, and leadership roles.
-          </p>
-        </div>
-        <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
-          <LuUsers className="w-3.5 h-3.5 text-purple-600" />
-          Community
-        </span>
-      </div>
+      <SectionFormHeader
+        title={title || "Volunteering & Leadership"}
+        subtitle="Non-profit work, community involvement, mentorship, and leadership roles."
+        icon={LuHeartHandshake}
+        badge="Community"
+        isVisible={isVisible}
+        onToggleVisibility={onToggleVisibility}
+        sectionKey="volunteer"
+        onRenameTitle={onRenameTitle}
+      />
 
       {/* Volunteering Cards */}
       <div className="space-y-4">

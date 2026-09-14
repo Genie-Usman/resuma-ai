@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { LuLanguages, LuPlus, LuTrash2 } from "react-icons/lu";
 import { defaultLanguageItem } from "../../../constants";
 import RatingInput from "../../../components/Inputs/RatingInput";
+import SectionFormHeader from "../components/SectionFormHeader";
 
 const LanguageForm = ({
   languages,
@@ -9,6 +10,10 @@ const LanguageForm = ({
   addArrayItem,
   removeArrayItem,
   setResumeData,
+  isVisible,
+  onToggleVisibility,
+  title,
+  onRenameTitle,
 }) => {
   // Ensure at least one language item exists
   useEffect(() => {
@@ -37,20 +42,16 @@ const LanguageForm = ({
   return (
     <div className="p-1 sm:p-2 space-y-6">
       {/* Header */}
-      <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-            Languages
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Spoken and written languages with professional fluency ratings.
-          </p>
-        </div>
-        <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
-          <LuLanguages className="w-3.5 h-3.5 text-purple-600" />
-          Communication
-        </span>
-      </div>
+      <SectionFormHeader
+        title={title || "Languages"}
+        subtitle="Spoken and written languages with professional fluency ratings."
+        icon={LuLanguages}
+        badge="Communication"
+        isVisible={isVisible}
+        onToggleVisibility={onToggleVisibility}
+        sectionKey="languages"
+        onRenameTitle={onRenameTitle}
+      />
 
       {/* Language Cards */}
       <div className="space-y-4">

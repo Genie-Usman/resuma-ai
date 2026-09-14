@@ -2,8 +2,18 @@ import { useEffect } from "react";
 import { LuBookOpen, LuPlus, LuTrash2 } from "react-icons/lu";
 import { defaultPublicationItem } from "../../../constants";
 import SummarySectionForm from "./SummarySectionForm";
+import SectionFormHeader from "../components/SectionFormHeader";
 
-const PublicationsForm = ({ publications, updateArrayItem, addArrayItem, removeArrayItem }) => {
+const PublicationsForm = ({
+  publications,
+  updateArrayItem,
+  addArrayItem,
+  removeArrayItem,
+  isVisible,
+  onToggleVisibility,
+  title,
+  onRenameTitle,
+}) => {
   useEffect(() => {
     document.title = "Resuma AI - Publications";
   }, []);
@@ -11,20 +21,16 @@ const PublicationsForm = ({ publications, updateArrayItem, addArrayItem, removeA
   return (
     <div className="p-1 sm:p-2 space-y-6">
       {/* Header */}
-      <div className="pb-3 border-b border-slate-100 flex items-start sm:items-center justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-            Publications & Research
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Peer-reviewed papers, patents, journal articles, and conference talks.
-          </p>
-        </div>
-        <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
-          <LuBookOpen className="w-3.5 h-3.5 text-purple-600" />
-          Research
-        </span>
-      </div>
+      <SectionFormHeader
+        title={title || "Publications & Research"}
+        subtitle="Peer-reviewed papers, patents, journal articles, and conference talks."
+        icon={LuBookOpen}
+        badge="Research"
+        isVisible={isVisible}
+        onToggleVisibility={onToggleVisibility}
+        sectionKey="publications"
+        onRenameTitle={onRenameTitle}
+      />
 
       {/* Publications Cards */}
       <div className="space-y-4">

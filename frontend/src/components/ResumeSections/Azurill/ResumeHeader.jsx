@@ -1,9 +1,10 @@
 import Picture from "../Picture";
 import { LuMapPin, LuPhone, LuLink } from "react-icons/lu";
 import { MdAlternateEmail } from "react-icons/md";
+import ResumeQrCode from "../ResumeQrCode";
 
-const ResumeHeader = ({ basics, themeColors }) => {
-
+const ResumeHeader = ({ basics, themeColors, profiles, sections }) => {
+  const resolvedProfiles = profiles || sections?.profiles?.items || [];
   const isValidUrl = (v) => typeof v === "string" && v.startsWith("http");
 
   return (
@@ -67,6 +68,15 @@ const ResumeHeader = ({ basics, themeColors }) => {
           </div>
         )}
       </div>
+
+      <ResumeQrCode
+        qrCode={basics?.qrCode}
+        basics={basics}
+        profiles={resolvedProfiles}
+        themeColors={themeColors}
+        align="center"
+        className="pt-1"
+      />
     </div>
   );
 };
