@@ -197,7 +197,7 @@ const CoverLetterDrawer = ({
     }
 
     setIsGenerating(true);
-    const toastId = toast.loading("Synthesizing matched cover letter with AI...", {
+    const toastId = toast.loading("Writing cover letter with AI...", {
       id: "cover-letter-gen",
     });
 
@@ -274,7 +274,7 @@ const CoverLetterDrawer = ({
       // Switch to editor subtab so user can immediately edit
       setActiveSubTab("editor");
 
-      toast.success("Matched cover letter crafted! You can now edit any section.", {
+      toast.success("Cover letter ready! You can now edit any section.", {
         id: toastId,
       });
     } catch (err) {
@@ -304,10 +304,10 @@ const CoverLetterDrawer = ({
           </div>
           <div>
             <h2 className="text-sm font-bold text-slate-800 leading-tight">
-              Matched Cover Letter
+              Cover Letter
             </h2>
             <p className="text-[11px] text-slate-500 leading-tight">
-              Synchronized typography, palette & narrative
+              Matches your resume style and design
             </p>
           </div>
         </div>
@@ -376,9 +376,9 @@ const CoverLetterDrawer = ({
             <div className="bg-slate-50/70 rounded-xl p-3 border border-slate-200/80 space-y-2.5">
               <div className="flex items-center justify-between">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                  <LuUser className="text-xs text-purple-600" /> Recipient Details
+                  <LuUser className="text-xs text-purple-600" /> Recipient Info
                 </label>
-                <span className="text-[10px] text-slate-400">Printed on header</span>
+                <span className="text-[10px] text-slate-400">Shown on letter header</span>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
@@ -460,7 +460,7 @@ const CoverLetterDrawer = ({
             {/* Salutation Input */}
             <div>
               <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                Salutation Greeting
+                Salutation
               </label>
               <input
                 type="text"
@@ -477,7 +477,7 @@ const CoverLetterDrawer = ({
             <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-                  Letter Body (Rich Text)
+                  Letter Body
                 </label>
                 <span className="text-[10px] text-slate-400">
                   Bold, italic, and bullet lists supported
@@ -490,16 +490,16 @@ const CoverLetterDrawer = ({
               </div>
             </div>
 
-            {/* Formal Sign-Off & Signature */}
+            {/* Sign-off & Signature */}
             <div className="bg-slate-50/70 rounded-xl p-3 border border-slate-200/80 space-y-2.5">
               <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
-                Sign-off & Signature
+                Sign-off & Name
               </label>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-[10px] font-medium text-slate-500 block mb-0.5">
-                    Sign-off Phrase
+                    Sign-off
                   </label>
                   <input
                     type="text"
@@ -514,7 +514,7 @@ const CoverLetterDrawer = ({
 
                 <div>
                   <label className="text-[10px] font-medium text-slate-500 block mb-0.5">
-                    Candidate Signature
+                    Your Name
                   </label>
                   <input
                     type="text"
@@ -536,9 +536,9 @@ const CoverLetterDrawer = ({
           <div className="space-y-3.5">
             <div className="p-3 bg-linear-to-r from-purple-50 to-indigo-50 border border-purple-200/70 rounded-xl text-xs text-purple-900 leading-relaxed">
               <p className="font-semibold flex items-center gap-1 mb-1">
-                <LuSparkles className="text-purple-600" /> Automatic Resume Synchronization
+                <LuSparkles className="text-purple-600" /> Tailored from Your Resume
               </p>
-              Resuma AI reads your work experience, quantified achievements, and target role to compose a tailored letter aligned directly with this employer.
+              Uses your real experience and the job description to write a clear, personalized letter for this role.
             </div>
 
             {/* Target Company & Job Title */}
@@ -579,14 +579,14 @@ const CoverLetterDrawer = ({
             {/* Tone Selector */}
             <div>
               <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                Letter Tone & Voice
+                Tone
               </label>
               <div className="grid grid-cols-2 gap-1.5">
                 {[
-                  { id: "impactful", label: "Impactful", desc: "Results-driven & confident" },
-                  { id: "formal", label: "Formal", desc: "Traditional executive cadence" },
-                  { id: "technical", label: "Technical", desc: "Architecture & engineering focus" },
-                  { id: "conversational", label: "Conversational", desc: "Modern startup warmth" },
+                  { id: "impactful", label: "Impactful", desc: "Confident & results-focused" },
+                  { id: "formal", label: "Formal", desc: "Professional & classic" },
+                  { id: "technical", label: "Technical", desc: "Clear & engineering-focused" },
+                  { id: "conversational", label: "Conversational", desc: "Warm & approachable" },
                 ].map((item) => (
                   <button
                     key={item.id}
@@ -613,7 +613,7 @@ const CoverLetterDrawer = ({
             {/* Job Description Textarea */}
             <div>
               <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                Pasted Job Description
+                Job Description
               </label>
               <textarea
                 rows={7}
@@ -634,12 +634,12 @@ const CoverLetterDrawer = ({
               {isGenerating ? (
                 <>
                   <LuRefreshCw className="text-sm animate-spin" />
-                  <span>Synthesizing Matched Cover Letter...</span>
+                  <span>Writing Cover Letter...</span>
                 </>
               ) : (
                 <>
                   <LuSparkles className="text-sm" />
-                  <span>Generate Matched Cover Letter</span>
+                  <span>Generate Cover Letter</span>
                 </>
               )}
             </button>

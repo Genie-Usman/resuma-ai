@@ -507,6 +507,34 @@ Return strictly valid JSON with the following structure (no extra text, no markd
 /**
  * Generate a synchronized, highly tailored 1-page Cover Letter (Roadmap Item 4.4)
  */
+const COVER_LETTER_TONE_DIRECTIVES = {
+    formal: `
+TONE: PROFESSIONAL & POLISHED
+- Clear, dignified, and professional without stiff corporate bureaucracy.
+- Sound like a credible, capable candidate communicating with respect and clarity.
+`,
+    impactful: `
+TONE: DIRECT & RESULTS-FOCUSED
+- Confident and clear, focused on real outcomes and practical problem-solving.
+- Plainly state what was built, improved, or delivered, with concrete numbers.
+- Use natural, active verbs like "built", "led", "improved", "designed", "scaled", "delivered".
+`,
+    concise: `
+TONE: CONCISE & TO THE POINT
+- Short, clear sentences. No filler words, preamble, or repetition.
+`,
+    technical: `
+TONE: TECHNICAL & PRACTICAL
+- Clear engineering language without buzzword salad.
+- Mention specific tools, languages, architectures, and performance gains naturally as a builder.
+`,
+    conversational: `
+TONE: WARM & NATURAL
+- Personable, approachable, and engaging.
+- Sounds like a thoughtful letter from someone who genuinely cares about the craft and company.
+`
+};
+
 const generateCoverLetter = async ({
     jobDescription,
     companyName = "",
@@ -545,11 +573,12 @@ const generateCoverLetter = async ({
         })),
     };
 
-    const toneInstruction = TONE_DIRECTIVES[tone] || TONE_DIRECTIVES.impactful;
+    const toneInstruction =
+        COVER_LETTER_TONE_DIRECTIVES[tone] || COVER_LETTER_TONE_DIRECTIVES.impactful;
 
     const prompt = `
-You are an executive career advisor and expert cover letter writer.
-Generate a compelling, highly tailored 1-page cover letter matching the candidate's authentic resume experience directly to the target role and company.
+You are an expert career advisor writing a clear, compelling 1-page cover letter for a job applicant.
+The letter must connect the candidate's real resume experience with the target role and company.
 
 TARGET COMPANY: ${companyName || "Target Company (infer from Job Description if mentioned)"}
 TARGET JOB TITLE: ${jobTitle || "Target Role (infer from Job Description if mentioned)"}
@@ -560,18 +589,38 @@ ${jobDescription}
 CANDIDATE PROFILE & RESUME:
 ${JSON.stringify(cleanCandidate, null, 2)}
 
-TONE GUIDELINES:
+TONE:
 ${toneInstruction}
 
-WRITING RULES:
-1. Ground the narrative in REAL candidate achievements and metrics from their resume (do not invent fake companies, degrees, or metrics).
-2. Connect their specific accomplishments directly to the target company's mission, stack, and challenges outlined in the job description.
-3. Structure for maximum hiring manager impact:
-   - Compelling Hook/Opening: State the target role, why this company excites them, and a strong thesis statement.
-   - Core Paragraph 1: Major relevant career win / leadership / technical contribution with quantifiable metrics.
-   - Core Paragraph 2: Secondary strength (domain alignment, scalability, cross-functional execution, or relevant tech stack).
-   - Confident Call to Action & Value Proposition: Why they are ready to deliver immediate value from day one.
-4. Keep the length balanced so it fits comfortably on a single page (~250-350 words total).
+STRICT WRITING RULES (ANTI-JARGON POLICY):
+1. ABSOLUTELY NO CORPORATE JARGON, AI BUZZWORDS, OR CLICHES:
+   - FORBIDDEN PHRASES & WORDS:
+     * "vertical slices", "shipping vertical slices", "handling vertical slices"
+     * "stringent operational demands", "under stringent demands"
+     * "synergy", "synergize", "synergistic"
+     * "zero tolerance for unverified outputs"
+     * "multiply productivity"
+     * "remove bottlenecks and accelerate your product roadmap"
+     * "game-changer", "paradigm shift", "dynamic self-starter", "thought leader"
+     * "hit the ground running", "wear multiple hats", "fast-paced environment"
+     * "mission-critical", "cutting-edge tooling", "robust solutions"
+     * Avoid overusing "spearheaded" (use "led", "built", "managed", "directed")
+     * Avoid overusing "orchestrated" (use "coordinated", "designed", "organized")
+     * Avoid "leveraged" or "utilized" (use "used", "applied", "worked with")
+2. WRITE LIKE A NATURAL, CONFIDENT HUMAN:
+   - Write clear, honest, plain-English sentences that a human recruiter or engineering manager will enjoy reading.
+   - Explain what the candidate actually created, built, or fixed, how they solved the problem, and what the real-world result was.
+   - Example of bad jargon: "I orchestrated high-throughput semantic retrieval engines across distributed architectures to drive synergy."
+   - Example of good plain English: "At NovaScale, I built the search engine that dropped query latency from 420ms to 68ms and handled over 100 million embeddings."
+3. REAL EXPERIENCE ONLY:
+   - Stick strictly to the candidate's actual projects, skills, companies, and numbers. Never invent fake credentials or exaggerated claims.
+4. STRUCTURE:
+   - Opening (1 paragraph, 3-4 sentences): State the role you're applying for, why this specific company interests you, and your core background.
+   - Body Paragraph 1 (3-4 sentences): One strong real accomplishment or project. What you built, what tech was used, and what result you achieved.
+   - Body Paragraph 2 (3-4 sentences): Your core skills, hands-on experience, and how you collaborate with a team.
+   - Closing (2-3 sentences): A warm, professional sign-off expressing interest in talking further.
+5. KEEP IT CRISP:
+   - Keep total length between 220 and 300 words so it fits cleanly on one page.
 
 Return strictly valid JSON with the following structure (no extra text, no markdown fences):
 {
@@ -586,13 +635,13 @@ Return strictly valid JSON with the following structure (no extra text, no markd
   "salutation": "Dear Hiring Team,",
   "opening": "Opening paragraph text...",
   "bodyParagraphs": [
-    "First core body paragraph highlighting a key accomplishment...",
-    "Second core body paragraph detailing skills and alignment..."
+    "First core body paragraph...",
+    "Second core body paragraph..."
   ],
-  "callToAction": "Closing call to action paragraph expressing enthusiasm for discussing how the candidate can drive results...",
+  "callToAction": "Closing paragraph...",
   "signOff": "Sincerely,",
   "signature": "${cleanCandidate.name}",
-  "fullHtml": "<p>Opening paragraph text...</p><p>First core body paragraph...</p><p>Second core body paragraph...</p><p>Closing call to action paragraph...</p>"
+  "fullHtml": "<p>Opening paragraph text...</p><p>First core body paragraph...</p><p>Second core body paragraph...</p><p>Closing paragraph...</p>"
 }
 `;
 

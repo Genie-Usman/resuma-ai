@@ -218,7 +218,7 @@ const MatchedCoverLetter = ({
                 No Cover Letter Generated Yet
               </h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
-                Open the <strong>Cover Letter</strong> drawer on the left activity rail, paste the job description, and click <strong>Generate Matched Cover Letter</strong> to craft an executive letter synchronized with your resume.
+                Open the <strong>Cover Letter</strong> drawer on the left, paste the job description, and click <strong>Generate Cover Letter</strong> to create a personalized letter that matches your resume.
               </p>
             </div>
           </div>
