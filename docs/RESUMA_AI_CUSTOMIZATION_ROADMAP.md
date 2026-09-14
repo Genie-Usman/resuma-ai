@@ -38,51 +38,83 @@ A comprehensive guide and specification document outlining planned customization
   * Persistence to MongoDB in `metadata.typography.density` and `metadata.typography.lineHeight`.
   * Global Undo/Redo (`Ctrl+Z` / `Ctrl+Y`) and headless PDF export synchronization.
 
-### 1.3 Page Margin Adjuster
-* **Goal**: Allow users to adjust physical page margins on the A4/Letter sheet.
-* **Presets**:
-  * **Narrow** (`12mm` / `0.47in`): Maximizes printable area.
-  * **Standard** (`18mm` / `0.7in`): Recommended for balanced aesthetic.
-  * **Wide** (`24mm` / `0.95in`): Elegant, editorial look for lighter content.
-* **PDF Sync**: Passed directly to Puppeteer `@page { margin: ... }` in `backend/services/pdfService.js` to ensure 100% WYSIWYG fidelity.
+### 1.3 Page Margin Adjuster (✅ Implemented)
+* **Goal**: Allow users to adjust physical page margins on the A4 sheet in real-time.
+* **Integrated Presets**:
+  * **Narrow (`12mm` / `0.47in`)**: Maximizes printable canvas area (`padding: 12px`). Ideal when paired with Compact density to pull long content onto 1 page.
+  * **Standard (`18mm` / `0.7in`)**: Recommended balanced default (`padding: 20px`).
+  * **Wide (`24mm` / `0.95in`)**: Elegant, editorial look for executive or concise profiles (`padding: 28px`).
+* **Implementation Details**:
+  * Directly controllable via the **Display Dropdown** on the canvas toolbar with 3-segment preset buttons (`Narrow`, `Standard`, `Wide`).
+  * Scoped CSS classes (`.resume-margin-narrow`, `.resume-margin-standard`, `.resume-margin-wide`) in `frontend/src/index.css`.
+  * Auto-recalculates page heights and cutoff guides in real-time via `usePageCalculator`.
+  * Full Undo/Redo (`Ctrl+Z` / `Ctrl+Y`) and auto-save persistence to MongoDB in `metadata.page.margin` & `metadata.page.marginPreset`.
+  * Automatically propagates to `/print/:id` ensuring 100% WYSIWYG fidelity in downloaded vector PDFs.
 
-### 1.4 Custom Color Palette Builder & Contrast Checker
-* **Goal**: Expand beyond preset color palettes with a custom color picker.
+### 1.4 Custom Color Palette Builder & Contrast Checker (✅ Implemented)
+* **Goal**: Expand beyond preset color palettes with a custom color picker and real-time WCAG 2.2 accessibility scoring.
 * **Features**:
-  * **Hex / HSL Picker**: Allows picking exact corporate or personal brand colors.
-  * **Real-time WCAG Contrast Checker**: Automatically warns if the selected accent color produces insufficient contrast against white paper (minimum 4.5:1 ratio for body text, 3:1 for large headers).
-  * **Color Roles**: Primary Accent (headers, icons), Secondary Accent (dates, subtitles), Neutral Dark (body text).
+  * **Interactive Hex & Native Color Wheel**: Pick colors visually or type exact 6-digit hex values (`#RRGGBB`) with real-time uppercase normalization.
+  * **Real-time WCAG 2.2 Relative Luminance Math**: Computes relative luminance ($L = 0.2126R + 0.7152G + 0.0722B$) and exact contrast ratio ($L_1+0.05 / L_2+0.05$).
+  * **Accessibility Readability Badges**:
+    * `AAA` ($\ge 7.0:1$): Exemplary contrast badge.
+    * `AA` ($\ge 4.5:1$): Full compliance badge for normal body text.
+    * `AA Large` ($\ge 3.0:1$): Approved for large section headers and bold titles.
+    * `Fail` ($< 3.0:1$): Low contrast warning with diagnostic advice.
+  * **3 Core Color Roles**:
+    * **Primary Accent** (`metadata.theme.primary`): Section headers, icons, bullets, timeline markers.
+    * **Neutral Dark** (`metadata.theme.text`): Body paragraphs, bullet text, descriptions.
+    * **Paper Background** (`metadata.theme.background`): Pure White (`#FFFFFF`), Crisp Ivory (`#FAFAF9`), Soft Cream (`#FDFBF7`), Cool Slate (`#F8FAFC`).
+  * **Curated Executive Quick-Picks**: 12 corporate/tech executive accent swatches (Navy, Cobalt, Deep Indigo, Emerald, Teal, Slate, Crimson, Burgundy, Royal Violet, Bronze, Amber Gold, Charcoal).
+  * **Canvas Top Bar Integration**: Quick `[ 🟢 Theme ]` button on the canvas bar displaying the active accent color for instant one-click access.
+  * **Undo/Redo & Auto-Save**: Immediate snapshot recording (`isStructural = true`) so color changes can be undone/redone via `Ctrl+Z` / `Ctrl+Y` and auto-saved to MongoDB.
+  * **CSS Custom Variable Cascade**: Emits `--resume-color-bg`, `--resume-color-text`, and `--resume-color-primary` on the resume container.
 
-### 1.5 Section Header Decorator Styles
-* **Goal**: Customize how section headers (e.g., "Work Experience", "Education") render.
+### 1.5 Section Header Decorator Styles (✅ Implemented)
+* **Goal**: Customize how section headers (e.g., "Work Experience", "Education") render across all 12 templates.
 * **Styles**:
-  * `Underline` (thin colored line across the width)
-  * `Left Accent Bar` (thick vertical colored bar to the left of the title)
-  * `Pill / Badge` (subtle light-tinted background badge)
-  * `Minimal Uppercase` (clean tracked uppercase with no lines)
+  * `Default`: Preserves the template author's original intended header style.
+  * `Underline`: Thin horizontal colored rule (`border-bottom: 2px solid var(--resume-color-primary)`) stretching across the section title.
+  * `Left Accent Bar`: Thick vertical colored accent bar (`border-left: 3.5px solid var(--resume-color-primary)`) on the left of the title.
+  * `Pill / Badge`: Subtle tinted background badge (`color-mix` accent tint with rounded corners and border) framing the section title.
+  * `Minimal Uppercase`: Clean, contemporary tracked uppercase typography style (`letter-spacing: 0.08em; text-transform: uppercase`) with no lines or badges.
+* **Implementation & UI**:
+  * Scoped CSS classes (`.resume-header-default`, `.resume-header-underline`, `.resume-header-left-bar`, `.resume-header-pill`, `.resume-header-minimal`) in `frontend/src/index.css`.
+  * Inherits active primary accent color dynamically via `--resume-color-primary`.
+  * Seamlessly integrated into `[ ⚙ Display ▾ ]` on the canvas toolbar with tactile selection pills.
+  * Full Undo/Redo (`Ctrl+Z` / `Ctrl+Y`) and auto-save persistence to MongoDB in `metadata.typography.headerStyle`.
+  * Headless vector PDF sync ensures downloaded PDFs match the selected header decorator with 100% WYSIWYG fidelity.
 
 ---
 
 ## 2. Canvas & Page Layout Intelligence
 
-### 2.1 "Shrink to 1 Page" (Smart Auto-Fit)
+### 2.1 "Shrink to 1 Page" (Smart Auto-Fit) (✅ Implemented)
 * **Problem**: Users often have 2 to 4 orphan lines spilling over onto Page 2.
 * **Solution**: A single-click optimization algorithm:
-  * Measures total sheet overflow height.
-  * Incrementally micro-tunes:
-    * Font size (`-0.25pt` increments down to a safe minimum of `9.5pt`).
-    * Section vertical margins (`-1px` increments).
-    * Line height (`-0.05` increments down to `1.25`).
-  * Stops immediately when total document height $\le 1123\text{px}$ (exact A4 height).
-  * Toast notification: *"Optimized! All content now fits cleanly on 1 page."*
+  * Measures total sheet overflow height against exact A4 height (`1123px`).
+  * Real-time synchronous DOM probing determines the least-invasive configuration:
+    1. Evaluates margin reduction: `wide` -> `standard`.
+    2. Evaluates density compression: `spacious` / `normal` -> `compact` (`0.92x`, line-height `1.28`, section margin `0.55rem`).
+    3. Evaluates printable margin expansion: `narrow` (`12mm` / `0.47in`).
+    4. Evaluates micro font scale: down to safe threshold `0.85x` (~`9.5pt`) using CSS variable `--resume-font-scale`.
+  * Stops immediately as soon as total document height $\le 1123\text{px}$.
+  * Takes an atomic undo snapshot (`isStructural = true`), allowing `Ctrl+Z` to revert in a single keystroke.
+  * Auto-saves to MongoDB and syncs with Puppeteer headless vector PDF export.
+  * Features dedicated `[ ✨ Shrink to 1 Page ]` button in the top canvas bar (with pulsing amber alert when near 1 page) and inside `[ ⚙ Display ▾ ]`.
+  * Toast notification: *"✨ Optimized! Content fitted cleanly onto 1 page."*
 
-### 2.2 Paper Size Standard Switcher (A4 vs. US Letter)
+### 2.2 Paper Size Standard Switcher (A4 vs. US Letter) (✅ Implemented)
 * **Problem**: North American job applications prefer US Letter (`8.5" x 11"` / `816px x 1056px`), while international applications mandate A4 (`210mm x 297mm` / `794px x 1123px`).
-* **Solution**:
-  * Add a paper size toggle in the Canvas `Display` dropdown:
-    * `A4 Paper (210 × 297 mm)`
-    * `US Letter (8.5 × 11 in)`
-  * Updates both the preview canvas dimensions and Puppeteer's PDF generation options (`format: 'A4'` vs `format: 'Letter'`).
+* **Implementation & Studio 2.0 Integration**:
+  * **Dynamic Paper Geometry**:
+    * **A4 Standard**: `210 × 297 mm` (`794 × 1123 px` at 96 DPI, aspect ratio ~`1.414`)
+    * **US Letter Standard**: `8.5 × 11 in` (`816 × 1056 px` at 96 DPI, aspect ratio `1.294`)
+  * **Studio 2.0 Activity Rail & Contextual Drawer**: Integrated into the dedicated **`Design & Formatting`** drawer with tactile switcher cards (`[ 📄 A4 Paper ]` vs `[ 📄 US Letter ]`).
+  * **Canvas & Pagination Engine**: `usePageCalculator(sheetContentRef, paperFormat)` recalculates page count, break positions, and overflow metrics against the active paper dimensions.
+  * **Auto-Fit Recalibration**: `handleShrinkToOnePage` auto-calibrates candidate probing against the active paper height (`1056px` for US Letter, `1123px` for A4).
+  * **Puppeteer Vector PDF Sync**: Puppeteer headless export passes `format: "Letter"` or `"A4"` with `@page { size: letter portrait }` or `A4 portrait` in `PrintResume.jsx` ensuring 100% WYSIWYG vector fidelity.
+  * **Undo/Redo & Auto-Save**: Managed in `metadata.page.format` via `updatePaperFormat` with single-keystroke `Ctrl+Z` / `Ctrl+Y` rollback.
 
 ### 2.3 Section Visibility (Soft-Hide / Archive)
 * **Goal**: Let users hide sections without permanently deleting content.

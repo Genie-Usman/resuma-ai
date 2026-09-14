@@ -144,11 +144,50 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
       ? "resume-density-spacious"
       : "resume-density-normal";
 
+  const activeMargin =
+    safeMetadata?.page?.marginPreset ||
+    (safeMetadata?.page?.margin === 12
+      ? "narrow"
+      : safeMetadata?.page?.margin === 24
+      ? "wide"
+      : "standard");
+
+  const marginClass =
+    activeMargin === "narrow"
+      ? "resume-margin-narrow"
+      : activeMargin === "wide"
+      ? "resume-margin-wide"
+      : "resume-margin-standard";
+
+  const activeHeaderStyle =
+    safeMetadata?.typography?.headerStyle ||
+    safeMetadata?.headerStyle ||
+    "default";
+
+  const headerStyleClass =
+    activeHeaderStyle === "underline"
+      ? "resume-header-underline"
+      : activeHeaderStyle === "left-bar"
+      ? "resume-header-left-bar"
+      : activeHeaderStyle === "pill"
+      ? "resume-header-pill"
+      : activeHeaderStyle === "minimal"
+      ? "resume-header-minimal"
+      : "resume-header-default";
+
+  const fontScale = safeMetadata?.typography?.fontScale;
+
   return (
     <div
-      className={`w-full h-full resume-font-root ${densityClass}`}
+      className={`w-full h-full resume-font-root ${densityClass} ${marginClass} ${headerStyleClass}`}
       style={{
         fontFamily: `"${activeFont}", ${getFontFallback(safeMetadata?.typography?.font?.category)}`,
+        "--resume-color-bg": themeColors[0] || "#ffffff",
+        "--resume-color-text": themeColors[1] || "#000000",
+        "--resume-color-primary": themeColors[2] || "#ca8a04",
+        ...(fontScale && fontScale !== 1
+          ? { "--resume-font-scale": `${(fontScale * 100).toFixed(1)}%` }
+          : {}),
       }}
     >
       {renderTemplateComponent()}

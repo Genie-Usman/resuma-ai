@@ -43,12 +43,12 @@ const ExperienceForm = ({
             Work Experience
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Highlight your career trajectory, achievements, and quantifiable business impact.
+            Add your recent roles, responsibilities, and achievements.
           </p>
         </div>
         <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
           <LuBriefcase className="w-3.5 h-3.5 text-purple-600" />
-          Core Section
+          Experience
         </span>
       </div>
 

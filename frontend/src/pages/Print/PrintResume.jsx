@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
-import { A4_WIDTH_PX } from "../ResumeUpdate/hooks/usePageCalculator";
+import { A4_WIDTH_PX, getPaperDimensions } from "../ResumeUpdate/hooks/usePageCalculator";
 import axiosInstance from "../../utils/axiosInstance";
 import { loadGoogleFont } from "../../utils/googleFonts";
 
@@ -88,13 +88,15 @@ const PrintResume = ({ isPublic = false }) => {
   }
 
   const templateId = resumeData.data?.metadata?.template || "azurill";
+  const paperFormat = resumeData.data?.metadata?.page?.format || "a4";
+  const paperConfig = getPaperDimensions(paperFormat);
 
   return (
     <div className="print-root min-h-screen bg-white text-slate-900 antialiased">
-      {/* Explicit A4 CSS print styles */}
+      {/* Explicit Dynamic CSS print styles */}
       <style>{`
         @page {
-          size: A4 portrait;
+          size: ${paperConfig.cssSize};
           margin: 0mm;
         }
         @media print {
@@ -110,7 +112,7 @@ const PrintResume = ({ isPublic = false }) => {
             print-color-adjust: exact !important;
           }
           .a4-print-sheet {
-            width: 210mm !important;
+            width: ${paperConfig.sheetWidthCss} !important;
             height: auto !important;
             margin: 0 auto !important;
             padding: 0 !important;
@@ -138,15 +140,15 @@ const PrintResume = ({ isPublic = false }) => {
         }
       `}</style>
 
-      {/* A4 Container */}
+      {/* Sheet Container */}
       <div
         className="a4-print-sheet bg-white mx-auto overflow-visible"
-        style={{ width: `${A4_WIDTH_PX}px`, minHeight: "1123px" }}
+        style={{ width: `${paperConfig.widthPx}px`, minHeight: `${paperConfig.heightPx}px` }}
       >
         <RenderResume
           templateId={templateId}
           resumeData={resumeData.data}
-          containerWidth={A4_WIDTH_PX}
+          containerWidth={paperConfig.widthPx}
         />
       </div>
 

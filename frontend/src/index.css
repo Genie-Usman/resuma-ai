@@ -529,7 +529,7 @@ h1, h2, h3, h4, h5, h6,
 /* 1. Compact Density Mode */
 .resume-density-compact {
   line-height: 1.28 !important;
-  font-size: 92% !important;
+  font-size: var(--resume-font-scale, 92%) !important;
 }
 
 .resume-density-compact p,
@@ -583,10 +583,15 @@ h1, h2, h3, h4, h5, h6,
   column-gap: 0.85rem !important;
 }
 
-/* 2. Spacious Density Mode */
+/* 2. Standard Density Mode */
+.resume-density-normal {
+  font-size: var(--resume-font-scale, 100%) !important;
+}
+
+/* 3. Spacious Density Mode */
 .resume-density-spacious {
   line-height: 1.65 !important;
-  font-size: 104% !important;
+  font-size: var(--resume-font-scale, 104%) !important;
 }
 
 .resume-density-spacious p,
@@ -640,4 +645,109 @@ h1, h2, h3, h4, h5, h6,
   column-gap: 1.6rem !important;
 }
 
-
+/* ==========================================================================
+   Resume Page Margin Presets (Narrow: 12mm, Standard: 18mm, Wide: 24mm)
+   ========================================================================== */
+
+/* 1. Narrow Margins (12mm / ~45px - Maximum printable area) */
+.resume-margin-narrow .p-5,
+.resume-margin-narrow .px-5,
+.resume-margin-narrow .py-5,
+.resume-margin-narrow .p-6,
+.resume-margin-narrow .px-6,
+.resume-margin-narrow .py-6 {
+  padding: 12px !important;
+}
+
+.resume-margin-narrow .sidebar.p-5,
+.resume-margin-narrow .main.p-5 {
+  padding: 12px !important;
+}
+
+/* 2. Standard Margins (18mm / ~68px - Recommended Default) */
+.resume-margin-standard .p-5,
+.resume-margin-standard .px-5,
+.resume-margin-standard .py-5 {
+  padding: 20px !important;
+}
+
+/* 3. Wide Margins (24mm / ~90px - Elegant editorial aesthetic) */
+.resume-margin-wide .p-5,
+.resume-margin-wide .px-5,
+.resume-margin-wide .py-5,
+.resume-margin-wide .p-6,
+.resume-margin-wide .px-6,
+.resume-margin-wide .py-6 {
+  padding: 28px !important;
+}
+
+.resume-margin-wide .sidebar.p-5,
+.resume-margin-wide .main.p-5 {
+  padding: 26px !important;
+}
+
+/* ==========================================================================
+   Section Header Decorator Styles (Underline, Left Bar, Pill Badge, Minimal)
+   ========================================================================== */
+
+/* 1. Underline: Horizontal accent line across section title */
+.resume-header-underline section > h4,
+.resume-header-underline section > div > h4,
+.resume-header-underline section h4 {
+  border-bottom: 2px solid var(--resume-color-primary, #ca8a04) !important;
+  border-left: none !important;
+  border-top: none !important;
+  border-right: none !important;
+  padding-bottom: 4px !important;
+  margin-bottom: 8px !important;
+  background: transparent !important;
+}
+
+/* 2. Left Accent Bar: Modern vertical colored bar on the left */
+.resume-header-left-bar section > h4,
+.resume-header-left-bar section > div > h4,
+.resume-header-left-bar section h4 {
+  border-left: 3.5px solid var(--resume-color-primary, #ca8a04) !important;
+  border-bottom: none !important;
+  border-top: none !important;
+  border-right: none !important;
+  padding-left: 8px !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 8px !important;
+  background: transparent !important;
+}
+
+/* 3. Pill / Badge: Subtle tinted background badge */
+.resume-header-pill section > h4,
+.resume-header-pill section > div > h4,
+.resume-header-pill section h4 {
+  display: inline-block !important;
+  padding: 3px 10px !important;
+  border-radius: 6px !important;
+  background-color: rgba(202, 138, 4, 0.1) !important;
+  background-color: color-mix(in srgb, var(--resume-color-primary, #ca8a04) 12%, transparent) !important;
+  border: 1px solid rgba(202, 138, 4, 0.25) !important;
+  border: 1px solid color-mix(in srgb, var(--resume-color-primary, #ca8a04) 28%, transparent) !important;
+  margin-bottom: 8px !important;
+}
+
+/* 4. Minimal Uppercase: Clean tracked uppercase with no lines or badges */
+.resume-header-minimal section > h4,
+.resume-header-minimal section > div > h4,
+.resume-header-minimal section h4 {
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-bottom: 6px !important;
+  background: transparent !important;
+}
+
+
+/* Hide legacy heading dots in custom decorated modes */
+.resume-header-underline .heading-dot,
+.resume-header-left-bar .heading-dot,
+.resume-header-pill .heading-dot,
+.resume-header-minimal .heading-dot {
+  display: none !important;
+}

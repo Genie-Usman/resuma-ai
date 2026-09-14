@@ -135,14 +135,14 @@ const ResumeAuditModal = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold text-slate-900">
-                  Resume Diagnostic Audit
+                  Resume Review
                 </h2>
                 <span className="px-2 py-0.5 text-[10px] font-bold text-purple-700 bg-purple-100 rounded-full tracking-wide">
-                  6-Pillar ATS Engine
+                  Full Quality Check
                 </span>
               </div>
               <p className="text-xs text-slate-500">
-                Deterministic rule evaluation & deep executive intelligence
+                Helpful suggestions to polish your resume before applying
               </p>
             </div>
           </div>
@@ -213,20 +213,20 @@ const ResumeAuditModal = ({
             {/* Middle: Diagnostic Health Overview */}
             <div className="flex-1 space-y-2 text-center md:text-left border-y md:border-y-0 md:border-l border-slate-100 md:pl-6 py-3 md:py-0 w-full">
               <h3 className="text-sm font-bold text-slate-900">
-                Executive Audit Status
+                Review Summary
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
                 {score >= 80
-                  ? "Your resume demonstrates high quantifiable impact, clear structural hierarchy, and compliant ATS formatting. Excellent work!"
+                  ? "Your resume has clear formatting, strong bullet points, and good structure. Ready to apply!"
                   : score >= 65
-                  ? `Your profile is strong but has ${auditReport.totalIssues} high-leverage areas for refinement before top-tier ATS submission.`
-                  : `Detected ${auditReport.totalIssues} critical issues that may cause automated ATS rejection or recruiter drop-off.`}
+                  ? `Your profile is strong, with ${auditReport.totalIssues} quick suggestions to make it even better.`
+                  : `Found ${auditReport.totalIssues} suggestions that will help improve clarity and recruiter interest.`}
               </p>
 
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-1">
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                  {auditReport.totalChecks} Automated Checks
+                  {auditReport.totalChecks} Checks Completed
                 </span>
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">
                   <span
@@ -257,12 +257,12 @@ const ResumeAuditModal = ({
                 ) : (
                   <>
                     <LuSparkles className="text-sm" />
-                    <span>Run Deep AI Audit</span>
+                    <span>Get AI Suggestions</span>
                   </>
                 )}
               </button>
               <span className="text-[11px] text-slate-400 mt-1.5">
-                Executive tone & bullet rewrites
+                Tone & bullet point improvements
               </span>
             </div>
           </div>
@@ -276,7 +276,7 @@ const ResumeAuditModal = ({
                     <LuSparkles className="text-sm" />
                   </div>
                   <h3 className="text-sm font-bold text-slate-900">
-                    Executive Gemini AI Analysis
+                    AI Review & Suggestions
                   </h3>
                 </div>
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800">
@@ -318,7 +318,7 @@ const ResumeAuditModal = ({
                 <div className="space-y-2 pt-2">
                   <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <LuAward className="text-purple-600" />
-                    Recommended Bullet Rewrites (Google X-Y-Z Formula)
+                    Recommended Bullet Rewrites (Measurable Results)
                   </h4>
                   <div className="space-y-2">
                     {aiAuditResult.bulletRewrites.map((rewrite, rIdx) => (
@@ -358,14 +358,14 @@ const ResumeAuditModal = ({
             </div>
           )}
 
-          {/* Diagnostic Pillars (6 Accordions) */}
+          {/* Category Breakdown (6 Accordions) */}
           <div className="space-y-3">
             <div className="flex items-center justify-between px-1">
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                Detailed Diagnostic Breakdown
+                Review by Category
               </h3>
               <span className="text-[11px] text-slate-400">
-                Click any pillar or check to inspect findings
+                Click any category to view suggestions
               </span>
             </div>
 

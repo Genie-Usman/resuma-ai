@@ -108,7 +108,7 @@ async function launchHeadlessBrowser() {
  * Generates a pixel-perfect, 100% vector PDF using Headless Chromium.
  * Navigates to the dedicated print view, waits for fonts & assets, and renders vector PDF.
  */
-async function generateVectorPdf({ resumeId, token, slug, isPublic = false, frontendUrl = "" }) {
+async function generateVectorPdf({ resumeId, token, slug, isPublic = false, frontendUrl = "", format = "A4" }) {
   const browser = await launchHeadlessBrowser();
   let page = null;
 
@@ -149,9 +149,10 @@ async function generateVectorPdf({ resumeId, token, slug, isPublic = false, fron
       }
     });
 
-    // Produce standard A4 Vector PDF
+    // Produce standard Vector PDF (A4 or Letter)
+    const puppeteerFormat = (format && format.toLowerCase() === "letter") ? "Letter" : "A4";
     const pdfBuffer = await page.pdf({
-      format: "A4",
+      format: puppeteerFormat,
       printBackground: true,
       preferCSSPageSize: true,
       margin: {

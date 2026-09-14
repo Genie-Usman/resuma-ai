@@ -34,6 +34,11 @@ import Modal from "../../components/shared/Modal.jsx";
 import ConfirmModal from "../../components/shared/ConfirmModal.jsx";
 import EditorSidebar from "./components/EditorSidebar.jsx";
 import ResumeCanvas from "./components/ResumeCanvas.jsx";
+import StudioActivityRail from "./components/StudioActivityRail.jsx";
+import ContentDrawer from "./components/drawers/ContentDrawer.jsx";
+import TemplatesDrawer from "./components/drawers/TemplatesDrawer.jsx";
+import DesignDrawer from "./components/drawers/DesignDrawer.jsx";
+import AiAuditDrawer from "./components/drawers/AiAuditDrawer.jsx";
 import JobMatchModal from "./components/JobMatchModal.jsx";
 import ResumeAuditModal from "./components/ResumeAuditModal.jsx";
 import ShareModal from "./components/ShareModal.jsx";
@@ -89,8 +94,6 @@ const EditResume = () => {
   const autoSaveTimerRef = useRef(null);
   const exportMenuRef = useRef(null);
   const moreMenuRef = useRef(null);
-  const aiMenuRef = useRef(null);
-  const viewMenuRef = useRef(null);
 
   const [activePage, setActivePage] = useState("personal-info");
   const [newProfileImageFile, setNewProfileImageFile] = useState(null);
@@ -101,11 +104,10 @@ const EditResume = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isNavigatingBack, setIsNavigatingBack] = useState(false);
-  const [viewMode, setViewMode] = useState("split"); // "split" | "edit" | "preview"
+  const [activeTab, setActiveTab] = useState("content"); // "content" | "templates" | "formatting" | "ai"
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const [aiMenuOpen, setAiMenuOpen] = useState(false);
-  const [viewMenuOpen, setViewMenuOpen] = useState(false);
 
   // Close dropdown menus on outside click or Escape key
   useEffect(() => {
@@ -116,20 +118,12 @@ const EditResume = () => {
       if (moreMenuRef.current && !moreMenuRef.current.contains(event.target)) {
         setMoreMenuOpen(false);
       }
-      if (aiMenuRef.current && !aiMenuRef.current.contains(event.target)) {
-        setAiMenuOpen(false);
-      }
-      if (viewMenuRef.current && !viewMenuRef.current.contains(event.target)) {
-        setViewMenuOpen(false);
-      }
     };
 
     const handleEscape = (event) => {
       if (event.key === "Escape") {
         setExportMenuOpen(false);
         setMoreMenuOpen(false);
-        setAiMenuOpen(false);
-        setViewMenuOpen(false);
       }
     };
 
@@ -156,6 +150,10 @@ const EditResume = () => {
     reorderSections,
     updateFontFamily,
     updateDensity,
+    updatePageMargin,
+    updatePaperFormat,
+    updateHeaderStyle,
+    shrinkToSinglePage,
     saveResume,
     uploadImagesAndSave,
     undo,
@@ -679,9 +677,9 @@ const EditResume = () => {
           </div>
         </div>
 
-        {/* Right: Studio Action Buttons (All tools, View dropdown & Undo/Redo together) */}
+        {/* Right: Studio Action Buttons */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* 1. Undo / Redo Actions (Crisp segmented pill matching adjacent studio tools) */}
+          {/* 1. Undo / Redo Actions */}
           <div className="flex items-center bg-white border border-slate-200/90 shadow-2xs rounded-xl p-0.5 shrink-0 h-[34px]">
             <button
               type="button"
@@ -716,230 +714,27 @@ const EditResume = () => {
 
           <div className="h-4 w-px bg-slate-200 shrink-0 hidden sm:block" />
 
-          {/* 2. Workspace View Dropdown (Moved to the right side with other dropdowns) */}
-          <div className="relative" ref={viewMenuRef}>
-            <button
-              type="button"
-              onClick={() => {
-                setViewMenuOpen((prev) => !prev);
-                setExportMenuOpen(false);
-                setMoreMenuOpen(false);
-                setAiMenuOpen(false);
-              }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold shadow-2xs transition-all cursor-pointer h-[34px] ${
-                viewMenuOpen
-                  ? "bg-purple-50 text-purple-700 border-purple-300 shadow-xs"
-                  : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90"
-              }`}
-              title="Switch Workspace View (Split, Form, Preview)"
-            >
-              {viewMode === "split" && <LuColumns2 className="text-sm text-purple-600 shrink-0" />}
-              {viewMode === "edit" && <LuPencil className="text-sm text-purple-600 shrink-0" />}
-              {viewMode === "preview" && <LuEye className="text-sm text-purple-600 shrink-0" />}
-              <span>
-                {viewMode === "split" ? "Split" : viewMode === "edit" ? "Form" : "Preview"}
-              </span>
-              <LuChevronDown
-                className={`text-xs transition-transform duration-200 text-slate-400 ${
-                  viewMenuOpen ? "rotate-180 text-purple-600" : ""
-                }`}
-              />
-            </button>
+          {/* 2. Public Share Link Button */}
+          <button
+            type="button"
+            onClick={() => setOpenShareModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/90 shadow-2xs rounded-xl transition-all cursor-pointer h-[34px]"
+            title="Share public recruiter link"
+          >
+            <LuShare2 className="text-xs text-purple-600 shrink-0" />
+            <span className="hidden sm:inline">Share</span>
+          </button>
 
-            {/* Floating View Menu */}
-            {viewMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-1.5 z-50 text-slate-700 animate-in fade-in-0 zoom-in-95 duration-100">
-                <div className="px-3.5 py-1 border-b border-slate-100 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-                  Workspace View
-                </div>
-
-                {/* Split */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setViewMode("split");
-                    setViewMenuOpen(false);
-                  }}
-                  className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                    viewMode === "split" ? "bg-purple-50 text-purple-700 font-semibold" : "hover:bg-slate-50 text-slate-700"
-                  }`}
-                >
-                  <span className="flex items-center gap-2.5">
-                    <LuColumns2 className="text-sm" />
-                    <span>Split View</span>
-                  </span>
-                  {viewMode === "split" && <LuCheck className="text-xs text-purple-600" />}
-                </button>
-
-                {/* Form */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setViewMode("edit");
-                    setViewMenuOpen(false);
-                  }}
-                  className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                    viewMode === "edit" ? "bg-purple-50 text-purple-700 font-semibold" : "hover:bg-slate-50 text-slate-700"
-                  }`}
-                >
-                  <span className="flex items-center gap-2.5">
-                    <LuPencil className="text-sm" />
-                    <span>Form View</span>
-                  </span>
-                  {viewMode === "edit" && <LuCheck className="text-xs text-purple-600" />}
-                </button>
-
-                {/* Preview */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setViewMode("preview");
-                    setViewMenuOpen(false);
-                  }}
-                  className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                    viewMode === "preview" ? "bg-purple-50 text-purple-700 font-semibold" : "hover:bg-slate-50 text-slate-700"
-                  }`}
-                >
-                  <span className="flex items-center gap-2.5">
-                    <LuEye className="text-sm" />
-                    <span>Preview View</span>
-                  </span>
-                  {viewMode === "preview" && <LuCheck className="text-xs text-purple-600" />}
-                </button>
-              </div>
-            )}
-          </div>
-          {/* 1. Smart AI & Audit Dropdown Menu */}
-          <div className="relative" ref={aiMenuRef}>
-            <button
-              type="button"
-              onClick={() => {
-                setAiMenuOpen((prev) => !prev);
-                setExportMenuOpen(false);
-                setMoreMenuOpen(false);
-              }}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
-                aiMenuOpen
-                  ? "bg-purple-50 text-purple-700 border-purple-300 shadow-xs"
-                  : "bg-white hover:bg-slate-50 text-slate-800 border-slate-200/90 shadow-2xs"
-              }`}
-              title="AI Tools & ATS Quality Audit"
-            >
-              <LuSparkles className="text-xs text-purple-600 shrink-0" />
-              <span
-                className={`flex items-center justify-center w-5 h-5 rounded-lg text-[10px] font-black shrink-0 ${
-                  liveAudit.overallScore >= 80
-                    ? "bg-emerald-100 text-emerald-700"
-                    : liveAudit.overallScore >= 65
-                    ? "bg-amber-100 text-amber-700"
-                    : "bg-rose-100 text-rose-700"
-                }`}
-              >
-                {liveAudit.overallScore}
-              </span>
-              <span className="hidden sm:inline font-semibold text-slate-700">
-                AI & Audit
-              </span>
-              <LuChevronDown
-                className={`text-xs transition-transform duration-200 text-slate-400 ${
-                  aiMenuOpen ? "rotate-180 text-purple-600" : ""
-                }`}
-              />
-            </button>
-
-            {/* Floating AI & Audit Popover */}
-            {aiMenuOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 text-slate-700 animate-in fade-in-0 zoom-in-95 duration-100">
-                {/* Header with mini score summary */}
-                <div className="px-3.5 pb-2 border-b border-slate-100 flex items-center justify-between">
-                  <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-                    AI Intelligence Suite
-                  </span>
-                  <span
-                    className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
-                      liveAudit.overallScore >= 80
-                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
-                        : liveAudit.overallScore >= 65
-                        ? "bg-amber-50 text-amber-700 border border-amber-200/60"
-                        : "bg-rose-50 text-rose-700 border border-rose-200/60"
-                    }`}
-                  >
-                    {liveAudit.grade || "ATS Score"}: {liveAudit.overallScore}/100
-                  </span>
-                </div>
-
-                {/* 1. Full ATS Audit Item */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAiMenuOpen(false);
-                    setOpenAuditModal(true);
-                  }}
-                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-emerald-50/80 hover:text-emerald-950 transition-colors cursor-pointer group"
-                >
-                  <span
-                    className={`p-2 rounded-xl text-sm font-black shrink-0 ${
-                      liveAudit.overallScore >= 80
-                        ? "bg-emerald-100 text-emerald-700 group-hover:bg-emerald-200"
-                        : "bg-amber-100 text-amber-700 group-hover:bg-amber-200"
-                    }`}
-                  >
-                    <LuTarget className="text-sm" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-slate-800 group-hover:text-emerald-900 flex items-center justify-between">
-                      <span>ATS Resume Audit</span>
-                      <span className="text-[9px] font-semibold text-emerald-600 group-hover:underline">View Report →</span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 truncate">
-                      6-pillar check ({liveAudit.issues?.length || 0} issues detected)
-                    </p>
-                  </div>
-                </button>
-
-                {/* 2. Job Description Match */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAiMenuOpen(false);
-                    setOpenJobMatchModal(true);
-                  }}
-                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-purple-50/80 hover:text-purple-950 transition-colors cursor-pointer group"
-                >
-                  <span className="p-2 rounded-xl bg-purple-100/90 text-purple-700 group-hover:bg-purple-200 transition-colors shrink-0">
-                    <LuSparkles className="text-sm" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-slate-800 group-hover:text-purple-900 flex items-center justify-between">
-                      <span>AI Job Match</span>
-                      <span className="text-[9px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-md">Gemini</span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 truncate">
-                      Target role keywords & match score
-                    </p>
-                  </div>
-                </button>
-
-                {/* Contextual helper tip */}
-                <div className="mx-3 mt-1.5 px-2.5 py-1.5 bg-slate-50 rounded-xl border border-slate-100 text-[10px] text-slate-500 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
-                  <span>Use AI rewrite directly on any bullet point</span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 2. Export Dropdown Menu (Primary Action) */}
+          {/* 3. Export Dropdown Menu (Primary Action) */}
           <div className="relative" ref={exportMenuRef}>
             <button
               type="button"
               disabled={isExporting}
               onClick={() => {
                 setExportMenuOpen((prev) => !prev);
-                setAiMenuOpen(false);
                 setMoreMenuOpen(false);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-50 h-[34px]"
               title="Export Options (Vector PDF, Print, JSON)"
             >
               {isExporting ? (
@@ -958,7 +753,7 @@ const EditResume = () => {
                   Export Options
                 </div>
 
-                {/* Direct Vector PDF */}
+                {/* Direct High Quality PDF */}
                 <button
                   type="button"
                   disabled={isExporting}
@@ -974,13 +769,13 @@ const EditResume = () => {
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold text-slate-800 group-hover:text-emerald-900 flex items-center justify-between">
                       <span>Download PDF</span>
-                      <span className="text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md">Vector</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md">Best Quality</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 truncate">Crisp, ATS-ready vector document</p>
+                    <p className="text-[11px] text-slate-500 truncate">High-quality PDF for job applications</p>
                   </div>
                 </button>
 
-                {/* Browser Print Preview */}
+                {/* Browser Print */}
                 <button
                   type="button"
                   onClick={() => {
@@ -994,13 +789,13 @@ const EditResume = () => {
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold text-slate-800 group-hover:text-purple-900">
-                      Print / System PDF
+                      Print Resume
                     </div>
-                    <p className="text-[11px] text-slate-500 truncate">Open browser print preview</p>
+                    <p className="text-[11px] text-slate-500 truncate">Print or save via browser</p>
                   </div>
                 </button>
 
-                {/* Export JSON Resume */}
+                {/* Export Data Backup */}
                 <button
                   type="button"
                   onClick={() => {
@@ -1014,31 +809,30 @@ const EditResume = () => {
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold text-slate-800 group-hover:text-indigo-900 flex items-center justify-between">
-                      <span>JSON Resume</span>
-                      <span className="text-[9px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md">v1.0</span>
+                      <span>Export Resume Data</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md">JSON</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 truncate">Open-standard schema backup</p>
+                    <p className="text-[11px] text-slate-500 truncate">Download backup file for your records</p>
                   </div>
                 </button>
               </div>
             )}
           </div>
 
-          {/* 3. More Actions Dropdown Menu (•••) */}
+          {/* 4. More Actions Dropdown Menu (•••) */}
           <div className="relative" ref={moreMenuRef}>
             <button
               type="button"
               onClick={() => {
                 setMoreMenuOpen((prev) => !prev);
                 setExportMenuOpen(false);
-                setAiMenuOpen(false);
               }}
-              className={`p-2 rounded-xl border transition-all cursor-pointer flex items-center justify-center ${
+              className={`p-2 rounded-xl border transition-all cursor-pointer flex items-center justify-center h-[34px] w-[34px] ${
                 moreMenuOpen
                   ? "bg-slate-100 text-purple-700 border-purple-300 shadow-xs"
                   : "bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border-slate-200/90 shadow-2xs"
               }`}
-              title="More studio options (Theme, Share, Save, Delete)"
+              title="More options (Save snapshot, Delete resume)"
               aria-label="More options"
             >
               <LuEllipsis className="text-base" />
@@ -1051,66 +845,7 @@ const EditResume = () => {
                   Studio Utilities
                 </div>
 
-                {/* Change Theme */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMoreMenuOpen(false);
-                    setOpenThemeSelector(true);
-                  }}
-                  className="w-full text-left px-3.5 py-2 text-xs flex items-center gap-2.5 hover:bg-purple-50/80 hover:text-purple-900 transition-colors cursor-pointer group"
-                >
-                  <span className="p-1.5 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors">
-                    <LuPalette className="text-sm" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-slate-800 group-hover:text-purple-900">Change Theme</div>
-                    <p className="text-[10px] text-slate-500">12 templates & custom palette</p>
-                  </div>
-                </button>
 
-                {/* Share Public Link */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMoreMenuOpen(false);
-                    setOpenShareModal(true);
-                  }}
-                  className="w-full text-left px-3.5 py-2 text-xs flex items-center gap-2.5 hover:bg-purple-50/80 hover:text-purple-900 transition-colors cursor-pointer group"
-                >
-                  <span className="p-1.5 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors">
-                    <LuShare2 className="text-sm" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-slate-800 group-hover:text-purple-900">Share Publicly</div>
-                    <p className="text-[10px] text-slate-500">Recruiter link & permissions</p>
-                  </div>
-                </button>
-
-                {/* Manual Save Snapshot */}
-                <button
-                  type="button"
-                  disabled={isSaving || isNavigatingBack}
-                  onClick={() => {
-                    setMoreMenuOpen(false);
-                    handleManualSave();
-                  }}
-                  className="w-full text-left px-3.5 py-2 text-xs flex items-center gap-2.5 hover:bg-purple-50/80 hover:text-purple-900 transition-colors cursor-pointer group disabled:opacity-50"
-                >
-                  <span className="p-1.5 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors">
-                    {isSaving ? (
-                      <LuRefreshCw className="text-sm animate-spin text-purple-600" />
-                    ) : (
-                      <LuSave className="text-sm" />
-                    )}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-slate-800 group-hover:text-purple-900">Save Snapshot</div>
-                    <p className="text-[10px] text-slate-500">Update cloud thumbnail now</p>
-                  </div>
-                </button>
-
-                <div className="border-t border-slate-100 my-1" />
 
                 {/* Delete Resume */}
                 <button
@@ -1137,88 +872,130 @@ const EditResume = () => {
 
       {/* 2. Studio Workspace Body (Full Height: calc(100vh - 64px)) */}
       <main className="flex-1 h-[calc(100vh-64px)] flex overflow-hidden">
-        {viewMode === "split" && (
-          <div className="w-full h-full flex overflow-hidden">
-            {/* Left: Section Navigation Sidebar */}
-            <div className="h-full shrink-0">
-              <EditorSidebar
-                activePage={activePage}
-                setActivePage={setActivePage}
-                sections={resumeData.data?.sections || {}}
-                layout={resumeData.data?.metadata?.layout || [[], []]}
-                templateId={currentTemplateId}
-                onToggleVisibility={toggleSectionVisibility}
-                onReorderSections={reorderSections}
-                onExportJson={handleExportJson}
-                isSaving={isSaving}
-              />
-            </div>
+        {/* Left Activity Rail (68px) */}
+        <StudioActivityRail
+          activeTab={activeTab}
+          onSelectTab={(tab) => {
+            setActiveTab(tab);
+            setIsDrawerOpen(true);
+          }}
+          isDrawerOpen={isDrawerOpen}
+          onToggleDrawer={() => setIsDrawerOpen((prev) => !prev)}
+          onBack={handleBackToDashboard}
+          overallScore={liveAudit.overallScore}
+        />
 
-            {/* Middle: Active Form Panel */}
-            <div className="w-[490px] lg:w-[540px] xl:w-[580px] shrink-0 h-full overflow-y-auto bg-white border-r border-slate-200/80 p-5 lg:p-6 custom-scrollbar">
-              {renderForm()}
-            </div>
-
-            {/* Right: Live A4 Resume Canvas (fills entire remaining space!) */}
-            <div className="flex-1 min-w-0 h-full overflow-hidden bg-slate-100 flex flex-col">
-              {resumeData?.data?.basics && (
-                <ResumeCanvas
-                  resumeData={resumeData?.data}
-                  templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
-                  colorPalette={themeColorPalette}
-                  canvasRef={resumeRef}
-                  onUpdateFont={updateFontFamily}
-                  activeFont={resumeData?.data?.metadata?.typography?.font?.family || resumeData?.data?.metadata?.fontFamily}
-                  onUpdateDensity={updateDensity}
-                  activeDensity={resumeData?.data?.metadata?.typography?.density || resumeData?.data?.metadata?.density || "normal"}
-                />
-              )}
-            </div>
+        {/* Dynamic Contextual Drawer or Content View */}
+        {activeTab === "templates" && isDrawerOpen && (
+          <div className="w-[380px] h-full shrink-0 z-20">
+            <TemplatesDrawer
+              currentTemplate={resumeData?.data?.metadata?.template || currentTemplateId}
+              onSelectTemplate={(templateId) => {
+                setResumeData((prev) => ({
+                  ...prev,
+                  template: templateId,
+                  data: {
+                    ...prev.data,
+                    metadata: {
+                      ...prev.data?.metadata,
+                      template: templateId,
+                    },
+                  },
+                }), true);
+              }}
+              currentColors={themeColorPalette}
+              onUpdateColors={(colors) => {
+                setResumeData((prev) => ({
+                  ...prev,
+                  data: {
+                    ...prev.data,
+                    metadata: {
+                      ...prev.data?.metadata,
+                      theme: {
+                        background: colors[0],
+                        text: colors[1],
+                        primary: colors[2],
+                      },
+                    },
+                  },
+                }), true);
+              }}
+              onClose={() => setIsDrawerOpen(false)}
+            />
           </div>
         )}
 
-        {viewMode === "edit" && (
-          <div className="w-full h-full flex overflow-hidden">
-            {/* Left Sidebar */}
-            <div className="h-full shrink-0">
-              <EditorSidebar
-                activePage={activePage}
-                setActivePage={setActivePage}
-                sections={resumeData.data?.sections || {}}
-                layout={resumeData.data?.metadata?.layout || [[], []]}
-                templateId={currentTemplateId}
-                onToggleVisibility={toggleSectionVisibility}
-                onReorderSections={reorderSections}
-                onExportJson={handleExportJson}
-                isSaving={isSaving}
-              />
-            </div>
-
-            {/* Expansive Form View */}
-            <div className="flex-1 h-full overflow-y-auto bg-slate-50/60 p-6 sm:p-10 flex justify-center custom-scrollbar">
-              <div className="w-full max-w-3xl bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8">
-                {renderForm()}
-              </div>
-            </div>
+        {activeTab === "formatting" && isDrawerOpen && (
+          <div className="w-[380px] h-full shrink-0 z-20">
+            <DesignDrawer
+              activeFont={resumeData?.data?.metadata?.typography?.font?.family || resumeData?.data?.metadata?.fontFamily}
+              onUpdateFont={updateFontFamily}
+              activeDensity={resumeData?.data?.metadata?.typography?.density || resumeData?.data?.metadata?.density || "normal"}
+              onUpdateDensity={updateDensity}
+              activeMargin={resumeData?.data?.metadata?.page?.marginPreset || (resumeData?.data?.metadata?.page?.margin === 12 ? "narrow" : resumeData?.data?.metadata?.page?.margin === 24 ? "wide" : "standard")}
+              onUpdateMargin={updatePageMargin}
+              activePaperFormat={resumeData?.data?.metadata?.page?.format || "a4"}
+              onUpdatePaperFormat={updatePaperFormat}
+              activeHeaderStyle={resumeData?.data?.metadata?.typography?.headerStyle || resumeData?.data?.metadata?.headerStyle || "default"}
+              onUpdateHeaderStyle={updateHeaderStyle}
+              pageCount={1}
+              onShrinkToSinglePage={shrinkToSinglePage}
+              onClose={() => setIsDrawerOpen(false)}
+            />
           </div>
         )}
 
-        {viewMode === "preview" && (
-          <div className="w-full h-full overflow-hidden bg-slate-100 flex flex-col">
-            {resumeData?.data?.basics && (
-              <ResumeCanvas
-                resumeData={resumeData?.data}
-                templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
-                colorPalette={themeColorPalette}
-                canvasRef={resumeRef}
-                onUpdateFont={updateFontFamily}
-                activeFont={resumeData?.data?.metadata?.typography?.font?.family || resumeData?.data?.metadata?.fontFamily}
-                onUpdateDensity={updateDensity}
-                activeDensity={resumeData?.data?.metadata?.typography?.density || resumeData?.data?.metadata?.density || "normal"}
-              />
-            )}
+        {activeTab === "ai" && isDrawerOpen && (
+          <div className="w-[380px] h-full shrink-0 z-20">
+            <AiAuditDrawer
+              resumeData={resumeData?.data || resumeData}
+              onOpenJobMatch={() => setOpenJobMatchModal(true)}
+              onOpenFullAudit={() => setOpenAuditModal(true)}
+              onClose={() => setIsDrawerOpen(false)}
+            />
           </div>
         )}
+
+        {/* Content Mode: Unified Zety-Grade Single Drawer (460px) */}
+        {activeTab === "content" && isDrawerOpen && (
+          <ContentDrawer
+            activePage={activePage}
+            setActivePage={setActivePage}
+            sections={resumeData.data?.sections || {}}
+            layout={resumeData.data?.metadata?.layout || [[], []]}
+            templateId={currentTemplateId}
+            onToggleVisibility={toggleSectionVisibility}
+            onReorderSections={reorderSections}
+            onExportJson={handleExportJson}
+            isSaving={isSaving}
+            onClose={() => setIsDrawerOpen(false)}
+          >
+            {renderForm()}
+          </ContentDrawer>
+        )}
+
+        {/* Live Resume Canvas Workspace (Expands to fill all remaining width!) */}
+        <div className="flex-1 min-w-0 h-full overflow-hidden bg-slate-100 flex flex-col">
+          {resumeData?.data?.basics && (
+            <ResumeCanvas
+              resumeData={resumeData?.data}
+              templateId={resumeData?.data?.metadata?.template || RESUME_TEMPLATES[0].id}
+              colorPalette={themeColorPalette}
+              canvasRef={resumeRef}
+              paperFormat={resumeData?.data?.metadata?.page?.format || "a4"}
+              onShrinkToSinglePage={shrinkToSinglePage}
+              onOpenDesignDrawer={() => {
+                setActiveTab("formatting");
+                setIsDrawerOpen(true);
+              }}
+              onOpenAiAuditDrawer={() => {
+                setActiveTab("ai");
+                setIsDrawerOpen(true);
+              }}
+              overallScore={liveAudit.overallScore}
+            />
+          )}
+        </div>
       </main>
 
       {/* Theme Selector Modal */}
@@ -1264,7 +1041,7 @@ const EditResume = () => {
         onClose={() => setOpenPreviewModal(false)}
         title={resumeData?.title || "Resume Preview"}
         showActionBtn
-        actionBtnText={isExporting ? "Generating Vector PDF..." : "Download Vector PDF"}
+        actionBtnText={isExporting ? "Generating PDF..." : "Download PDF"}
         actionBtnIcon={isExporting ? <LuRefreshCw className="text-base animate-spin" /> : <LuDownload className="text-base" />}
         onActionClick={handleDownloadVectorPdf}
         width="95vw"
@@ -1272,11 +1049,11 @@ const EditResume = () => {
         isPrint={true}
       >
         <div className="flex flex-col gap-3 max-w-5xl mx-auto w-full p-2">
-          {/* Vector PDF Export Tip */}
+          {/* PDF Export Tip */}
           <div className="p-3 bg-emerald-50/90 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-start gap-2.5 shadow-xs">
             <LuSparkles className="text-base text-emerald-600 mt-0.5 shrink-0" />
             <div>
-              <span className="font-semibold text-emerald-950">1-Click Vector Export:</span> Resuma AI uses server-side headless Chromium to generate clean, selectable vector documents with clickable links and crisp typography.
+              <span className="font-semibold text-emerald-950">High Quality PDF:</span> Download a clean, job-ready document with sharp text and clickable links.
             </div>
           </div>
 
@@ -1303,7 +1080,8 @@ const EditResume = () => {
         resumeData={resumeData?.data || resumeData || {}}
         onNavigateSection={(sectionKey) => {
           setActivePage(sectionKey);
-          if (viewMode === "preview") setViewMode("split");
+          setActiveTab("content");
+          setIsDrawerOpen(true);
         }}
         onApplyBulletRewrite={handleApplyBulletRewrite}
       />

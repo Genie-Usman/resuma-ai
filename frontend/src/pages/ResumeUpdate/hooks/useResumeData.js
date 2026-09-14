@@ -380,6 +380,167 @@ export const useResumeData = (resumeId) => {
     [recordSnapshot]
   );
 
+  // Update Page Margin Preset in metadata.page.margin (12mm, 18mm, 24mm)
+  const updatePageMargin = useCallback(
+    (marginPreset) => {
+      recordSnapshot(true);
+      const marginMm = marginPreset === "narrow" ? 12 : marginPreset === "wide" ? 24 : 18;
+
+      setResumeDataState((prev) => {
+        if (!prev) return prev;
+        const currentPage = prev.data?.metadata?.page || {};
+
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            metadata: {
+              ...prev.data?.metadata,
+              page: {
+                ...currentPage,
+                margin: marginMm,
+                marginPreset,
+              },
+            },
+          },
+        };
+      });
+      const label =
+        marginPreset === "narrow"
+          ? "Narrow (12mm)"
+          : marginPreset === "wide"
+          ? "Wide (24mm)"
+          : "Standard (18mm)";
+      toast.success(`Margin: ${label}`, { id: "margin-toast", duration: 1200 });
+    },
+    [recordSnapshot]
+  );
+
+  // Update Paper Format Standard (A4 vs US Letter) in metadata.page.format
+  const updatePaperFormat = useCallback(
+    (format) => {
+      recordSnapshot(true);
+      const normalizedFormat = format === "letter" ? "letter" : "a4";
+
+      setResumeDataState((prev) => {
+        if (!prev) return prev;
+        const currentPage = prev.data?.metadata?.page || {};
+
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            metadata: {
+              ...prev.data?.metadata,
+              page: {
+                ...currentPage,
+                format: normalizedFormat,
+              },
+            },
+          },
+        };
+      });
+      const label =
+        normalizedFormat === "letter"
+          ? "US Letter (8.5 × 11 in)"
+          : "A4 Paper (210 × 297 mm)";
+      toast.success(`Paper Size: ${label}`, {
+        id: "paper-format-toast",
+        duration: 1400,
+        icon: "📄",
+      });
+    },
+    [recordSnapshot]
+  );
+
+  // Update Header Decorator Style in metadata.typography.headerStyle
+  const updateHeaderStyle = useCallback(
+    (headerStyle) => {
+      recordSnapshot(true);
+
+      setResumeDataState((prev) => {
+        if (!prev) return prev;
+        const currentTypography = prev.data?.metadata?.typography || {};
+
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            metadata: {
+              ...prev.data?.metadata,
+              headerStyle,
+              typography: {
+                ...currentTypography,
+                headerStyle,
+              },
+            },
+          },
+        };
+      });
+      const labels = {
+        default: "Default",
+        underline: "Underline",
+        "left-bar": "Left Accent Bar",
+        pill: "Pill Badge",
+        minimal: "Minimal Uppercase",
+      };
+      toast.success(`Header Style: ${labels[headerStyle] || headerStyle}`, {
+        id: "header-style-toast",
+        duration: 1200,
+      });
+    },
+    [recordSnapshot]
+  );
+
+  // Smart Auto-Fit: Shrink to 1 Page
+  const shrinkToSinglePage = useCallback(
+    (settings) => {
+      recordSnapshot(true);
+      const {
+        density = "compact",
+        marginPreset = "standard",
+        fontScale = null,
+      } = settings || {};
+
+      const marginMm = marginPreset === "narrow" ? 12 : marginPreset === "wide" ? 24 : 18;
+
+      setResumeDataState((prev) => {
+        if (!prev) return prev;
+        const currentTypography = prev.data?.metadata?.typography || {};
+        const currentPage = prev.data?.metadata?.page || {};
+
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            metadata: {
+              ...prev.data?.metadata,
+              density,
+              typography: {
+                ...currentTypography,
+                density,
+                lineHeight: density === "compact" ? 1.28 : 1.5,
+                fontScale: fontScale || (density === "compact" ? 0.92 : 1.0),
+              },
+              page: {
+                ...currentPage,
+                margin: marginMm,
+                marginPreset,
+              },
+            },
+          },
+        };
+      });
+
+      toast.success("✨ Optimized! Content fitted cleanly onto 1 page.", {
+        id: "shrink-to-page-toast",
+        duration: 2500,
+        icon: "📄",
+      });
+    },
+    [recordSnapshot]
+  );
+
   // Undo Handler
   const undo = useCallback(() => {
     if (pastRef.current.length === 0) return;
@@ -550,6 +711,10 @@ export const useResumeData = (resumeId) => {
     reorderSections,
     updateFontFamily,
     updateDensity,
+    updatePageMargin,
+    updatePaperFormat,
+    updateHeaderStyle,
+    shrinkToSinglePage,
     saveResume,
     uploadImagesAndSave,
     // History Actions & State

@@ -304,6 +304,7 @@ const exportResumePdf = async (req, res) => {
       } catch {}
     }
     const frontendUrl = (process.env.FRONTEND_URL || detectedOrigin || "http://localhost:5173").replace(/\/+$/, "");
+    const paperFormat = resume.data?.metadata?.page?.format || req.query?.format || "a4";
 
     const pdfBuffer = await generateVectorPdf({
       resumeId: resume._id.toString(),
@@ -311,6 +312,7 @@ const exportResumePdf = async (req, res) => {
       slug: resume.slug,
       isPublic: false,
       frontendUrl,
+      format: paperFormat,
     });
 
     const safeTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "Resume";
@@ -349,12 +351,14 @@ const exportPublicResumePdf = async (req, res) => {
       } catch {}
     }
     const frontendUrl = (process.env.FRONTEND_URL || detectedOrigin || "http://localhost:5173").replace(/\/+$/, "");
+    const paperFormat = resume.data?.metadata?.page?.format || req.query?.format || "a4";
 
     const pdfBuffer = await generateVectorPdf({
       resumeId: resume._id.toString(),
       slug: resume.slug,
       isPublic: true,
       frontendUrl,
+      format: paperFormat,
     });
 
     const safeTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "Resume";

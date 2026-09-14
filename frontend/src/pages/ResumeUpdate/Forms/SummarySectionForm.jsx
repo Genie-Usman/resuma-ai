@@ -16,6 +16,18 @@ import {
     MdFormatListBulleted,
     MdFormatListNumbered,
 } from 'react-icons/md';
+import {
+    LuSparkles,
+    LuListPlus,
+    LuCopy,
+    LuCheck,
+    LuRefreshCw,
+    LuTrendingUp,
+    LuBriefcase,
+    LuMinimize2,
+    LuCpu,
+    LuFileText,
+} from 'react-icons/lu';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { API_PATHS } from '../../../utils/apiPaths';
@@ -116,43 +128,30 @@ const MenuBar = ({ editor }) => {
     );
 };
 
-import {
-    LuSparkles,
-    LuListPlus,
-    LuCopy,
-    LuCheck,
-    LuRefreshCw,
-    LuTrendingUp,
-    LuBriefcase,
-    LuMinimize2,
-    LuCpu,
-    LuFileText,
-} from 'react-icons/lu';
-
 const AI_TONES = [
     {
         id: "impactful",
         label: "Impactful",
         icon: LuTrendingUp,
-        description: "Google XYZ formula: Accomplished [X], measured by [Y], by [Z]",
+        description: "Focus on measurable results and achievements",
     },
     {
         id: "formal",
-        label: "Formal",
+        label: "Professional",
         icon: LuBriefcase,
-        description: "Executive leadership vocabulary and strategic governance",
+        description: "Polished and formal tone",
     },
     {
         id: "concise",
         label: "Concise",
         icon: LuMinimize2,
-        description: "Punchy, tight, high-density bullet points with zero fluff",
+        description: "Short and clear without extra words",
     },
     {
         id: "technical",
         label: "Technical",
         icon: LuCpu,
-        description: "Deep engineering precision, architecture, and system metrics",
+        description: "Highlights technical skills and system metrics",
     },
 ];
 
@@ -282,7 +281,7 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item, label }) 
                             Professional Summary
                         </h2>
                         <p className="text-xs text-slate-500 mt-0.5">
-                            Highlight your core specialization, years of experience, and career value proposition.
+                            Write a brief overview of your background, key strengths, and career goals.
                         </p>
                     </div>
                     <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200/80 shadow-2xs">
@@ -295,7 +294,7 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item, label }) 
             {/* Compact Studio Header: Label on Left, AI Actions on Right */}
             <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
                 <label className="studio-label mb-0 text-slate-700 font-semibold">
-                    {label || (sectionId === "summary" ? "Executive Summary" : "Bullet Points & Achievements")}
+                    {label || (sectionId === "summary" ? "Summary" : "Bullet Points & Achievements")}
                 </label>
 
                 <div className="flex items-center gap-1.5">
