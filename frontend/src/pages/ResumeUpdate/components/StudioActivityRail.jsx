@@ -3,15 +3,13 @@ import {
   LuPalette,
   LuSlidersHorizontal,
   LuSparkles,
-  LuArrowLeft,
   LuInfo,
 } from "react-icons/lu";
-import LOGO from "../../../assets/logo.svg";
 
 /**
  * StudioActivityRail Component
- * Sleek, dark 68px vertical activity rail inspired by best-in-class editors (Zety, Figma).
- * Provides one-click access to Content, Templates, Formatting, and AI & Audit drawers.
+ * Refined, high-end vertical activity rail.
+ * Primary studio activity options are placed cleanly at the top with enlarged touch targets.
  */
 const StudioActivityRail = ({
   activeTab,
@@ -52,22 +50,11 @@ const StudioActivityRail = ({
 
   return (
     <aside
-      className="w-[68px] h-full bg-slate-950 text-slate-400 flex flex-col justify-between items-center py-3 select-none z-30 shrink-0 border-r border-slate-800/80 shadow-lg"
+      className="w-[76px] h-full bg-slate-950 text-slate-400 flex flex-col items-center pt-3.5 pb-3 px-2 select-none z-30 shrink-0 border-r border-slate-800/80 shadow-lg"
       aria-label="Studio Activity Rail"
     >
-      {/* Top: Brand Logo */}
-      <div className="flex flex-col items-center gap-2 pt-1">
-        <img
-          src={LOGO}
-          alt="Resuma AI"
-          className="w-7 h-7 opacity-80 hover:opacity-100 transition-opacity"
-          title="Resuma AI Studio"
-        />
-        <div className="w-8 h-px bg-slate-800/80 my-1" />
-      </div>
-
-      {/* Middle: 4 Primary Activity Tabs */}
-      <nav className="flex flex-col items-center gap-1.5 w-full px-1.5">
+      {/* Primary Activity Tabs (Pushed to the top) */}
+      <nav className="flex flex-col items-center gap-2.5 w-full">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id && isDrawerOpen;
@@ -78,35 +65,40 @@ const StudioActivityRail = ({
               type="button"
               onClick={() => {
                 if (activeTab === item.id && isDrawerOpen) {
-                  // Toggle drawer closed if clicking active tab
                   onToggleDrawer();
                 } else {
                   onSelectTab(item.id);
                 }
               }}
-              className={`relative w-full h-[58px] rounded-xl flex flex-col items-center justify-center gap-1 transition-all cursor-pointer group ${
+              className={`relative w-full h-[66px] rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer group ${
                 isActive
-                  ? "bg-purple-600/20 text-purple-300 font-semibold shadow-inner"
-                  : "text-slate-400 hover:text-slate-100 hover:bg-slate-900/80"
+                  ? "bg-linear-to-b from-purple-500/20 to-indigo-500/15 border border-purple-500/30 text-white shadow-xs"
+                  : "border border-transparent text-slate-400 hover:text-slate-100 hover:bg-slate-900/90 hover:border-slate-800/60"
               }`}
               title={item.tooltip}
             >
-              {/* Active Tab Left Border Pill */}
+              {/* Active Tab Left Border Flush Pill */}
               {isActive && (
-                <span className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-purple-500 rounded-r-full shadow-[0_0_8px_rgba(168,85,247,0.6)]" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-7 bg-linear-to-b from-purple-500 to-indigo-500 rounded-r-full shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
               )}
 
               {/* Icon Container with Badge */}
-              <div className="relative">
-                <Icon className={`text-xl transition-transform group-hover:scale-110 ${isActive ? "text-purple-400" : ""}`} />
+              <div className="relative flex items-center justify-center">
+                <Icon
+                  className={`text-[22px] transition-transform duration-150 group-hover:scale-110 ${
+                    isActive
+                      ? "text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]"
+                      : "text-slate-400 group-hover:text-slate-200"
+                  }`}
+                />
                 {item.badge !== undefined && (
                   <span
-                    className={`absolute -top-1.5 -right-2.5 px-1 py-0.2 rounded-full text-[9px] font-black leading-tight border ${
+                    className={`absolute -top-1.5 -right-3.5 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold leading-none tracking-tight border shadow-xs ${
                       item.badge >= 80
-                        ? "bg-emerald-500 text-slate-950 border-emerald-400"
+                        ? "bg-emerald-500 text-slate-950 border-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.4)]"
                         : item.badge >= 65
-                        ? "bg-amber-500 text-slate-950 border-amber-400"
-                        : "bg-rose-500 text-white border-rose-400"
+                        ? "bg-amber-500 text-slate-950 border-amber-300"
+                        : "bg-rose-500 text-white border-rose-300"
                     }`}
                   >
                     {item.badge}
@@ -115,7 +107,13 @@ const StudioActivityRail = ({
               </div>
 
               {/* Label */}
-              <span className={`text-[10px] tracking-tight leading-none ${isActive ? "text-purple-300 font-bold" : "text-slate-400"}`}>
+              <span
+                className={`text-[11px] tracking-tight leading-none transition-colors ${
+                  isActive
+                    ? "text-white font-bold"
+                    : "text-slate-400 group-hover:text-slate-200 font-medium"
+                }`}
+              >
                 {item.label}
               </span>
             </button>
@@ -123,19 +121,19 @@ const StudioActivityRail = ({
         })}
       </nav>
 
-      {/* Bottom: Quick Help */}
-      <div className="flex flex-col items-center gap-2 pb-1">
-        {onOpenHelp && (
+      {/* Bottom: Quick Help (Placed at the bottom using mt-auto) */}
+      {onOpenHelp && (
+        <div className="mt-auto flex flex-col items-center pt-2">
           <button
             type="button"
             onClick={onOpenHelp}
-            className="w-9 h-9 rounded-xl hover:bg-slate-900 text-slate-500 hover:text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-10 h-10 rounded-xl hover:bg-slate-900 text-slate-500 hover:text-slate-300 flex items-center justify-center transition-colors cursor-pointer border border-transparent hover:border-slate-800/60"
             title="Keyboard Shortcuts & Tips"
           >
-            <LuInfo className="text-base" />
+            <LuInfo className="text-lg" />
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </aside>
   );
 };
