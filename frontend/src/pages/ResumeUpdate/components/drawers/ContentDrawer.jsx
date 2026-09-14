@@ -163,7 +163,7 @@ const ContentDrawer = ({
   const activeLabel = SECTION_LABELS[activePage] || activePage;
 
   return (
-    <aside className="w-[460px] lg:w-[480px] shrink-0 h-full bg-white border-r border-slate-200/90 flex flex-col z-20 shadow-xs select-none">
+    <aside className="w-full h-full bg-white flex flex-col select-none">
       {/* 1. Header Bar: Mode Switcher & Stepper */}
       <div className="h-14 px-4 bg-white/95 backdrop-blur-md border-b border-slate-200/80 flex items-center justify-between shrink-0 z-10">
         {mode === "form" ? (
@@ -338,22 +338,13 @@ const ContentDrawer = ({
       </div>
 
       {/* 2. Main Content Body */}
-      {mode === "form" ? (
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-6 bg-white studio-form-container">
-          {children}
-        </div>
-      ) : (
-        /* Sections Overview Mode (Drag-and-Drop Reordering + Visibility) */
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-slate-50/60 flex flex-col gap-3">
-          <div className="p-3 bg-purple-50/70 rounded-xl border border-purple-200/60 text-xs text-purple-900 flex items-center justify-between">
-            <span className="font-medium">
-              Click any section to edit, or drag handles to reorder.
-            </span>
-            <span className="text-[10px] font-bold text-purple-700 bg-white px-2 py-0.5 rounded-full border border-purple-200/80">
-              {orderedSectionKeys.length} Sections
-            </span>
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-6 bg-white">
+        {mode === "form" ? (
+          <div className="studio-form-container">
+            {children}
           </div>
-
+        ) : (
+          /* Sections Overview Mode (Drag-and-Drop Reordering + Visibility) */
           <EditorSidebar
             activePage={activePage}
             setActivePage={(page) => {
@@ -368,8 +359,8 @@ const ContentDrawer = ({
             onExportJson={onExportJson}
             isSaving={isSaving}
           />
-        </div>
-      )}
+        )}
+      </div>
     </aside>
   );
 };

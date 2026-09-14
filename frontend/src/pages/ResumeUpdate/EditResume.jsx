@@ -885,93 +885,90 @@ const EditResume = () => {
           overallScore={liveAudit.overallScore}
         />
 
-        {/* Dynamic Contextual Drawer or Content View */}
-        {activeTab === "templates" && isDrawerOpen && (
-          <div className="w-[380px] h-full shrink-0 z-20">
-            <TemplatesDrawer
-              currentTemplate={resumeData?.data?.metadata?.template || currentTemplateId}
-              onSelectTemplate={(templateId) => {
-                setResumeData((prev) => ({
-                  ...prev,
-                  template: templateId,
-                  data: {
-                    ...prev.data,
-                    metadata: {
-                      ...prev.data?.metadata,
-                      template: templateId,
-                    },
-                  },
-                }), true);
-              }}
-              currentColors={themeColorPalette}
-              onUpdateColors={(colors) => {
-                setResumeData((prev) => ({
-                  ...prev,
-                  data: {
-                    ...prev.data,
-                    metadata: {
-                      ...prev.data?.metadata,
-                      theme: {
-                        background: colors[0],
-                        text: colors[1],
-                        primary: colors[2],
+        {/* Standardized Studio Drawer (450px) - Zero Layout Shift Across Modes */}
+        {isDrawerOpen && (
+          <div className="w-[450px] h-full shrink-0 z-20 border-r border-slate-200/90 bg-white flex flex-col overflow-hidden select-none">
+            {activeTab === "content" && (
+              <ContentDrawer
+                activePage={activePage}
+                setActivePage={setActivePage}
+                sections={resumeData.data?.sections || {}}
+                layout={resumeData.data?.metadata?.layout || [[], []]}
+                templateId={currentTemplateId}
+                onToggleVisibility={toggleSectionVisibility}
+                onReorderSections={reorderSections}
+                onExportJson={handleExportJson}
+                isSaving={isSaving}
+                onClose={() => setIsDrawerOpen(false)}
+              >
+                {renderForm()}
+              </ContentDrawer>
+            )}
+
+            {activeTab === "templates" && (
+              <TemplatesDrawer
+                currentTemplate={resumeData?.data?.metadata?.template || currentTemplateId}
+                onSelectTemplate={(templateId) => {
+                  setResumeData((prev) => ({
+                    ...prev,
+                    template: templateId,
+                    data: {
+                      ...prev.data,
+                      metadata: {
+                        ...prev.data?.metadata,
+                        template: templateId,
                       },
                     },
-                  },
-                }), true);
-              }}
-              onClose={() => setIsDrawerOpen(false)}
-            />
-          </div>
-        )}
+                  }), true);
+                }}
+                currentColors={themeColorPalette}
+                onUpdateColors={(colors) => {
+                  setResumeData((prev) => ({
+                    ...prev,
+                    data: {
+                      ...prev.data,
+                      metadata: {
+                        ...prev.data?.metadata,
+                        theme: {
+                          background: colors[0],
+                          text: colors[1],
+                          primary: colors[2],
+                        },
+                      },
+                    },
+                  }), true);
+                }}
+                onClose={() => setIsDrawerOpen(false)}
+              />
+            )}
 
-        {activeTab === "formatting" && isDrawerOpen && (
-          <div className="w-[380px] h-full shrink-0 z-20">
-            <DesignDrawer
-              activeFont={resumeData?.data?.metadata?.typography?.font?.family || resumeData?.data?.metadata?.fontFamily}
-              onUpdateFont={updateFontFamily}
-              activeDensity={resumeData?.data?.metadata?.typography?.density || resumeData?.data?.metadata?.density || "normal"}
-              onUpdateDensity={updateDensity}
-              activeMargin={resumeData?.data?.metadata?.page?.marginPreset || (resumeData?.data?.metadata?.page?.margin === 12 ? "narrow" : resumeData?.data?.metadata?.page?.margin === 24 ? "wide" : "standard")}
-              onUpdateMargin={updatePageMargin}
-              activePaperFormat={resumeData?.data?.metadata?.page?.format || "a4"}
-              onUpdatePaperFormat={updatePaperFormat}
-              activeHeaderStyle={resumeData?.data?.metadata?.typography?.headerStyle || resumeData?.data?.metadata?.headerStyle || "default"}
-              onUpdateHeaderStyle={updateHeaderStyle}
-              pageCount={1}
-              onShrinkToSinglePage={shrinkToSinglePage}
-              onClose={() => setIsDrawerOpen(false)}
-            />
-          </div>
-        )}
+            {activeTab === "formatting" && (
+              <DesignDrawer
+                activeFont={resumeData?.data?.metadata?.typography?.font?.family || resumeData?.data?.metadata?.fontFamily}
+                onUpdateFont={updateFontFamily}
+                activeDensity={resumeData?.data?.metadata?.typography?.density || resumeData?.data?.metadata?.density || "normal"}
+                onUpdateDensity={updateDensity}
+                activeMargin={resumeData?.data?.metadata?.page?.marginPreset || (resumeData?.data?.metadata?.page?.margin === 12 ? "narrow" : resumeData?.data?.metadata?.page?.margin === 24 ? "wide" : "standard")}
+                onUpdateMargin={updatePageMargin}
+                activePaperFormat={resumeData?.data?.metadata?.page?.format || "a4"}
+                onUpdatePaperFormat={updatePaperFormat}
+                activeHeaderStyle={resumeData?.data?.metadata?.typography?.headerStyle || resumeData?.data?.metadata?.headerStyle || "default"}
+                onUpdateHeaderStyle={updateHeaderStyle}
+                pageCount={1}
+                onShrinkToSinglePage={shrinkToSinglePage}
+                onClose={() => setIsDrawerOpen(false)}
+              />
+            )}
 
-        {activeTab === "ai" && isDrawerOpen && (
-          <div className="w-[380px] h-full shrink-0 z-20">
-            <AiAuditDrawer
-              resumeData={resumeData?.data || resumeData}
-              onOpenJobMatch={() => setOpenJobMatchModal(true)}
-              onOpenFullAudit={() => setOpenAuditModal(true)}
-              onClose={() => setIsDrawerOpen(false)}
-            />
+            {activeTab === "ai" && (
+              <AiAuditDrawer
+                resumeData={resumeData?.data || resumeData}
+                onOpenJobMatch={() => setOpenJobMatchModal(true)}
+                onOpenFullAudit={() => setOpenAuditModal(true)}
+                onClose={() => setIsDrawerOpen(false)}
+              />
+            )}
           </div>
-        )}
-
-        {/* Content Mode: Unified Zety-Grade Single Drawer (460px) */}
-        {activeTab === "content" && isDrawerOpen && (
-          <ContentDrawer
-            activePage={activePage}
-            setActivePage={setActivePage}
-            sections={resumeData.data?.sections || {}}
-            layout={resumeData.data?.metadata?.layout || [[], []]}
-            templateId={currentTemplateId}
-            onToggleVisibility={toggleSectionVisibility}
-            onReorderSections={reorderSections}
-            onExportJson={handleExportJson}
-            isSaving={isSaving}
-            onClose={() => setIsDrawerOpen(false)}
-          >
-            {renderForm()}
-          </ContentDrawer>
         )}
 
         {/* Live Resume Canvas Workspace (Expands to fill all remaining width!) */}

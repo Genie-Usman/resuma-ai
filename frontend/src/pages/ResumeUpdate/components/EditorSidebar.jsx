@@ -28,8 +28,6 @@ import {
   LuHeartHandshake,
   LuUsers,
   LuFileJson,
-  LuPanelLeftClose,
-  LuPanelLeftOpen,
 } from "react-icons/lu";
 import SortableSectionItem from "./SortableSectionItem";
 import {
@@ -128,7 +126,6 @@ const EditorSidebar = ({
   onExportJson,
   isSaving,
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeId, setActiveId] = useState(null);
 
   const isTwoColumn = useMemo(() => isTwoColumnTemplate(templateId), [templateId]);
@@ -240,204 +237,18 @@ const EditorSidebar = ({
     // to preserve template column layout integrity and prevent broken resume layouts.
   };
 
-  // -------------------------------------------------------------
-  // Compact Icon Rail Mode (64px)
-  // -------------------------------------------------------------
-  if (isCollapsed) {
-    return (
-      <aside className="w-16 h-full bg-white border border-slate-200/90 rounded-2xl p-2 shadow-xs flex flex-col items-center justify-between transition-all duration-200">
-        {/* Top: Expand Toggle */}
-        <div className="w-full flex flex-col items-center gap-2 pb-2 border-b border-slate-100">
-          <button
-            type="button"
-            onClick={() => setIsCollapsed(false)}
-            className="p-2 rounded-xl text-slate-500 hover:text-purple-600 hover:bg-purple-50 transition-colors cursor-pointer"
-            title="Expand sidebar (shows full section names)"
-          >
-            <LuPanelLeftOpen className="text-lg" />
-          </button>
-        </div>
-
-        {/* Scrollable Icon List */}
-        <div className="flex-1 w-full overflow-y-auto custom-scrollbar py-2 flex flex-col items-center gap-1.5">
-          {/* Personal Info */}
-          <button
-            type="button"
-            onClick={() => setActivePage("personal-info")}
-            className={`relative p-2.5 rounded-xl transition-all cursor-pointer ${
-              activePage === "personal-info"
-                ? "bg-purple-600 text-white shadow-xs"
-                : "text-slate-600 hover:bg-slate-100"
-            }`}
-            title="Personal Information (Core)"
-          >
-            <LuUser className="text-base" />
-          </button>
-
-          {/* 1-Column Mode: Continuous vertical icon list */}
-          {!isTwoColumn &&
-            flatKeys.map((key) => {
-              const sec = sections[key];
-              const Icon = SECTION_ICONS[key] || LuSparkles;
-              const isActive = activePage === key;
-              const isVisible = sec?.visible !== false;
-
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setActivePage(key)}
-                  className={`relative p-2.5 rounded-xl transition-all cursor-pointer ${
-                    isActive
-                      ? "bg-purple-600 text-white shadow-xs"
-                      : "text-slate-600 hover:bg-slate-100"
-                  } ${!isVisible ? "opacity-40" : ""}`}
-                  title={sec?.name || key}
-                >
-                  <Icon className="text-base" />
-                  {Array.isArray(sec?.items) && sec.items.length > 0 && (
-                    <span
-                      className={`absolute -top-0.5 -right-0.5 text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold ${
-                        isActive
-                          ? "bg-white text-purple-700"
-                          : "bg-slate-200 text-slate-700"
-                      }`}
-                    >
-                      {sec.items.length}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-
-          {/* 2-Column Mode: Separated Main and Sidebar Icons */}
-          {isTwoColumn && (
-            <>
-              {/* Divider: Main Column */}
-              <div className="w-6 h-px bg-slate-200 my-1" title="Main Content Sections" />
-
-              {/* Main Column Icons */}
-              {mainKeys.map((key) => {
-                const sec = sections[key];
-                const Icon = SECTION_ICONS[key] || LuSparkles;
-                const isActive = activePage === key;
-                const isVisible = sec?.visible !== false;
-
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setActivePage(key)}
-                    className={`relative p-2.5 rounded-xl transition-all cursor-pointer ${
-                      isActive
-                        ? "bg-blue-600 text-white shadow-xs"
-                        : "text-slate-600 hover:bg-slate-100"
-                    } ${!isVisible ? "opacity-40" : ""}`}
-                    title={`${sec?.name || key} (Main Column)`}
-                  >
-                    <Icon className="text-base" />
-                    {Array.isArray(sec?.items) && sec.items.length > 0 && (
-                      <span
-                        className={`absolute -top-0.5 -right-0.5 text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold ${
-                          isActive
-                            ? "bg-white text-blue-700"
-                            : "bg-slate-200 text-slate-700"
-                        }`}
-                      >
-                        {sec.items.length}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-
-              {/* Divider: Sidebar Column */}
-              <div className="w-6 h-px bg-purple-200 my-1" title="Sidebar Column Sections" />
-
-              {/* Sidebar Column Icons */}
-              {sidebarKeys.map((key) => {
-                const sec = sections[key];
-                const Icon = SECTION_ICONS[key] || LuSparkles;
-                const isActive = activePage === key;
-                const isVisible = sec?.visible !== false;
-
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setActivePage(key)}
-                    className={`relative p-2.5 rounded-xl transition-all cursor-pointer ${
-                      isActive
-                        ? "bg-purple-600 text-white shadow-xs"
-                        : "text-slate-600 hover:bg-slate-100"
-                    } ${!isVisible ? "opacity-40" : ""}`}
-                    title={`${sec?.name || key} (Sidebar Column)`}
-                  >
-                    <Icon className="text-base" />
-                    {Array.isArray(sec?.items) && sec.items.length > 0 && (
-                      <span
-                        className={`absolute -top-0.5 -right-0.5 text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold ${
-                          isActive
-                            ? "bg-white text-purple-700"
-                            : "bg-slate-200 text-slate-700"
-                        }`}
-                      >
-                        {sec.items.length}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </>
-          )}
-        </div>
-
-        {/* Bottom: JSON Export */}
-        <div className="pt-2 border-t border-slate-100 w-full flex justify-center">
-          {onExportJson && (
-            <button
-              type="button"
-              onClick={onExportJson}
-              className="p-2 rounded-xl text-slate-500 hover:text-purple-600 hover:bg-purple-50 transition-colors cursor-pointer"
-              title="Export JSON Resume"
-            >
-              <LuFileJson className="text-base" />
-            </button>
-          )}
-        </div>
-      </aside>
-    );
-  }
-
   // Active section data for DragOverlay preview
   const activeSection = activeId ? sections[activeId] : null;
   const ActiveIcon = activeId ? SECTION_ICONS[activeId] || LuSparkles : null;
 
-  // -------------------------------------------------------------
-  // Expanded Drawer Mode (240px - 270px)
-  // -------------------------------------------------------------
   return (
-    <aside className="w-full h-full bg-white border border-slate-200/90 rounded-2xl p-3 shadow-xs flex flex-col gap-2.5 transition-all duration-200">
-      {/* Top Section: Action Controls */}
-      <div className="flex items-center justify-between gap-1 pb-2 border-b border-slate-100">
-        <div className="flex items-center gap-1.5 min-w-0">
-          <h3 className="text-xs font-bold text-slate-800 tracking-wider uppercase truncate">
-            Resume Sections
-          </h3>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">
-            Drag to reorder
-          </span>
-          <button
-            type="button"
-            onClick={() => setIsCollapsed(true)}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-            title="Collapse sidebar to icon rail (frees space for preview)"
-          >
-            <LuPanelLeftClose className="text-sm" />
-          </button>
-        </div>
+    <div className="w-full flex-1 flex flex-col gap-3 min-w-0 select-none">
+      {/* Overview helper line */}
+      <div className="flex items-center justify-between px-0.5 text-xs text-slate-500 pb-0.5">
+        <span>Click any section to edit, or drag to reorder</span>
+        <span className="text-[11px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200/60">
+          {(isTwoColumn ? mainKeys.length + sidebarKeys.length : flatKeys.length)} Sections
+        </span>
       </div>
 
       {/* Fixed: Personal Information */}
@@ -655,7 +466,7 @@ const EditorSidebar = ({
           )}
         </div>
       </div>
-    </aside>
+    </div>
   );
 };
 

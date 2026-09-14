@@ -44,7 +44,7 @@ const AiAuditDrawer = ({
       : "bg-rose-50 text-rose-800 border-rose-200";
 
   return (
-    <div className="w-full h-full flex flex-col bg-white border-r border-slate-200/90 select-none overflow-hidden animate-in slide-in-from-left duration-200">
+    <div className="w-full h-full flex flex-col bg-white select-none overflow-hidden">
       {/* Drawer Top Header */}
       <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-200/80 bg-slate-50/50 shrink-0">
         <div className="flex items-center gap-2">
