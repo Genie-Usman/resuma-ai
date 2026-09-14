@@ -341,6 +341,10 @@ h1, h2, h3, h4, h5, h6,
     transform: none !important;
   }
 
+  .matched-cover-letter {
+    box-sizing: border-box !important;
+  }
+
   /* Allow sections, grids, and columns to break naturally across pages */
   section,
   article,

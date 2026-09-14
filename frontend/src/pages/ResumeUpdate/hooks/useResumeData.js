@@ -100,6 +100,10 @@ export const useResumeData = (resumeId) => {
             ...(incomingData.basics || {}),
           },
           sections: mergedSections,
+          coverLetter: {
+            ...defaultData.coverLetter,
+            ...(incomingData.coverLetter || {}),
+          },
           metadata: {
             ...defaultData.metadata,
             ...(incomingData.metadata || {}),
@@ -730,6 +734,69 @@ export const useResumeData = (resumeId) => {
     [recordSnapshot]
   );
 
+  // Update Flexible Date Formatting (Roadmap Item 3.3)
+  const updateDateFormat = useCallback(
+    (dateFormat, isFinal = false) => {
+      if (isFinal) {
+        recordSnapshot(true);
+      }
+      setResumeDataState((prev) => {
+        if (!prev) return prev;
+        const currentMetadata = prev.data?.metadata || {};
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            metadata: {
+              ...currentMetadata,
+              dateFormat,
+              date: {
+                ...(currentMetadata.date || {}),
+                format: dateFormat,
+              },
+            },
+          },
+        };
+      });
+      const formatLabels = {
+        short: "Short (Jan 2024)",
+        full: "Full (January 2024)",
+        year: "Year Only (2024)",
+        numeric: "Numeric (01/2024)",
+      };
+      toast.success(`Date Format: ${formatLabels[dateFormat] || dateFormat}`, {
+        id: "date-format-toast",
+        duration: 1200,
+      });
+    },
+    [recordSnapshot]
+  );
+
+  // Update Matched Cover Letter Data (Roadmap Item 4.4)
+  const updateCoverLetter = useCallback(
+    (coverLetterUpdate, isFinal = false) => {
+      if (isFinal) {
+        recordSnapshot(true);
+      }
+      setResumeDataState((prev) => {
+        if (!prev) return prev;
+        const currentCoverLetter = prev.data?.coverLetter || {};
+        const updated = typeof coverLetterUpdate === "function"
+          ? coverLetterUpdate(currentCoverLetter)
+          : { ...currentCoverLetter, ...coverLetterUpdate };
+
+        return {
+          ...prev,
+          data: {
+            ...prev.data,
+            coverLetter: updated,
+          },
+        };
+      });
+    },
+    [recordSnapshot]
+  );
+
   // Undo Handler
   const undo = useCallback(() => {
     if (pastRef.current.length === 0) return;
@@ -906,6 +973,8 @@ export const useResumeData = (resumeId) => {
     updatePageMargin,
     updatePaperFormat,
     updateHeaderStyle,
+    updateDateFormat,
+    updateCoverLetter,
     shrinkToSinglePage,
     saveResume,
     uploadImagesAndSave,

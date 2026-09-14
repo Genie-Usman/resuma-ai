@@ -28,10 +28,23 @@ const resumeAuditSchema = z.object({
     targetRole: z.string().optional()
 });
 
+const generateCoverLetterSchema = z.object({
+    jobDescription: z.string().min(10, "Job description must be at least 10 characters"),
+    companyName: z.string().optional(),
+    targetCompany: z.string().optional(),
+    jobTitle: z.string().optional(),
+    targetJobTitle: z.string().optional(),
+    tone: z.enum(["formal", "impactful", "concise", "technical", "conversational"]).default("impactful").optional(),
+    resumeData: z.record(z.any()).refine((val) => typeof val === "object" && val !== null, {
+        message: "Resume data is required"
+    })
+});
+
 module.exports = {
     generateSummarySchema,
     jobMatchSchema,
     improveBulletSchema,
-    resumeAuditSchema
+    resumeAuditSchema,
+    generateCoverLetterSchema
 };
 

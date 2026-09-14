@@ -218,11 +218,13 @@ A comprehensive guide and specification document outlining planned customization
   2. **Technical Specialist**: Emphasizes architecture, system scale, cutting-edge tooling, and latency/uptime.
   3. **Growth / Impact**: Emphasizes rapid delivery, user acquisition, conversion metrics, and adaptability.
 
-### 4.4 Matched Cover Letter Generator
+### 4.4 Matched Cover Letter Generator [COMPLETED]
 * **Feature**: Automatically generate a synchronized 1-page cover letter:
   * Uses the same header typography, template aesthetic, and accent color palette as the resume.
   * Tailors the narrative directly to the pasted job description and target company name.
-  * Can be exported together as a 2-page package or standalone PDF.
+  * **100% Fully Editable**: Rich text Tiptap editor for letter body (bold, italic, underline, lists) plus customizable recipient, company, salutation, and signature.
+  * Live Canvas preview with dynamic sheet rendering and instant switching (`[ Resume | Cover Letter ]`).
+  * Seamless Vector PDF export: Standalone Cover Letter PDF or unified 2-page Application Package (Resume + Cover Letter).
 
 ---
 

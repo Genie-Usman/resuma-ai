@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
+import MatchedCoverLetter from "../../components/ResumeSections/MatchedCoverLetter";
 import { A4_WIDTH_PX, getPaperDimensions } from "../ResumeUpdate/hooks/usePageCalculator";
 import axiosInstance from "../../utils/axiosInstance";
 import { loadGoogleFont } from "../../utils/googleFonts";
@@ -9,6 +10,7 @@ const PrintResume = ({ isPublic = false }) => {
   const { resumeId, slug } = useParams();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
+  const mode = searchParams.get("mode") || "resume"; // "resume" | "cover-letter" | "package"
 
   const [resumeData, setResumeData] = useState(null);
   const [isReady, setIsReady] = useState(false);
@@ -90,6 +92,11 @@ const PrintResume = ({ isPublic = false }) => {
   const templateId = resumeData.data?.metadata?.template || "azurill";
   const paperFormat = resumeData.data?.metadata?.page?.format || "a4";
   const paperConfig = getPaperDimensions(paperFormat);
+  const colorPalette = resumeData.data?.metadata?.theme?.colors || [
+    resumeData.data?.metadata?.theme?.background || "#ffffff",
+    resumeData.data?.metadata?.theme?.text || "#111827",
+    resumeData.data?.metadata?.theme?.primary || "#7c3aed",
+  ];
 
   return (
     <div className="print-root min-h-screen bg-white text-slate-900 antialiased">
@@ -137,20 +144,77 @@ const PrintResume = ({ isPublic = false }) => {
             color: inherit !important;
             text-decoration: none !important;
           }
+          .matched-cover-letter {
+            box-sizing: border-box !important;
+            width: 100% !important;
+          }
         }
       `}</style>
 
-      {/* Sheet Container */}
-      <div
-        className="a4-print-sheet bg-white mx-auto overflow-visible"
-        style={{ width: `${paperConfig.widthPx}px`, minHeight: `${paperConfig.heightPx}px` }}
-      >
-        <RenderResume
-          templateId={templateId}
-          resumeData={resumeData.data}
-          containerWidth={paperConfig.widthPx}
-        />
-      </div>
+      {/* Sheet Container(s) */}
+      {mode === "cover-letter" ? (
+        <div
+          className="a4-print-sheet bg-white mx-auto overflow-hidden"
+          style={{ width: `${paperConfig.widthPx}px`, minHeight: `${paperConfig.heightPx}px` }}
+        >
+          <MatchedCoverLetter
+            basics={resumeData.data?.basics}
+            metadata={resumeData.data?.metadata}
+            coverLetter={resumeData.data?.coverLetter}
+            themeColors={colorPalette}
+            containerWidth={paperConfig.widthPx}
+          />
+        </div>
+      ) : mode === "package" ? (
+        <>
+          {/* Page 1: Resume */}
+          <div
+            className="a4-print-sheet bg-white mx-auto overflow-visible"
+            style={{
+              width: `${paperConfig.widthPx}px`,
+              minHeight: `${paperConfig.heightPx}px`,
+              breakAfter: "page",
+              pageBreakAfter: "always",
+            }}
+          >
+            <RenderResume
+              templateId={templateId}
+              resumeData={resumeData.data}
+              containerWidth={paperConfig.widthPx}
+            />
+          </div>
+
+          {/* Page 2: Matched Cover Letter */}
+          <div
+            className="a4-print-sheet bg-white mx-auto overflow-hidden"
+            style={{
+              width: `${paperConfig.widthPx}px`,
+              minHeight: `${paperConfig.heightPx}px`,
+              breakBefore: "page",
+              pageBreakBefore: "always",
+            }}
+          >
+            <MatchedCoverLetter
+              basics={resumeData.data?.basics}
+              metadata={resumeData.data?.metadata}
+              coverLetter={resumeData.data?.coverLetter}
+              themeColors={colorPalette}
+              containerWidth={paperConfig.widthPx}
+            />
+          </div>
+        </>
+      ) : (
+        <div
+          className="a4-print-sheet bg-white mx-auto overflow-visible"
+          style={{ width: `${paperConfig.widthPx}px`, minHeight: `${paperConfig.heightPx}px` }}
+        >
+          <RenderResume
+            templateId={templateId}
+            resumeData={resumeData.data}
+            containerWidth={paperConfig.widthPx}
+          />
+        </div>
+      )}
 
       {/* Signal element for Headless Puppeteer when ready */}
       {isReady && <div id="print-ready" style={{ display: "none" }} />}

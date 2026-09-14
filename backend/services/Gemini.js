@@ -34,6 +34,11 @@ TONE: CONCISE (Punchy & Direct)
 TONE: TECHNICAL (Deep Engineering & Systems Precision)
 - Deep technical specificity: architecture, frameworks, protocols, scale, throughput, and performance benchmarks.
 - Metrics: Latencies (ms), throughput (RPS/QPS), memory/CPU optimization, uptime SLAs.
+`,
+    conversational: `
+TONE: CONVERSATIONAL (Modern, Personable & Authentic)
+- Warm, collaborative, and authentic modern startup tone.
+- Balance professional rigor with natural human passion for the craft and mission.
 `
 };
 
@@ -499,9 +504,105 @@ Return strictly valid JSON with the following structure (no extra text, no markd
     return await generateWithFallback(prompt);
 };
 
+/**
+ * Generate a synchronized, highly tailored 1-page Cover Letter (Roadmap Item 4.4)
+ */
+const generateCoverLetter = async ({
+    jobDescription,
+    companyName = "",
+    jobTitle = "",
+    tone = "impactful",
+    resumeData = {},
+}) => {
+    const basics = resumeData?.basics || {};
+    const sections = resumeData?.sections || {};
+
+    const cleanCandidate = {
+        name: basics.name || "Candidate",
+        headline: basics.headline || "",
+        email: basics.email || "",
+        phone: basics.phone || "",
+        location: basics.location || "",
+        summary: basics.summary || "",
+        experience: (sections.experience?.items || []).slice(0, 4).map((e) => ({
+            company: e.company,
+            position: e.position,
+            date: e.date,
+            summary: e.summary ? e.summary.replace(/<[^>]*>?/gm, " ").trim() : "",
+        })),
+        skills: (sections.skills?.items || []).slice(0, 6).map((s) => ({
+            name: s.name,
+            keywords: s.keywords,
+        })),
+        education: (sections.education?.items || []).slice(0, 2).map((ed) => ({
+            institution: ed.institution,
+            studyType: ed.studyType,
+            area: ed.area,
+        })),
+        projects: (sections.projects?.items || []).slice(0, 3).map((p) => ({
+            name: p.name,
+            summary: p.summary ? p.summary.replace(/<[^>]*>?/gm, " ").trim() : "",
+        })),
+    };
+
+    const toneInstruction = TONE_DIRECTIVES[tone] || TONE_DIRECTIVES.impactful;
+
+    const prompt = `
+You are an executive career advisor and expert cover letter writer.
+Generate a compelling, highly tailored 1-page cover letter matching the candidate's authentic resume experience directly to the target role and company.
+
+TARGET COMPANY: ${companyName || "Target Company (infer from Job Description if mentioned)"}
+TARGET JOB TITLE: ${jobTitle || "Target Role (infer from Job Description if mentioned)"}
+
+TARGET JOB DESCRIPTION:
+${jobDescription}
+
+CANDIDATE PROFILE & RESUME:
+${JSON.stringify(cleanCandidate, null, 2)}
+
+TONE GUIDELINES:
+${toneInstruction}
+
+WRITING RULES:
+1. Ground the narrative in REAL candidate achievements and metrics from their resume (do not invent fake companies, degrees, or metrics).
+2. Connect their specific accomplishments directly to the target company's mission, stack, and challenges outlined in the job description.
+3. Structure for maximum hiring manager impact:
+   - Compelling Hook/Opening: State the target role, why this company excites them, and a strong thesis statement.
+   - Core Paragraph 1: Major relevant career win / leadership / technical contribution with quantifiable metrics.
+   - Core Paragraph 2: Secondary strength (domain alignment, scalability, cross-functional execution, or relevant tech stack).
+   - Confident Call to Action & Value Proposition: Why they are ready to deliver immediate value from day one.
+4. Keep the length balanced so it fits comfortably on a single page (~250-350 words total).
+
+Return strictly valid JSON with the following structure (no extra text, no markdown fences):
+{
+  "recipient": {
+    "name": "Hiring Team",
+    "title": "Hiring Manager",
+    "company": "${companyName || "Company Name"}",
+    "address": "San Francisco, CA"
+  },
+  "companyName": "${companyName || "Company Name"}",
+  "jobTitle": "${jobTitle || "Target Role"}",
+  "salutation": "Dear Hiring Team,",
+  "opening": "Opening paragraph text...",
+  "bodyParagraphs": [
+    "First core body paragraph highlighting a key accomplishment...",
+    "Second core body paragraph detailing skills and alignment..."
+  ],
+  "callToAction": "Closing call to action paragraph expressing enthusiasm for discussing how the candidate can drive results...",
+  "signOff": "Sincerely,",
+  "signature": "${cleanCandidate.name}",
+  "fullHtml": "<p>Opening paragraph text...</p><p>First core body paragraph...</p><p>Second core body paragraph...</p><p>Closing call to action paragraph...</p>"
+}
+`;
+
+    return await generateWithFallback(prompt);
+};
+
 module.exports = {
     generateItemSummary,
     analyzeJobMatch,
     improveBulletPoint,
     auditResume,
+    generateCoverLetter,
 };

@@ -20,7 +20,10 @@ export const API_PATHS = {
         DELETE: (id) => `/api/resume/${id}`,
         DUPLICATE: (id) => `/api/resume/${id}/duplicate`,
         UPLOAD_IMAGES: (id) => `/api/resume/${id}/upload-images`,
-        EXPORT_PDF: (id) => `/api/resume/${id}/export-pdf`,
+        EXPORT_PDF: (id, mode = "resume") =>
+            mode === "resume"
+                ? `/api/resume/${id}/export-pdf`
+                : `/api/resume/${id}/export-pdf?mode=${encodeURIComponent(mode)}`,
         EXPORT_PUBLIC_PDF: (slug) => `/api/resume/public/${slug}/export-pdf`,
     },
 
@@ -33,5 +36,6 @@ export const API_PATHS = {
         JOB_MATCH: "/api/gemini/job-match",
         IMPROVE_BULLET: "/api/gemini/improve-bullet-point",
         RESUME_AUDIT: "/api/gemini/resume-audit",
+        GENERATE_COVER_LETTER: "/api/gemini/generate-cover-letter",
     },
 };

@@ -20,6 +20,8 @@ import {
   LuChevronDown,
   LuPrinter,
   LuFileJson,
+  LuFileText,
+  LuLayers,
   LuEllipsis,
 } from "react-icons/lu";
 import toast from "react-hot-toast";
@@ -39,6 +41,7 @@ import ContentDrawer from "./components/drawers/ContentDrawer.jsx";
 import TemplatesDrawer from "./components/drawers/TemplatesDrawer.jsx";
 import DesignDrawer from "./components/drawers/DesignDrawer.jsx";
 import AiAuditDrawer from "./components/drawers/AiAuditDrawer.jsx";
+import CoverLetterDrawer from "./components/drawers/CoverLetterDrawer.jsx";
 import SectionFormHeader from "./components/SectionFormHeader.jsx";
 import JobMatchModal from "./components/JobMatchModal.jsx";
 import ResumeAuditModal from "./components/ResumeAuditModal.jsx";
@@ -107,7 +110,8 @@ const EditResume = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isNavigatingBack, setIsNavigatingBack] = useState(false);
-  const [activeTab, setActiveTab] = useState("content"); // "content" | "templates" | "formatting" | "ai"
+  const [activeTab, setActiveTab] = useState("content"); // "content" | "templates" | "formatting" | "cover-letter" | "ai"
+  const [canvasDocType, setCanvasDocType] = useState("resume"); // "resume" | "cover-letter"
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -160,6 +164,7 @@ const EditResume = () => {
     updatePageMargin,
     updatePaperFormat,
     updateHeaderStyle,
+    updateCoverLetter,
     shrinkToSinglePage,
     saveResume,
     uploadImagesAndSave,
@@ -250,6 +255,8 @@ const EditResume = () => {
     setOpenPreviewModal,
     isExporting,
     handleDownloadVectorPdf,
+    handleDownloadCoverLetterPdf,
+    handleDownloadApplicationPackage,
   } = useResumeExport(resumeId, resumeData?.title);
 
   // Snapshot initial loaded data
@@ -860,13 +867,13 @@ const EditResume = () => {
                   Export Options
                 </div>
 
-                {/* Direct High Quality PDF */}
+                {/* Direct High Quality PDF (Resume) */}
                 <button
                   type="button"
                   disabled={isExporting}
                   onClick={() => {
                     setExportMenuOpen(false);
-                    handleDownloadVectorPdf();
+                    handleDownloadVectorPdf("resume");
                   }}
                   className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-emerald-50/80 hover:text-emerald-950 transition-colors cursor-pointer group disabled:opacity-50"
                 >
@@ -875,10 +882,54 @@ const EditResume = () => {
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold text-slate-800 group-hover:text-emerald-900 flex items-center justify-between">
-                      <span>Download PDF</span>
-                      <span className="text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md">Best Quality</span>
+                      <span>Download Resume (PDF)</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md">Vector</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 truncate">High-quality PDF for job applications</p>
+                    <p className="text-[11px] text-slate-500 truncate">High-quality vector resume</p>
+                  </div>
+                </button>
+
+                {/* Direct Matched Cover Letter PDF */}
+                <button
+                  type="button"
+                  disabled={isExporting}
+                  onClick={() => {
+                    setExportMenuOpen(false);
+                    handleDownloadCoverLetterPdf();
+                  }}
+                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-purple-50/80 hover:text-purple-950 transition-colors cursor-pointer group disabled:opacity-50"
+                >
+                  <span className="p-2 rounded-xl bg-purple-100/90 text-purple-700 group-hover:bg-purple-200 transition-colors shrink-0">
+                    <LuFileText className="text-sm" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-slate-800 group-hover:text-purple-900 flex items-center justify-between">
+                      <span>Cover Letter (PDF)</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-md">Matched</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 truncate">Synchronized 1-page letter</p>
+                  </div>
+                </button>
+
+                {/* 2-Page Application Package (Resume + Cover Letter) */}
+                <button
+                  type="button"
+                  disabled={isExporting}
+                  onClick={() => {
+                    setExportMenuOpen(false);
+                    handleDownloadApplicationPackage();
+                  }}
+                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-indigo-50/80 hover:text-indigo-950 transition-colors cursor-pointer group disabled:opacity-50"
+                >
+                  <span className="p-2 rounded-xl bg-indigo-100/90 text-indigo-700 group-hover:bg-indigo-200 transition-colors shrink-0">
+                    <LuLayers className="text-sm" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-slate-800 group-hover:text-indigo-900 flex items-center justify-between">
+                      <span>Application Package (PDF)</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md">2 Pages</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 truncate">Unified Resume + Cover Letter</p>
                   </div>
                 </button>
 
@@ -985,6 +1036,9 @@ const EditResume = () => {
           onSelectTab={(tab) => {
             setActiveTab(tab);
             setIsDrawerOpen(true);
+            if (tab === "cover-letter") {
+              setCanvasDocType("cover-letter");
+            }
           }}
           isDrawerOpen={isDrawerOpen}
           onToggleDrawer={() => setIsDrawerOpen((prev) => !prev)}
@@ -1068,6 +1122,19 @@ const EditResume = () => {
               />
             )}
 
+            {activeTab === "cover-letter" && (
+              <CoverLetterDrawer
+                resumeData={resumeData}
+                updateCoverLetter={updateCoverLetter}
+                onDownloadCoverLetterPdf={handleDownloadCoverLetterPdf}
+                onDownloadApplicationPackage={handleDownloadApplicationPackage}
+                isExporting={isExporting}
+                onClose={() => setIsDrawerOpen(false)}
+                onSwitchToCoverLetterView={() => setCanvasDocType("cover-letter")}
+                canvasDocType={canvasDocType}
+              />
+            )}
+
             {activeTab === "ai" && (
               <AiAuditDrawer
                 resumeData={resumeData?.data || resumeData}
@@ -1088,6 +1155,8 @@ const EditResume = () => {
               colorPalette={themeColorPalette}
               canvasRef={resumeRef}
               paperFormat={resumeData?.data?.metadata?.page?.format || "a4"}
+              docType={canvasDocType}
+              onDocTypeChange={setCanvasDocType}
               onShrinkToSinglePage={shrinkToSinglePage}
               onOpenDesignDrawer={() => {
                 setActiveTab("formatting");

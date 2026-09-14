@@ -229,6 +229,26 @@ export const getDefaultResumeData = (user = {}) => ({
     custom: {}
   },
 
+  coverLetter: {
+    enabled: false,
+    companyName: "",
+    jobTitle: "",
+    jobDescription: "",
+    tone: "impactful",
+    recipient: {
+      name: "Hiring Team",
+      title: "Hiring Manager",
+      company: "",
+      address: "",
+    },
+    salutation: "Dear Hiring Team,",
+    opening: "",
+    bodyParagraphs: [],
+    callToAction: "",
+    signOff: "Sincerely,",
+    signature: user.name || "",
+  },
+
   metadata: {
     template: 'pikachu',
     layout: [

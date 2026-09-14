@@ -2,6 +2,7 @@ import {
   LuFileText,
   LuPalette,
   LuSlidersHorizontal,
+  LuMail,
   LuSparkles,
   LuInfo,
 } from "react-icons/lu";
@@ -38,6 +39,12 @@ const StudioActivityRail = ({
       label: "Design",
       icon: LuSlidersHorizontal,
       tooltip: "Fonts, spacing, margins & paper size",
+    },
+    {
+      id: "cover-letter",
+      label: "Letter",
+      icon: LuMail,
+      tooltip: "Matched cover letter generator & editor",
     },
     {
       id: "ai",

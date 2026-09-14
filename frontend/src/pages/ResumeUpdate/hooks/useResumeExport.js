@@ -11,9 +11,10 @@ export const useResumeExport = (resumeId, documentTitle = "Resume") => {
 
   /**
    * Direct 1-click Headless Vector PDF export.
-   * Downloads high-fidelity A4 vector PDF directly from the backend Chromium microservice.
+   * Downloads high-fidelity A4/Letter vector PDF directly from the backend Chromium microservice.
+   * Supports: "resume" (1-page), "cover-letter" (1-page), or "package" (2-page application package).
    */
-  const handleDownloadVectorPdf = async () => {
+  const handleDownloadVectorPdf = async (mode = "resume") => {
     if (!resumeId) {
       toast.error("Resume ID is missing");
       return;
@@ -21,13 +22,21 @@ export const useResumeExport = (resumeId, documentTitle = "Resume") => {
 
     if (isExporting) return;
     setIsExporting(true);
-    const toastId = toast.loading("Generating vector PDF with Headless Chromium...", {
+
+    const loadingText =
+      mode === "cover-letter"
+        ? "Generating matched Cover Letter PDF..."
+        : mode === "package"
+        ? "Generating 2-Page Application Package (Resume + Cover Letter)..."
+        : "Generating vector PDF with Headless Chromium...";
+
+    const toastId = toast.loading(loadingText, {
       id: "pdf-export-toast",
     });
 
     try {
       const response = await axiosInstance.get(
-        API_PATHS.RESUME.EXPORT_PDF(resumeId),
+        API_PATHS.RESUME.EXPORT_PDF(resumeId, mode),
         { responseType: "blob" }
       );
       let blobData = response.data;
@@ -49,17 +58,31 @@ export const useResumeExport = (resumeId, documentTitle = "Resume") => {
       const link = document.createElement("a");
       link.href = downloadUrl;
 
-      const safeTitle = (documentTitle || "Resume")
+      const baseTitle = (documentTitle || "Resume")
         .replace(/[^a-zA-Z0-9-_ ]/g, "")
         .trim() || "Resume";
-      link.download = `${safeTitle}.pdf`;
 
+      let downloadName = `${baseTitle}.pdf`;
+      if (mode === "cover-letter") {
+        downloadName = `${baseTitle} - Cover Letter.pdf`;
+      } else if (mode === "package") {
+        downloadName = `${baseTitle} - Application Package.pdf`;
+      }
+
+      link.download = downloadName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(downloadUrl);
 
-      toast.success("Vector PDF downloaded successfully!", { id: toastId });
+      const successText =
+        mode === "cover-letter"
+          ? "Cover Letter PDF downloaded successfully!"
+          : mode === "package"
+          ? "2-Page Application Package downloaded successfully!"
+          : "Vector PDF downloaded successfully!";
+
+      toast.success(successText, { id: toastId });
     } catch (err) {
       console.error("Vector PDF export failed:", err);
       toast.error(
@@ -71,6 +94,9 @@ export const useResumeExport = (resumeId, documentTitle = "Resume") => {
     }
   };
 
+  const handleDownloadCoverLetterPdf = () => handleDownloadVectorPdf("cover-letter");
+  const handleDownloadApplicationPackage = () => handleDownloadVectorPdf("package");
+
   return {
     openThemeSelector,
     setOpenThemeSelector,
@@ -78,6 +104,8 @@ export const useResumeExport = (resumeId, documentTitle = "Resume") => {
     setOpenPreviewModal,
     isExporting,
     handleDownloadVectorPdf,
+    handleDownloadCoverLetterPdf,
+    handleDownloadApplicationPackage,
     showAtsGuidance,
     setShowAtsGuidance,
   };

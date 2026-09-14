@@ -4,6 +4,7 @@ const {
   analyzeJobMatch,
   improveBulletPoint,
   auditResume,
+  generateCoverLetter,
 } = require("../services/Gemini");
 const { geminiLimiter } = require("../middlewares/rateLimiter");
 const { validateRequest } = require("../middlewares/validateMiddleware");
@@ -12,6 +13,7 @@ const {
   jobMatchSchema,
   improveBulletSchema,
   resumeAuditSchema,
+  generateCoverLetterSchema,
 } = require("../validators/geminiValidator");
 
 const router = express.Router();
@@ -84,6 +86,38 @@ router.post(
     } catch (err) {
       console.error("Resume audit error:", err.message);
       res.status(500).json({ error: "Failed to audit resume. Please try again." });
+    }
+  }
+);
+
+// Generate Matched Cover Letter (Roadmap Item 4.4)
+router.post(
+  "/generate-cover-letter",
+  geminiLimiter,
+  validateRequest(generateCoverLetterSchema),
+  async (req, res) => {
+    const {
+      jobDescription,
+      companyName,
+      targetCompany,
+      jobTitle,
+      targetJobTitle,
+      tone,
+      resumeData,
+    } = req.body;
+
+    try {
+      const coverLetter = await generateCoverLetter({
+        jobDescription,
+        companyName: companyName || targetCompany || "",
+        jobTitle: jobTitle || targetJobTitle || "",
+        tone: tone || "impactful",
+        resumeData: resumeData || {},
+      });
+      res.json({ coverLetter, ...coverLetter });
+    } catch (err) {
+      console.error("Cover letter generation error:", err);
+      res.status(500).json({ error: err.message || "Failed to generate cover letter. Please try again." });
     }
   }
 );

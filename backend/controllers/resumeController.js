@@ -305,6 +305,7 @@ const exportResumePdf = async (req, res) => {
     }
     const frontendUrl = (process.env.FRONTEND_URL || detectedOrigin || "http://localhost:5173").replace(/\/+$/, "");
     const paperFormat = resume.data?.metadata?.page?.format || req.query?.format || "a4";
+    const mode = req.query?.mode || "resume";
 
     const pdfBuffer = await generateVectorPdf({
       resumeId: resume._id.toString(),
@@ -313,10 +314,16 @@ const exportResumePdf = async (req, res) => {
       isPublic: false,
       frontendUrl,
       format: paperFormat,
+      mode,
     });
 
-    const safeTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "Resume";
-    const filename = `${safeTitle}.pdf`;
+    const baseTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "Resume";
+    let filename = `${baseTitle}.pdf`;
+    if (mode === "cover-letter") {
+      filename = `${baseTitle} - Cover Letter.pdf`;
+    } else if (mode === "package") {
+      filename = `${baseTitle} - Application Package.pdf`;
+    }
 
     const binaryBuffer = Buffer.isBuffer(pdfBuffer) ? pdfBuffer : Buffer.from(pdfBuffer);
 

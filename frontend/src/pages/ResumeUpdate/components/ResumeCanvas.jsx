@@ -6,6 +6,7 @@ import {
   LuScissors,
   LuLayers,
   LuFileText,
+  LuMail,
   LuSparkles,
 } from "react-icons/lu";
 import toast from "react-hot-toast";
@@ -14,12 +15,14 @@ import {
   getPaperDimensions,
 } from "../hooks/usePageCalculator";
 import RenderResume from "../../../components/ResumeTemplates/RenderResume";
+import MatchedCoverLetter from "../../../components/ResumeSections/MatchedCoverLetter";
 
 /**
  * ResumeCanvas Component (Studio 2.0)
  * Expansive, calm document preview area.
  * Free of cramped button clusters, with dynamic A4 and US Letter support,
  * real-time page break guides, smooth zoom, and responsive auto-fit.
+ * Now supports seamless switching between Resume and Matched Cover Letter!
  */
 const ResumeCanvas = ({
   resumeData,
@@ -27,6 +30,8 @@ const ResumeCanvas = ({
   colorPalette,
   canvasRef, // Forwarded ref for thumbnail capture or export
   paperFormat = "a4",
+  docType = "resume", // "resume" | "cover-letter"
+  onDocTypeChange,
   onShrinkToSinglePage,
   onOpenDesignDrawer,
   onOpenAiAuditDrawer,
@@ -149,6 +154,9 @@ const ResumeCanvas = ({
     calculateAutoFit();
   };
 
+  const displayPageCount =
+    docType === "cover-letter" ? Math.max(1, pageCount) : pageCount;
+
   return (
     <div
       ref={containerRef}
@@ -156,17 +164,47 @@ const ResumeCanvas = ({
     >
       {/* 1. Calm Canvas Top Control Bar */}
       <div className="flex items-center justify-between gap-2 px-4 py-2 bg-white/95 backdrop-blur-md border-b border-slate-200/80 text-xs text-slate-700 z-10 shrink-0">
-        {/* Left: Page Count Badge & Paper Format indicator */}
+        {/* Left: Document Mode Switcher Pill & Page Count Badge */}
         <div className="flex items-center gap-2">
+          {/* Document Switcher: Resume vs Matched Cover Letter */}
+          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200/80 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => onDocTypeChange && onDocTypeChange("resume")}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
+                docType === "resume"
+                  ? "bg-white text-purple-700 font-bold shadow-2xs"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+              title="View & edit Resume document"
+            >
+              <LuFileText className="text-xs" />
+              <span>Resume</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onDocTypeChange && onDocTypeChange("cover-letter")}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
+                docType === "cover-letter"
+                  ? "bg-white text-purple-700 font-bold shadow-2xs"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+              title="View & edit Matched Cover Letter"
+            >
+              <LuMail className="text-xs" />
+              <span>Cover Letter</span>
+            </button>
+          </div>
+
+          {/* Page Count Badge & Paper Format indicator */}
           <button
             type="button"
             onClick={onOpenDesignDrawer}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200/80 border border-slate-200/80 text-xs text-slate-700 font-semibold shrink-0 transition-colors cursor-pointer"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200/80 border border-slate-200/80 text-xs text-slate-700 font-semibold shrink-0 transition-colors cursor-pointer"
             title="Click to open Design drawer (A4 vs Letter, Margins, Spacing)"
           >
-            <LuFileText className="text-xs text-slate-500" />
             <span>
-              {pageCount} {pageCount === 1 ? "Page" : "Pages"} · {activePaper.shortLabel}
+              {displayPageCount} {displayPageCount === 1 ? "Page" : "Pages"} · {activePaper.shortLabel}
             </span>
           </button>
         </div>
@@ -196,22 +234,26 @@ const ResumeCanvas = ({
             Pages
           </button>
 
-          <div className="w-px h-3 bg-slate-300 mx-0.5" />
+          {docType === "resume" && (
+            <>
+              <div className="w-px h-3 bg-slate-300 mx-0.5" />
 
-          {/* Cutoff Guides Toggle */}
-          <button
-            type="button"
-            onClick={() => setShowGuides((prev) => !prev)}
-            className={`px-2 py-0.5 rounded-md text-[11px] flex items-center gap-1 transition-colors cursor-pointer ${
-              showGuides && viewMode === "continuous"
-                ? "text-purple-700 font-semibold"
-                : "text-slate-400 hover:text-slate-600"
-            }`}
-            title="Toggle visual page break guide lines"
-          >
-            <LuScissors className="text-xs" />
-            <span className="hidden md:inline">Guides</span>
-          </button>
+              {/* Cutoff Guides Toggle */}
+              <button
+                type="button"
+                onClick={() => setShowGuides((prev) => !prev)}
+                className={`px-2 py-0.5 rounded-md text-[11px] flex items-center gap-1 transition-colors cursor-pointer ${
+                  showGuides && viewMode === "continuous"
+                    ? "text-purple-700 font-semibold"
+                    : "text-slate-400 hover:text-slate-600"
+                }`}
+                title="Toggle visual page break guide lines"
+              >
+                <LuScissors className="text-xs" />
+                <span className="hidden md:inline">Guides</span>
+              </button>
+            </>
+          )}
         </div>
 
         {/* Right: Smooth Zoom Controls */}
@@ -266,7 +308,7 @@ const ResumeCanvas = ({
           <div
             style={{
               width: `${Math.round(activePaper.widthPx * zoom)}px`,
-              height: `${Math.round(pageCount * activePaper.heightPx * zoom)}px`,
+              height: `${Math.round(displayPageCount * activePaper.heightPx * zoom)}px`,
               position: "relative",
               transition: "width 0.15s ease-out, height 0.15s ease-out",
             }}
@@ -279,14 +321,14 @@ const ResumeCanvas = ({
                 top: 0,
                 left: 0,
                 width: `${activePaper.widthPx}px`,
-                minHeight: `${pageCount * activePaper.heightPx}px`,
+                minHeight: `${displayPageCount * activePaper.heightPx}px`,
                 transform: `scale(${zoom})`,
                 transformOrigin: "top left",
               }}
               className="a4-paper-sheet bg-white"
             >
-              {/* Overlaid Visual Page Break Lines */}
-              {showGuides &&
+              {/* Overlaid Visual Page Break Lines (Resume only) */}
+              {docType === "resume" && showGuides &&
                 breakPositions.map((pos, idx) => (
                   <div
                     key={`page-break-${idx}`}
@@ -302,15 +344,25 @@ const ResumeCanvas = ({
                   </div>
                 ))}
 
-              {/* Resume Content */}
+              {/* Document Content */}
               <div ref={sheetContentRef} className="w-full">
-                {resumeData?.basics && (
-                  <RenderResume
-                    templateId={templateId}
-                    resumeData={resumeData}
-                    colorPalette={colorPalette}
+                {docType === "cover-letter" ? (
+                  <MatchedCoverLetter
+                    basics={resumeData?.basics}
+                    metadata={resumeData?.metadata}
+                    coverLetter={resumeData?.coverLetter}
+                    themeColors={colorPalette}
                     containerWidth={activePaper.widthPx}
                   />
+                ) : (
+                  resumeData?.basics && (
+                    <RenderResume
+                      templateId={templateId}
+                      resumeData={resumeData}
+                      colorPalette={colorPalette}
+                      containerWidth={activePaper.widthPx}
+                    />
+                  )
                 )}
               </div>
             </div>
@@ -323,7 +375,7 @@ const ResumeCanvas = ({
             style={{
               width: `${Math.round(activePaper.widthPx * zoom)}px`,
               height: `${Math.round(
-                (pageCount * activePaper.heightPx + (pageCount - 1) * 24) * zoom
+                (displayPageCount * activePaper.heightPx + (displayPageCount - 1) * 24) * zoom
               )}px`,
               position: "relative",
               transition: "width 0.15s ease-out, height 0.15s ease-out",
@@ -341,7 +393,7 @@ const ResumeCanvas = ({
               }}
               className="flex flex-col gap-6"
             >
-              {Array.from({ length: pageCount }).map((_, pageIdx) => (
+              {Array.from({ length: displayPageCount }).map((_, pageIdx) => (
                 <div
                   key={`paper-page-card-${pageIdx}`}
                   className="relative a4-paper-sheet shadow-2xl rounded-xs bg-white border border-gray-200 overflow-hidden"
@@ -352,7 +404,7 @@ const ResumeCanvas = ({
                 >
                   {/* Page Card Header Badge */}
                   <div className="absolute top-2 right-3 z-20 px-2 py-0.5 rounded bg-gray-100/90 border border-gray-200 text-[11px] font-semibold text-gray-500 select-none shadow-xs">
-                    Page {pageIdx + 1} of {pageCount} · {activePaper.shortLabel}
+                    Page {pageIdx + 1} of {displayPageCount} · {activePaper.shortLabel}
                   </div>
 
                   {/* Window into the continuous content clipped per page */}
@@ -364,13 +416,23 @@ const ResumeCanvas = ({
                       width: `${activePaper.widthPx}px`,
                     }}
                   >
-                    {resumeData?.basics && (
-                      <RenderResume
-                        templateId={templateId}
-                        resumeData={resumeData}
-                        colorPalette={colorPalette}
+                    {docType === "cover-letter" ? (
+                      <MatchedCoverLetter
+                        basics={resumeData?.basics}
+                        metadata={resumeData?.metadata}
+                        coverLetter={resumeData?.coverLetter}
+                        themeColors={colorPalette}
                         containerWidth={activePaper.widthPx}
                       />
+                    ) : (
+                      resumeData?.basics && (
+                        <RenderResume
+                          templateId={templateId}
+                          resumeData={resumeData}
+                          colorPalette={colorPalette}
+                          containerWidth={activePaper.widthPx}
+                        />
+                      )
                     )}
                   </div>
                 </div>
