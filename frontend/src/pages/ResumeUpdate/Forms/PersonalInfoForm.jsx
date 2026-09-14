@@ -2,13 +2,17 @@ import { useEffect, useMemo } from "react";
 import {
   LuUser,
   LuQrCode,
-  LuGlobe,
-  LuLink,
   LuSmartphone,
   LuSparkles,
+  LuLink,
 } from "react-icons/lu";
+import {
+  FaGlobe,
+  FaLinkedin,
+  FaGithub,
+  FaLink as FaLinkIcon,
+} from "react-icons/fa6";
 import ProfilePhotoSelector from "../../../components/Inputs/ProfilePhotoSelector";
-import BrandIcon from "../../../components/shared/BrandIcon";
 import ResumeQrCode, {
   resolveQrUrl,
   getDefaultSubtitle,
@@ -18,22 +22,22 @@ const DESTINATIONS = [
   {
     id: "portfolio",
     label: "Portfolio",
-    icon: ({ className }) => <LuGlobe className={className} />,
+    icon: FaGlobe,
   },
   {
     id: "linkedin",
     label: "LinkedIn",
-    icon: ({ className }) => <BrandIcon slug="linkedin" className={className} />,
+    icon: FaLinkedin,
   },
   {
     id: "github",
     label: "GitHub",
-    icon: ({ className }) => <BrandIcon slug="github" className={className} />,
+    icon: FaGithub,
   },
   {
     id: "custom",
-    label: "Custom Link",
-    icon: ({ className }) => <LuLink className={className} />,
+    label: "Custom",
+    icon: FaLinkIcon,
   },
 ];
 
@@ -177,10 +181,10 @@ const PersonalInfoForm = ({ profileData = {}, updateSection, profiles = [] }) =>
       {/* 3. Discreet QR Code Generator (Roadmap Item 3.2) */}
       <div className="border border-slate-200/80 rounded-2xl p-4 sm:p-5 bg-white shadow-2xs space-y-4 transition-all">
         {/* Card Header with Enable Toggle */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-start sm:items-center justify-between gap-3">
+          <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
             <div
-              className={`p-2.5 rounded-xl transition-colors shrink-0 ${
+              className={`p-2.5 rounded-xl transition-colors shrink-0 mt-0.5 sm:mt-0 ${
                 isQrEnabled
                   ? "bg-purple-600 text-white shadow-xs shadow-purple-500/20"
                   : "bg-slate-100 text-slate-500"
@@ -188,15 +192,17 @@ const PersonalInfoForm = ({ profileData = {}, updateSection, profiles = [] }) =>
             >
               <LuQrCode className="w-5 h-5" />
             </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-slate-900">Discreet QR Code</h3>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <h3 className="text-sm font-bold text-slate-900 whitespace-nowrap">
+                  Discreet QR Code
+                </h3>
                 <span className="text-[10px] font-bold text-purple-700 bg-purple-100/70 px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
                   Paper ➔ Digital
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5 truncate">
-                Bridge your physical resume to your digital portfolio or LinkedIn.
+              <p className="text-xs text-slate-500 mt-0.5 leading-snug">
+                Connect your printed resume to your online profile or portfolio.
               </p>
             </div>
           </div>
@@ -217,7 +223,7 @@ const PersonalInfoForm = ({ profileData = {}, updateSection, profiles = [] }) =>
                 showSubtitle: qr.showSubtitle !== false,
               });
             }}
-            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 ${
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 mt-0.5 sm:mt-0 ${
               isQrEnabled ? "bg-purple-600" : "bg-slate-200"
             }`}
           >
@@ -255,14 +261,22 @@ const PersonalInfoForm = ({ profileData = {}, updateSection, profiles = [] }) =>
                           subtitle: qr.subtitle || newSubtitle,
                         });
                       }}
-                      className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                      className={`group flex flex-col items-center justify-center gap-2 p-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
                         isSelected
                           ? "bg-purple-50 text-purple-900 border-purple-500 ring-1 ring-purple-500/20 shadow-xs"
-                          : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+                          : "bg-white text-slate-700 border-slate-200/80 hover:bg-slate-50 hover:border-slate-300"
                       }`}
                     >
-                      <Icon className={`text-base ${isSelected ? "text-purple-600" : "text-slate-500"}`} />
-                      <span>{dest.label}</span>
+                      <div
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                          isSelected
+                            ? "bg-purple-600 text-white shadow-2xs"
+                            : "bg-slate-100 text-slate-600 group-hover:bg-slate-200 group-hover:text-slate-900"
+                        }`}
+                      >
+                        <Icon className="w-4 h-4 shrink-0" />
+                      </div>
+                      <span className="tracking-tight">{dest.label}</span>
                     </button>
                   );
                 })}
