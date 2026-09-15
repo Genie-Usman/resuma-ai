@@ -25,6 +25,8 @@ export const API_PATHS = {
                 ? `/api/resume/${id}/export-pdf`
                 : `/api/resume/${id}/export-pdf?mode=${encodeURIComponent(mode)}`,
         EXPORT_PUBLIC_PDF: (slug) => `/api/resume/public/${slug}/export-pdf`,
+        EXPORT_DOCX: (id) => `/api/resume/${id}/export-docx`,
+        EXPORT_PUBLIC_DOCX: (slug) => `/api/resume/public/${slug}/export-docx`,
     },
 
     IMAGE: {

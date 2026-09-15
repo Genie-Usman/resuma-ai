@@ -9,6 +9,8 @@ const {
   getPublicResume,
   exportResumePdf,
   exportPublicResumePdf,
+  exportResumeDocx,
+  exportPublicResumeDocx,
 } = require("../controllers/resumeController");
 
 const { uploadResumeImages } = require("../controllers/uploadImages");
@@ -23,12 +25,14 @@ const router = express.Router();
 // Public Resume Routes (Unauthenticated Recruiter View & PDF Export)
 router.get("/public/:slug", getPublicResume);
 router.get("/public/:slug/export-pdf", exportPublicResumePdf);
+router.get("/public/:slug/export-docx", exportPublicResumeDocx);
 
 // Core Protected Resume Routes
 router.post("/", protect, validateRequest(createResumeSchema), createResume);
 router.get("/", protect, getUserResumes);
 router.get("/:id", protect, getResumeById);
 router.get("/:id/export-pdf", protect, exportResumePdf);
+router.get("/:id/export-docx", protect, exportResumeDocx);
 router.post("/:id/duplicate", protect, duplicateResume);
 router.put("/:id", protect, validateRequest(updateResumeSchema), updateResume);
 router.delete("/:id", protect, deleteResume);

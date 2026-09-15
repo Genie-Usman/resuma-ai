@@ -97,6 +97,72 @@ export const useResumeExport = (resumeId, documentTitle = "Resume") => {
   const handleDownloadCoverLetterPdf = () => handleDownloadVectorPdf("cover-letter");
   const handleDownloadApplicationPackage = () => handleDownloadVectorPdf("package");
 
+  /**
+   * Direct 1-click Editable Word (.docx) export.
+   * Downloads an ATS-compliant, native Microsoft Word resume generated on the backend.
+   */
+  const handleDownloadDocx = async () => {
+    if (!resumeId) {
+      toast.error("Resume ID is missing");
+      return;
+    }
+
+    if (isExporting) return;
+    setIsExporting(true);
+
+    const toastId = toast.loading("Generating editable Word document (.docx)...", {
+      id: "docx-export-toast",
+    });
+
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.RESUME.EXPORT_DOCX(resumeId),
+        { responseType: "blob" }
+      );
+      let blobData = response.data;
+
+      // Defensive recovery for serialized JSON bytes
+      if (blobData instanceof Blob) {
+        const previewText = await blobData.slice(0, 10).text();
+        if (previewText.startsWith('{"0":') || previewText.startsWith('{"typ')) {
+          const fullText = await blobData.text();
+          const parsed = JSON.parse(fullText);
+          const bytes = parsed.data ? parsed.data : Object.values(parsed);
+          blobData = new Uint8Array(bytes);
+        }
+      }
+
+      const blob = new Blob([blobData], {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+
+      const baseTitle = (documentTitle || "Resume")
+        .replace(/[^a-zA-Z0-9-_ ]/g, "")
+        .trim() || "Resume";
+
+      link.download = `${baseTitle}.docx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+
+      toast.success("Word document (.docx) downloaded successfully!", {
+        id: toastId,
+      });
+    } catch (err) {
+      console.error("DOCX export failed:", err);
+      toast.error(
+        err.response?.data?.message || "Failed to generate Word document",
+        { id: toastId }
+      );
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return {
     openThemeSelector,
     setOpenThemeSelector,
@@ -106,6 +172,7 @@ export const useResumeExport = (resumeId, documentTitle = "Resume") => {
     handleDownloadVectorPdf,
     handleDownloadCoverLetterPdf,
     handleDownloadApplicationPackage,
+    handleDownloadDocx,
     showAtsGuidance,
     setShowAtsGuidance,
   };

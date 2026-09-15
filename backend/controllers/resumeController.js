@@ -5,6 +5,7 @@ const User = require('../models/User.js');
 const { getDefaultResumeData } = require('../utils/DefaultResume.js');
 const { slugify } = require('../utils/helper.js');
 const { generateVectorPdf } = require('../services/pdfService');
+const { generateResumeDocx } = require('../services/docxService');
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
@@ -382,6 +383,80 @@ const exportPublicResumePdf = async (req, res) => {
   }
 };
 
+// @desc    Export Resume as Editable Microsoft Word Document (.docx)
+// @route   GET /api/resume/:id/export-docx
+// @access  Private
+const exportResumeDocx = async (req, res) => {
+  try {
+    const resume = await Resume.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+    });
+
+    if (!resume) {
+      return res.status(404).json({ message: "Resume not found or unauthorized" });
+    }
+
+    const docxBuffer = await generateResumeDocx({
+      resumeData: resume.data || {},
+    });
+
+    const safeTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "Resume";
+    const filename = `${safeTitle}.docx`;
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${encodeURIComponent(filename)}"`
+    );
+    res.setHeader("Content-Length", docxBuffer.length);
+    res.end(docxBuffer);
+  } catch (error) {
+    console.error("Export DOCX error:", error);
+    res.status(500).json({ message: "Failed to generate Word document", error: error.message });
+  }
+};
+
+// @desc    Export Public Resume as Editable Microsoft Word Document (.docx)
+// @route   GET /api/resume/public/:slug/export-docx
+// @access  Public
+const exportPublicResumeDocx = async (req, res) => {
+  try {
+    const resume = await Resume.findOne({
+      slug: req.params.slug,
+      isPublic: { $ne: false },
+    });
+
+    if (!resume) {
+      return res.status(404).json({ message: "Resume not found or is set to private." });
+    }
+
+    const docxBuffer = await generateResumeDocx({
+      resumeData: resume.data || {},
+    });
+
+    const safeTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "Resume";
+    const filename = `${safeTitle}.docx`;
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${encodeURIComponent(filename)}"`
+    );
+    res.setHeader("Content-Length", docxBuffer.length);
+    res.end(docxBuffer);
+  } catch (error) {
+    console.error("Export public DOCX error:", error);
+    res.status(500).json({ message: "Failed to generate Word document", error: error.message });
+  }
+};
+
 module.exports = {
   createResume,
   getUserResumes,
@@ -392,4 +467,6 @@ module.exports = {
   getPublicResume,
   exportResumePdf,
   exportPublicResumePdf,
-};
+  exportResumeDocx,
+  exportPublicResumeDocx,
+};

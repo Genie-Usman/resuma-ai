@@ -10,6 +10,7 @@ import {
   LuZoomOut,
   LuMaximize2,
   LuCircleAlert,
+  LuFileText,
 } from "react-icons/lu";
 import toast from "react-hot-toast";
 import RenderResume from "../../components/ResumeTemplates/RenderResume";
@@ -118,6 +119,54 @@ const PublicResumeView = () => {
     } catch (err) {
       console.error("Public PDF export error:", err);
       toast.error(err.response?.data?.message || "Failed to download vector PDF", { id: toastId });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleDownloadDocx = async () => {
+    if (!slug) return;
+    setIsExporting(true);
+    const toastId = toast.loading("Generating editable Word document (.docx)...", { id: "public-docx" });
+
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.RESUME.EXPORT_PUBLIC_DOCX(slug),
+        { responseType: "blob" }
+      );
+
+      let blobData = response.data;
+      if (blobData instanceof Blob) {
+        const previewText = await blobData.slice(0, 10).text();
+        if (previewText.startsWith('{"0":') || previewText.startsWith('{"typ')) {
+          const fullText = await blobData.text();
+          const parsed = JSON.parse(fullText);
+          const bytes = parsed.data ? parsed.data : Object.values(parsed);
+          blobData = new Uint8Array(bytes);
+        }
+      }
+
+      const blob = new Blob([blobData], {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+
+      const safeTitle = (resume?.title || "Candidate-Resume")
+        .replace(/[^a-zA-Z0-9-_ ]/g, "")
+        .trim() || "Candidate-Resume";
+      link.download = `${safeTitle}.docx`;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+
+      toast.success("Word document (.docx) downloaded successfully!", { id: toastId });
+    } catch (err) {
+      console.error("Public DOCX export error:", err);
+      toast.error(err.response?.data?.message || "Failed to download Word document", { id: toastId });
     } finally {
       setIsExporting(false);
     }
@@ -242,6 +291,18 @@ const PublicResumeView = () => {
                 <LuDownload className="text-sm" />
               )}
               <span>{isExporting ? "Exporting..." : "Download PDF"}</span>
+            </button>
+
+            {/* Download Word Document (.docx) */}
+            <button
+              type="button"
+              disabled={isExporting}
+              onClick={handleDownloadDocx}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+              title="Download editable Word document (.docx)"
+            >
+              <LuFileText className="text-sm" />
+              <span>Word (.docx)</span>
             </button>
 
             {/* Platform Branding CTA */}

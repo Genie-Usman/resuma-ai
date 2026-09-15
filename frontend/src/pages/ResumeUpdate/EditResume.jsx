@@ -257,6 +257,7 @@ const EditResume = () => {
     handleDownloadVectorPdf,
     handleDownloadCoverLetterPdf,
     handleDownloadApplicationPackage,
+    handleDownloadDocx,
   } = useResumeExport(resumeId, resumeData?.title);
 
   // Snapshot initial loaded data
@@ -886,6 +887,28 @@ const EditResume = () => {
                       <span className="text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md">Vector</span>
                     </div>
                     <p className="text-[11px] text-slate-500 truncate">High-quality vector resume</p>
+                  </div>
+                </button>
+
+                {/* Editable Word / DOCX Export */}
+                <button
+                  type="button"
+                  disabled={isExporting}
+                  onClick={() => {
+                    setExportMenuOpen(false);
+                    handleDownloadDocx();
+                  }}
+                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-blue-50/80 hover:text-blue-950 transition-colors cursor-pointer group disabled:opacity-50"
+                >
+                  <span className="p-2 rounded-xl bg-blue-100/90 text-blue-700 group-hover:bg-blue-200 transition-colors shrink-0">
+                    <LuFileText className="text-sm" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-slate-800 group-hover:text-blue-900 flex items-center justify-between">
+                      <span>Download Word Document (.docx)</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-md">DOCX</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 truncate">Editable Word format for recruiters</p>
                   </div>
                 </button>
 

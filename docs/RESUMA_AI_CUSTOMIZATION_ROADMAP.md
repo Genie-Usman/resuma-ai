@@ -230,10 +230,14 @@ A comprehensive guide and specification document outlining planned customization
 
 ## 5. Export, Sharing & Version Management
 
-### 5.1 Editable Word / DOCX Export
+### 5.1 Editable Word / DOCX Export [COMPLETED]
 * **Goal**: Support recruiters and agencies that explicitly require `.docx` submissions.
 * **Implementation**:
-  * Use `docx` npm library to convert resume schema JSON into native Word styles, tables, and bulleted lists.
+  * Utilizes `docx` npm library to convert resume schema JSON into native OpenXML styles, borderless alignment tables, and bulleted lists.
+  * **HTML to Word Parser**: Parses rich HTML summaries and bullet items into native Word paragraph runs (`bullet: { level: 0 }`, `<strong>`, `<em>`).
+  * **ATS & Recruiter Compliant**: Standard 0.75-inch (1080 dxa) margins, universal typography (Arial), themed section dividers, and borderless 2-column header tables to prevent tab stop misalignment.
+  * **Multi-Channel Availability**: 1-click download in Studio Export dropdown menu (`Download Word Document (.docx)`) and on recruiter public portfolio links (`resuma.ai/p/:slug`).
+  * **Dual REST Endpoints**: `GET /api/resume/:id/export-docx` (authenticated) and `GET /api/resume/public/:slug/export-docx` (public).
 
 ### 5.2 Public Web Portfolio Link (`resuma.ai/p/:slug`)
 * **Goal**: Allow users to share a beautiful responsive web version of their resume with a single link.
@@ -265,8 +269,8 @@ A comprehensive guide and specification document outlining planned customization
 | **In-Line AI Bullet Point Polisher** | AI Suite | Very High | Low-Medium (2 days)| 🟡 Phase 2 |
 | **Discreet Contact QR Code** | Content | Medium | Low (1 day) | 🔵 Phase 3 |
 | **Public Portfolio Web Link** | Sharing | High | Medium (3 days) | 🔵 Phase 3 |
-| **DOCX / Word Export** | Export | High | High (4 days) | 🔵 Phase 3 |
-| **Matched Cover Letter Generator** | AI Suite | Very High | High (4 days) | 🟣 Phase 4 |
+| **DOCX / Word Export** | Export | High | High (4 days) | ✅ Completed |
+| **Matched Cover Letter Generator** | AI Suite | Very High | High (4 days) | ✅ Completed |
 
 ---
 
