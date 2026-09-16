@@ -6,6 +6,7 @@ export const TWO_COLUMN_TEMPLATES = new Set([
   "glalie",
   "leafish",
   "pikachu",
+  "cascade",
 ]);
 
 export const isTwoColumnTemplate = (templateId) => {

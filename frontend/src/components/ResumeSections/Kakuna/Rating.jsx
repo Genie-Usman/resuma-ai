@@ -1,5 +1,8 @@
+import { normalizeRatingLevel } from '../../../utils/ratingUtils';
+
 const Rating = ({ level, themeColors }) => {
-  const normalized = Math.round((level / 100) * 5);
+  const normalized = normalizeRatingLevel(level);
+  if (!normalized) return null;
 
   return (
     <div className="flex items-center gap-x-1.5">
@@ -20,6 +23,6 @@ const Rating = ({ level, themeColors }) => {
       })}
     </div>
   );
-}
+};
 
 export default Rating;

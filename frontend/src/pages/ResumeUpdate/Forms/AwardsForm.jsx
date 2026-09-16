@@ -61,8 +61,8 @@ const AwardsForm = ({
               )}
             </div>
 
-            {/* Inputs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Inputs - Stacked cleanly for spacious, un-truncated layout */}
+            <div className="space-y-3.5">
               <div>
                 <label className="studio-label">Award Title</label>
                 <input
@@ -80,12 +80,12 @@ const AwardsForm = ({
                   type="text"
                   value={item.awarder || ""}
                   onChange={({ target }) => updateArrayItem(index, "awarder", target.value)}
-                  placeholder="e.g. OpenAI & Microsoft"
+                  placeholder="e.g. OpenAI & Microsoft, IEEE"
                   className="studio-input"
                 />
               </div>
 
-              <div className="sm:col-span-2">
+              <div>
                 <label className="studio-label">Date Received</label>
                 <input
                   type="text"

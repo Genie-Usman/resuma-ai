@@ -63,8 +63,8 @@ const VolunteeringForm = ({
               )}
             </div>
 
-            {/* Inputs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Inputs - Stacked cleanly for spacious, un-truncated layout */}
+            <div className="space-y-3.5">
               <div>
                 <label className="studio-label">Organization / Initiative</label>
                 <input
@@ -87,26 +87,28 @@ const VolunteeringForm = ({
                 />
               </div>
 
-              <div>
-                <label className="studio-label">Location</label>
-                <input
-                  type="text"
-                  value={item.location || ""}
-                  onChange={({ target }) => updateArrayItem(index, "location", target.value)}
-                  placeholder="e.g. San Francisco, CA"
-                  className="studio-input"
-                />
-              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="studio-label">Location</label>
+                  <input
+                    type="text"
+                    value={item.location || ""}
+                    onChange={({ target }) => updateArrayItem(index, "location", target.value)}
+                    placeholder="e.g. San Francisco, CA"
+                    className="studio-input"
+                  />
+                </div>
 
-              <div>
-                <label className="studio-label">Dates / Period</label>
-                <input
-                  type="text"
-                  value={item.date || ""}
-                  onChange={({ target }) => updateArrayItem(index, "date", target.value)}
-                  placeholder="e.g. 2023 - Present"
-                  className="studio-input"
-                />
+                <div>
+                  <label className="studio-label">Dates / Period</label>
+                  <input
+                    type="text"
+                    value={item.date || ""}
+                    onChange={({ target }) => updateArrayItem(index, "date", target.value)}
+                    placeholder="e.g. 2023 - Present"
+                    className="studio-input"
+                  />
+                </div>
               </div>
             </div>
 

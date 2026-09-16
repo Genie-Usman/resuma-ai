@@ -85,8 +85,8 @@ const ProfileForm = ({
               )}
             </div>
 
-            {/* Inputs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Inputs - Stacked cleanly for spacious, un-truncated layout */}
+            <div className="space-y-3.5">
               <div>
                 <label className="studio-label">Network / Platform</label>
                 <input
@@ -115,7 +115,7 @@ const ProfileForm = ({
                 />
               </div>
 
-              <div className="sm:col-span-2">
+              <div>
                 <label className="studio-label">Profile URL</label>
                 <input
                   type="url"
@@ -132,7 +132,7 @@ const ProfileForm = ({
                 />
               </div>
 
-              <div className="sm:col-span-2">
+              <div>
                 <label className="studio-label">Icon Slug</label>
                 <div className="flex items-center gap-2">
                   <div className="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0">

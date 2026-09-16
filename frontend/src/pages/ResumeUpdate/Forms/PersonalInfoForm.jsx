@@ -147,34 +147,32 @@ const PersonalInfoForm = ({ profileData = {}, updateSection, profiles = [] }) =>
         </div>
 
         {/* Location & Portfolio Website */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div>
-            <label className="studio-label">Location / City</label>
-            <input
-              type="text"
-              value={profileData?.location || ""}
-              onChange={({ target }) => updateSection("location", target.value)}
-              placeholder="San Francisco, CA (Remote)"
-              className="studio-input"
-            />
-          </div>
+        <div>
+          <label className="studio-label">Location / City</label>
+          <input
+            type="text"
+            value={profileData?.location || ""}
+            onChange={({ target }) => updateSection("location", target.value)}
+            placeholder="San Francisco, CA (Remote)"
+            className="studio-input"
+          />
+        </div>
 
-          <div>
-            <label className="studio-label">Portfolio / Website</label>
-            <input
-              type="url"
-              value={profileData?.url?.href || ""}
-              onChange={({ target }) =>
-                updateSection("url", {
-                  ...profileData?.url,
-                  href: target.value,
-                  label: target.value.replace(/^https?:\/\//, ""),
-                })
-              }
-              placeholder="https://alexmorgan.dev"
-              className="studio-input"
-            />
-          </div>
+        <div>
+          <label className="studio-label">Portfolio / Website</label>
+          <input
+            type="url"
+            value={profileData?.url?.href || ""}
+            onChange={({ target }) =>
+              updateSection("url", {
+                ...profileData?.url,
+                href: target.value,
+                label: target.value.replace(/^https?:\/\//, ""),
+              })
+            }
+            placeholder="https://alexmorgan.dev"
+            className="studio-input"
+          />
         </div>
       </div>
 

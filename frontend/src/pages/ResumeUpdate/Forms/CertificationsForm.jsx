@@ -61,15 +61,15 @@ const CertificationsForm = ({
               )}
             </div>
 
-            {/* Inputs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Inputs - Stacked cleanly for full visibility of long names and URLs */}
+            <div className="space-y-3.5">
               <div>
                 <label className="studio-label">Certificate Name</label>
                 <input
                   type="text"
                   value={item.name || ""}
                   onChange={({ target }) => updateArrayItem(index, "name", target.value)}
-                  placeholder="e.g. AWS Solutions Architect - Professional"
+                  placeholder="e.g. AWS Certified Solutions Architect - Professional"
                   className="studio-input"
                 />
               </div>
@@ -80,7 +80,7 @@ const CertificationsForm = ({
                   type="text"
                   value={item.issuer || ""}
                   onChange={({ target }) => updateArrayItem(index, "issuer", target.value)}
-                  placeholder="e.g. Amazon Web Services, Google Cloud"
+                  placeholder="e.g. Amazon Web Services, Google Cloud, Microsoft"
                   className="studio-input"
                 />
               </div>
@@ -91,7 +91,7 @@ const CertificationsForm = ({
                   type="text"
                   value={item.date || ""}
                   onChange={({ target }) => updateArrayItem(index, "date", target.value)}
-                  placeholder="e.g. Nov 2023 - Nov 2026"
+                  placeholder="e.g. Nov 2023 - Nov 2026, 2024"
                   className="studio-input"
                 />
               </div>
@@ -104,7 +104,7 @@ const CertificationsForm = ({
                   onChange={({ target }) =>
                     updateArrayItem(index, "url.href", target.value)
                   }
-                  placeholder="https://cp.certmetrics.com/..."
+                  placeholder="https://cp.certmetrics.com/... or Credential ID"
                   className="studio-input"
                 />
               </div>

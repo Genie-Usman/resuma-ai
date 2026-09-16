@@ -683,6 +683,22 @@ const EditResume = () => {
         return (
           <SkillsForm
             skills={sections.skills?.items || []}
+            showRatings={sections.skills?.showRatings !== false}
+            onToggleShowRatings={(val) =>
+              setResumeData((prev) => ({
+                ...prev,
+                data: {
+                  ...prev.data,
+                  sections: {
+                    ...prev.data.sections,
+                    skills: {
+                      ...prev.data.sections.skills,
+                      showRatings: typeof val === "boolean" ? val : !prev.data.sections.skills?.showRatings,
+                    },
+                  },
+                },
+              }), true)
+            }
             updateArrayItem={(index, key, value) => updateArrayItem("skills", index, key, value)}
             addArrayItem={() => addArrayItem("skills", defaultSkillsItem)}
             removeArrayItem={(index) => removeArrayItem("skills", index)}
@@ -743,6 +759,22 @@ const EditResume = () => {
         return (
           <LanguageForm
             languages={sections.languages?.items || []}
+            showRatings={sections.languages?.showRatings !== false}
+            onToggleShowRatings={(val) =>
+              setResumeData((prev) => ({
+                ...prev,
+                data: {
+                  ...prev.data,
+                  sections: {
+                    ...prev.data.sections,
+                    languages: {
+                      ...prev.data.sections.languages,
+                      showRatings: typeof val === "boolean" ? val : !prev.data.sections.languages?.showRatings,
+                    },
+                  },
+                },
+              }), true)
+            }
             updateArrayItem={(index, key, value) => updateArrayItem("languages", index, key, value)}
             addArrayItem={() => addArrayItem("languages", defaultLanguageItem)}
             removeArrayItem={(index) => removeArrayItem("languages", index)}
@@ -1160,9 +1192,9 @@ const EditResume = () => {
           onManualSave={handleManualSave}
         />
 
-        {/* Standardized Studio Drawer (450px) - Zero Layout Shift Across Modes */}
+        {/* Standardized Studio Drawer (480px) - Zero Layout Shift Across Modes */}
         {isDrawerOpen && (
-          <div className="w-[450px] h-full shrink-0 z-20 border-r border-slate-200/90 bg-white flex flex-col overflow-hidden select-none">
+          <div className="w-[460px] sm:w-[480px] h-full shrink-0 z-20 border-r border-slate-200/90 bg-white flex flex-col overflow-hidden select-none">
             {activeTab === "content" && (
               <ContentDrawer
                 activePage={activePage}

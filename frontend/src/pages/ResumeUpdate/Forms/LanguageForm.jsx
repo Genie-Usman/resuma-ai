@@ -1,11 +1,14 @@
 import { useEffect } from "react";
-import { LuLanguages, LuPlus, LuTrash2 } from "react-icons/lu";
+import { LuLanguages, LuPlus, LuTrash2, LuEye, LuEyeOff } from "react-icons/lu";
 import { defaultLanguageItem } from "../../../constants";
 import RatingInput from "../../../components/Inputs/RatingInput";
 import SectionFormHeader from "../components/SectionFormHeader";
+import { LANGUAGE_LEVEL_LABELS } from "../../../utils/ratingUtils";
 
 const LanguageForm = ({
   languages,
+  showRatings = true,
+  onToggleShowRatings,
   updateArrayItem,
   addArrayItem,
   removeArrayItem,
@@ -52,6 +55,41 @@ const LanguageForm = ({
         onRenameTitle={onRenameTitle}
       />
 
+      {/* Section-Wide Rating Visibility Switch */}
+      {onToggleShowRatings && (
+        <div className="flex items-center justify-between p-3 bg-purple-50/60 border border-purple-200/70 rounded-xl">
+          <div className="flex items-center gap-2.5">
+            <div className={`p-1.5 rounded-lg ${showRatings ? "bg-purple-100 text-purple-700" : "bg-slate-200 text-slate-500"}`}>
+              {showRatings ? <LuEye className="w-4 h-4" /> : <LuEyeOff className="w-4 h-4" />}
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-slate-800">
+                Language Fluency Ratings
+              </p>
+              <p className="text-[11px] text-slate-500">
+                {showRatings
+                  ? "Displaying fluency meters on supported resume templates"
+                  : "Ratings hidden across all languages"}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onToggleShowRatings(!showRatings)}
+            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+              showRatings ? "bg-purple-600" : "bg-slate-300"
+            }`}
+            title={showRatings ? "Hide all ratings" : "Show ratings"}
+          >
+            <span
+              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                showRatings ? "translate-x-4" : "translate-x-0"
+              }`}
+            />
+          </button>
+        </div>
+      )}
+
       {/* Language Cards */}
       <div className="space-y-4">
         {languages.map((item, index) => (
@@ -82,40 +120,30 @@ const LanguageForm = ({
               )}
             </div>
 
-            {/* Inputs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Inputs - Stacked cleanly for spacious, un-truncated layout */}
+            <div className="space-y-3.5">
               <div>
                 <label className="studio-label">Language</label>
                 <input
                   type="text"
                   value={item.name || ""}
                   onChange={({ target }) => updateArrayItem(index, "name", target.value)}
-                  placeholder="e.g. English, Spanish, French"
+                  placeholder="e.g. English, Urdu, Spanish, Mandarin, French"
                   className="studio-input"
                 />
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="studio-label mb-0">
-                    Proficiency ({Math.round((item.level || 0) / 20)} / 5)
-                  </label>
-                  <span className="text-xs font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200/50">
-                    {(item.level || 0) >= 100
-                      ? "Native"
-                      : (item.level || 0) >= 80
-                      ? "Fluent"
-                      : (item.level || 0) >= 60
-                      ? "Professional"
-                      : (item.level || 0) >= 40
-                      ? "Intermediate"
-                      : "Basic"}
-                  </span>
-                </div>
-                <div className="p-2.5 bg-slate-50/70 border border-slate-200/70 rounded-xl">
+                <label className="studio-label">
+                  Proficiency Rating
+                </label>
+                <div className="p-3 bg-slate-50/70 border border-slate-200/70 rounded-xl">
                   <RatingInput
                     value={item.level || 0}
                     onChange={(value) => updateArrayItem(index, "level", value)}
+                    showRating={item.showRating !== false}
+                    onToggleShowRating={(val) => updateArrayItem(index, "showRating", val)}
+                    labels={LANGUAGE_LEVEL_LABELS}
                   />
                 </div>
               </div>

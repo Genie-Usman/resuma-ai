@@ -61,8 +61,8 @@ const PublicationsForm = ({
               )}
             </div>
 
-            {/* Inputs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Inputs - Stacked cleanly for spacious, un-truncated layout */}
+            <div className="space-y-3.5">
               <div>
                 <label className="studio-label">Publication Title</label>
                 <input
@@ -80,12 +80,12 @@ const PublicationsForm = ({
                   type="text"
                   value={item.publisher || ""}
                   onChange={({ target }) => updateArrayItem(index, "publisher", target.value)}
-                  placeholder="e.g. NeurIPS 2024, IEEE, ACM"
+                  placeholder="e.g. NeurIPS 2024, IEEE, ACM, Springer"
                   className="studio-input"
                 />
               </div>
 
-              <div className="sm:col-span-2">
+              <div>
                 <label className="studio-label">Date Published</label>
                 <input
                   type="text"

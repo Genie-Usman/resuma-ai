@@ -84,6 +84,195 @@ const MatchedCoverLetter = ({
     return [];
   }, [coverLetter]);
 
+  // Check if active template is Cascade
+  const isCascade =
+    (metadata?.template && String(metadata.template).toLowerCase() === "cascade") ||
+    (coverLetter?.template && String(coverLetter.template).toLowerCase() === "cascade");
+
+  if (isCascade) {
+    const formattedDateLocation = basics.location
+      ? `${basics.location.split(",")[0].trim()}, ${formattedToday}`
+      : formattedToday;
+
+    return (
+      <div
+        className="matched-cover-letter w-full box-border grid grid-cols-12 text-left min-h-full print:min-h-0"
+        style={{
+          fontFamily: activeFont,
+          backgroundColor: colors[0],
+          width: containerWidth ? `${containerWidth}px` : "100%",
+          minHeight: "100%",
+        }}
+      >
+        {/* Left Sidebar (Solid Accent Color matching Cascade Resume) */}
+        <aside
+          className="col-span-4 flex flex-col min-h-full pb-8 select-none"
+          style={{
+            backgroundColor: colors[2] || "#1a365d",
+            color: "#ffffff",
+          }}
+        >
+          {/* Optional Profile Picture */}
+          {basics.picture?.url && !basics.picture?.effects?.hidden && (
+            <div className="px-6 pt-6 pb-2">
+              <div className="rounded-xl overflow-hidden shadow-md ring-2 ring-white/20 bg-white/10 w-fit">
+                <Picture picture={basics.picture} size={88} />
+              </div>
+            </div>
+          )}
+
+          {/* Name & Title */}
+          <div className="px-6 pt-6 pb-4 space-y-1">
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white leading-tight break-words">
+              {candidateName}
+            </h1>
+            {basics.headline && (
+              <p className="text-xs sm:text-[13px] font-semibold text-slate-300 leading-snug break-words">
+                {basics.headline}
+              </p>
+            )}
+          </div>
+
+          {/* Personal Info Banner */}
+          <div className="w-full bg-black/25 px-6 py-2 mb-3">
+            <h4 className="text-[11px] font-bold uppercase tracking-wider text-white">
+              Personal Info
+            </h4>
+          </div>
+
+          {/* Contact Items */}
+          <div className="px-6 space-y-3.5 text-left text-xs">
+            {basics.phone && (
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">
+                  Phone
+                </span>
+                <a
+                  href={`tel:${basics.phone}`}
+                  className="font-medium text-white hover:underline leading-snug block"
+                >
+                  {basics.phone}
+                </a>
+              </div>
+            )}
+
+            {basics.email && (
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">
+                  E-mail
+                </span>
+                <a
+                  href={`mailto:${basics.email}`}
+                  className="font-medium text-white hover:underline leading-snug block break-all"
+                >
+                  {basics.email}
+                </a>
+              </div>
+            )}
+
+            {basics.location && (
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">
+                  Address
+                </span>
+                <span className="font-medium text-white leading-snug block break-words">
+                  {basics.location}
+                </span>
+              </div>
+            )}
+
+            {basics.url?.label && (
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">
+                  Portfolio
+                </span>
+                <a
+                  href={basics.url?.href || basics.url?.label}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-blue-200 hover:underline leading-snug block break-all"
+                >
+                  {basics.url.label}
+                </a>
+              </div>
+            )}
+          </div>
+        </aside>
+
+        {/* Right Letter Body */}
+        <main
+          className="col-span-8 flex flex-col justify-start p-8 sm:p-10 text-left min-h-full"
+          style={{
+            backgroundColor: colors[0],
+            color: colors[1],
+          }}
+        >
+          {/* Top Date */}
+          <div className="text-xs font-semibold text-slate-500 mb-6">
+            {formattedDateLocation}
+          </div>
+
+          {/* Recipient Block */}
+          <div className="space-y-0.5 mb-6 text-xs sm:text-[13px]">
+            <div className="font-bold text-slate-900">
+              {recipient.name || "Ms. Katherine Bloomstein"}
+            </div>
+            {recipient.title && (
+              <div className="italic text-slate-600">{recipient.title}</div>
+            )}
+            {companyName && (
+              <div className="text-slate-800 font-medium">{companyName}</div>
+            )}
+            {recipient.address && (
+              <div className="text-slate-500">{recipient.address}</div>
+            )}
+          </div>
+
+          {/* Salutation */}
+          <div className="font-bold text-slate-900 text-xs sm:text-[13.5px] mb-4">
+            {salutation}
+          </div>
+
+          {/* Letter Body Paragraphs */}
+          {coverLetter.bodyHtml ? (
+            <div
+              className="cover-letter-body max-w-none text-slate-800 text-[13px] sm:text-[13.5px] leading-[1.65] text-justify sm:text-left [&>p]:mb-3 [&>p:last-child]:mb-0 [&>ul]:my-2 [&>ul]:pl-5 [&>ol]:my-2 [&>ol]:pl-5 [&>li]:my-0.5"
+              dangerouslySetInnerHTML={{ __html: coverLetter.bodyHtml }}
+            />
+          ) : paragraphs.length > 0 ? (
+            <div className="space-y-3 text-slate-800 text-[13px] sm:text-[13.5px] leading-[1.65] text-justify sm:text-left">
+              {paragraphs.map((p, idx) => (
+                <p key={idx}>{p}</p>
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 border-2 border-dashed border-purple-200 rounded-2xl bg-purple-50/50 text-center space-y-3 my-4">
+              <div className="w-10 h-10 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center mx-auto text-lg font-bold">
+                ✉️
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-800">
+                  No Cover Letter Generated Yet
+                </h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+                  Open the <strong>Cover Letter</strong> drawer on the left, paste the job description, and click <strong>Generate Cover Letter</strong> to create a personalized letter that matches your resume.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Formal Sign-off */}
+          <footer className="mt-8 space-y-1.5 text-xs sm:text-[13px]">
+            <div className="text-slate-700">{signOff}</div>
+            <div className="font-bold text-slate-900 text-sm sm:text-base pt-1">
+              {candidateName}
+            </div>
+          </footer>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div
       className="matched-cover-letter w-full box-border flex flex-col justify-start text-left"

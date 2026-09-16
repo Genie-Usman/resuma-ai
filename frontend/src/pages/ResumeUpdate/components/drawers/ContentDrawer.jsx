@@ -414,7 +414,7 @@ const ContentDrawer = ({
       </div>
 
       {/* 2. Main Content Body */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-6 bg-white">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-5 bg-white">
         {mode === "form" ? (
           <div className="studio-form-container">
             {children}

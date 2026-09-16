@@ -106,30 +106,28 @@ const ProjectsForm = ({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="studio-label">Timeline / Period</label>
-                  <input
-                    type="text"
-                    value={item.date || ""}
-                    onChange={({ target }) => updateArrayItem(index, "date", target.value)}
-                    placeholder="e.g. 2023 - Present"
-                    className="studio-input"
-                  />
-                </div>
+              <div>
+                <label className="studio-label">Timeline / Period</label>
+                <input
+                  type="text"
+                  value={item.date || ""}
+                  onChange={({ target }) => updateArrayItem(index, "date", target.value)}
+                  placeholder="e.g. 2023 - Present"
+                  className="studio-input"
+                />
+              </div>
 
-                <div>
-                  <label className="studio-label">Project / Demo URL</label>
-                  <input
-                    type="text"
-                    value={item.url?.href || ""}
-                    onChange={({ target }) =>
-                      updateArrayItem(index, "url.href", target.value)
-                    }
-                    placeholder="https://github.com/..."
-                    className="studio-input"
-                  />
-                </div>
+              <div>
+                <label className="studio-label">Project / Demo URL</label>
+                <input
+                  type="text"
+                  value={item.url?.href || ""}
+                  onChange={({ target }) =>
+                    updateArrayItem(index, "url.href", target.value)
+                  }
+                  placeholder="https://github.com/... or https://myproject.com"
+                  className="studio-input"
+                />
               </div>
 
               <div>

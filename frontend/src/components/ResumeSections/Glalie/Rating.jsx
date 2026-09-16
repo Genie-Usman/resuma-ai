@@ -1,7 +1,10 @@
 import { hexToRgba, linearTransform } from '../../../utils/helper';
+import { normalizeRatingLevel } from '../../../utils/ratingUtils';
 
 const Rating = ({ level, themeColors }) => {
-    const normalized = Math.round((level / 100) * 5);
+    const normalized = normalizeRatingLevel(level);
+    if (!normalized) return null;
+
     return (
         <div className="relative">
             <div className="h-2.5 w-full rounded-sm" style={{ backgroundColor: hexToRgba(themeColors[2], 0.4) }} />

@@ -60,8 +60,8 @@ const ReferenceForm = ({
               )}
             </div>
 
-            {/* Inputs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Inputs - Stacked cleanly for spacious layout */}
+            <div className="space-y-3.5">
               <div>
                 <label className="studio-label">Reference Name & Title</label>
                 <input
@@ -79,7 +79,7 @@ const ReferenceForm = ({
                   type="text"
                   value={item.description || ""}
                   onChange={({ target }) => updateArrayItem(index, "description", target.value)}
-                  placeholder="e.g. Available upon request"
+                  placeholder="e.g. Former Manager at HyperScale AI, Available upon request"
                   className="studio-input"
                 />
               </div>

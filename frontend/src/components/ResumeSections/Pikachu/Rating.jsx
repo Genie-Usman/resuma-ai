@@ -1,7 +1,9 @@
 import { FaStar } from 'react-icons/fa';
+import { normalizeRatingLevel } from '../../../utils/ratingUtils';
 
 const Rating = ({ level, themeColors }) => {
-    const normalized = Math.round((level / 100) * 5);
+    const normalized = normalizeRatingLevel(level);
+    if (!normalized) return null;
 
     return (
         <div className="flex items-center gap-x-1.5">
@@ -11,7 +13,7 @@ const Rating = ({ level, themeColors }) => {
                     <FaStar
                         key={index}
                         style={{
-                            color: isActive ? themeColors[2] : `${themeColors[1]}66`, // 66 = ~40% opacity
+                            color: isActive ? themeColors[2] : `${themeColors[1]}66`,
                             fontSize: "1rem"
                         }}
                     />

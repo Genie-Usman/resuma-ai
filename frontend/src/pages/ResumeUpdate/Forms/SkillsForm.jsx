@@ -1,11 +1,13 @@
 import { useEffect } from "react";
-import { LuPlus, LuTrash2, LuSparkles } from "react-icons/lu";
+import { LuPlus, LuTrash2, LuSparkles, LuEye, LuEyeOff } from "react-icons/lu";
 import { defaultSkillsItem } from "../../../constants";
 import RatingInput from "../../../components/Inputs/RatingInput";
 import SectionFormHeader from "../components/SectionFormHeader";
 
 const SkillsForm = ({
   skills,
+  showRatings = true,
+  onToggleShowRatings,
   updateArrayItem,
   addArrayItem,
   removeArrayItem,
@@ -52,6 +54,41 @@ const SkillsForm = ({
         onRenameTitle={onRenameTitle}
       />
 
+      {/* Section-Wide Rating Visibility Switch */}
+      {onToggleShowRatings && (
+        <div className="flex items-center justify-between p-3 bg-purple-50/60 border border-purple-200/70 rounded-xl">
+          <div className="flex items-center gap-2.5">
+            <div className={`p-1.5 rounded-lg ${showRatings ? "bg-purple-100 text-purple-700" : "bg-slate-200 text-slate-500"}`}>
+              {showRatings ? <LuEye className="w-4 h-4" /> : <LuEyeOff className="w-4 h-4" />}
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-slate-800">
+                Proficiency Rating Bars
+              </p>
+              <p className="text-[11px] text-slate-500">
+                {showRatings
+                  ? "Displaying rating meters on supported resume templates"
+                  : "Ratings hidden across all skill groups"}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onToggleShowRatings(!showRatings)}
+            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+              showRatings ? "bg-purple-600" : "bg-slate-300"
+            }`}
+            title={showRatings ? "Hide all ratings" : "Show ratings"}
+          >
+            <span
+              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                showRatings ? "translate-x-4" : "translate-x-0"
+              }`}
+            />
+          </button>
+        </div>
+      )}
+
       {/* Skills Group Cards */}
       <div className="space-y-4">
         {skills.map((item, index) => (
@@ -82,15 +119,15 @@ const SkillsForm = ({
               )}
             </div>
 
-            {/* Inputs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Inputs - Stacked cleanly for spacious, un-truncated layout */}
+            <div className="space-y-3.5">
               <div>
                 <label className="studio-label">Category / Area</label>
                 <input
                   type="text"
                   value={item.name || ""}
                   onChange={({ target }) => updateArrayItem(index, "name", target.value)}
-                  placeholder="e.g. Cloud & Infrastructure"
+                  placeholder="e.g. Cloud & Infrastructure, Frontend Engineering"
                   className="studio-input"
                 />
               </div>
@@ -106,24 +143,21 @@ const SkillsForm = ({
                 />
               </div>
 
-              <div className="sm:col-span-2">
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="studio-label mb-0">
-                    Proficiency Rating
-                  </label>
-                  <span className="text-xs font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200/50">
-                    {Math.round((item.level || 0) / 20)} / 5
-                  </span>
-                </div>
+              <div>
+                <label className="studio-label">
+                  Proficiency Rating
+                </label>
                 <div className="p-3 bg-slate-50/70 border border-slate-200/70 rounded-xl">
                   <RatingInput
                     value={item.level || 0}
                     onChange={(value) => updateArrayItem(index, "level", value)}
+                    showRating={item.showRating !== false}
+                    onToggleShowRating={(val) => updateArrayItem(index, "showRating", val)}
                   />
                 </div>
               </div>
 
-              <div className="sm:col-span-2">
+              <div>
                 <label className="studio-label">Skills & Technologies (Keywords)</label>
                 <input
                   type="text"

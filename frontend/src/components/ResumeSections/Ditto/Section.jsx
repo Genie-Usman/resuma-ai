@@ -1,4 +1,5 @@
 import Rating from './Rating';
+import { shouldShowRating } from '../../../utils/ratingUtils';
 
 const Section = ({ section, children, className, urlKey, levelKey, summaryKey, keywordsKey, themeColors }) => {
     if (!section?.visible || !section?.items?.length) return null;
@@ -72,7 +73,7 @@ const Section = ({ section, children, className, urlKey, levelKey, summaryKey, k
                                     />
                                 )}
 
-                                {level !== undefined && !isNaN(level) && (
+                                {shouldShowRating(section, item, levelKey) && (
                                     <Rating level={level} themeColors={themeColors} />
                                 )}
 

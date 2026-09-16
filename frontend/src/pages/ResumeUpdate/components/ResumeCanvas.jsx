@@ -349,7 +349,10 @@ const ResumeCanvas = ({
                 {docType === "cover-letter" ? (
                   <MatchedCoverLetter
                     basics={resumeData?.basics}
-                    metadata={resumeData?.metadata}
+                    metadata={{
+                      ...resumeData?.metadata,
+                      template: templateId || resumeData?.metadata?.template,
+                    }}
                     coverLetter={resumeData?.coverLetter}
                     themeColors={colorPalette}
                     containerWidth={activePaper.widthPx}
@@ -419,7 +422,10 @@ const ResumeCanvas = ({
                     {docType === "cover-letter" ? (
                       <MatchedCoverLetter
                         basics={resumeData?.basics}
-                        metadata={resumeData?.metadata}
+                        metadata={{
+                          ...resumeData?.metadata,
+                          template: templateId || resumeData?.metadata?.template,
+                        }}
                         coverLetter={resumeData?.coverLetter}
                         themeColors={colorPalette}
                         containerWidth={activePaper.widthPx}

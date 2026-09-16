@@ -25,6 +25,7 @@ const TEMPLATES = [
   { id: "onyx", name: "Onyx", subtitle: "Crimson Corporate", cols: "1-Col" },
   { id: "pikachu", name: "Pikachu", subtitle: "Warm Amber Card", cols: "2-Col" },
   { id: "rhyhorn", name: "Rhyhorn", subtitle: "Clean Border Divider", cols: "1-Col" },
+  { id: "cascade", name: "Cascade", subtitle: "Sleek Modern 2-Column", cols: "2-Col" },
 ];
 
 const CreateResumeForm = ({ onClose }) => {

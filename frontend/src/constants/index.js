@@ -10,6 +10,7 @@ import NOSEPASS from "../assets/template_images/nosepass.jpg"
 import ONYX from "../assets/template_images/onyx.jpg"
 import PIKACHU from "../assets/template_images/pikachu.jpg"
 import RHYHORN from "../assets/template_images/rhyhorn.jpg"
+import CASCADE from "../assets/template_images/cascade.jpg"
 
 export { TWO_COLUMN_TEMPLATES, isTwoColumnTemplate } from "../utils/layoutUtils";
 
@@ -98,10 +99,20 @@ export const RESUME_TEMPLATES = [
         columns: 1,
         layoutType: 'single-column',
     },
+    {
+        id: 'cascade',
+        name: 'Cascade',
+        thumbnail: CASCADE,
+        colorPaletteCode: 'cascade',
+        columns: 2,
+        layoutType: 'two-column',
+        description: 'Sleek design with a modern edge, blending professionalism and creativity',
+    },
 ]
 
 // [backgroundColor, textColor, accentColor]
 export const THEME_COLOR_PALETTE = {
+  cascade: ['#ffffff', '#1e293b', '#1a365d'],
   classic: ['#ffffff', '#000000', '#ca8a04'],
   midnight: ['#0f172a', '#f8fafc', '#38bdf8'],
   graphite: ['#1e293b', '#e2e8f0', '#f59e0b'],

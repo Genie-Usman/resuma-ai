@@ -274,12 +274,12 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item, label }) 
     return (
         <div className='w-full'>
             {/* Compact Studio Header: Label on Left, AI Actions on Right */}
-            <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-0">
                     {label || (sectionId === "summary" ? "Summary Text" : "Responsibilities & Accomplishments")}
                 </label>
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0 ml-auto">
                     {/* Improve with AI Button */}
                     <button
                         type="button"
@@ -314,8 +314,8 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item, label }) 
                 </div>
             </div>
 
-            {/* Tone Selector: Exact 4-column equal grid - fits perfectly without wrapping */}
-            <div className="grid grid-cols-4 gap-1 p-1 bg-slate-100/90 rounded-xl border border-slate-200/70 mb-2.5">
+            {/* Tone Selector: 2-column balanced grid - no truncation for any tone label */}
+            <div className="grid grid-cols-2 gap-1.5 p-1.5 bg-slate-100/90 rounded-xl border border-slate-200/70 mb-2.5">
                 {AI_TONES.map((t) => {
                     const Icon = t.icon;
                     const isSelected = selectedTone === t.id;
@@ -325,14 +325,14 @@ const SummarySectionForm = ({ content, updateContent, sectionId, item, label }) 
                             type="button"
                             onClick={() => setSelectedTone(t.id)}
                             title={t.description}
-                            className={`flex items-center justify-center gap-1 py-1 px-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer truncate ${
+                            className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                                 isSelected
-                                    ? "bg-white text-purple-700 shadow-2xs font-semibold"
-                                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+                                    ? "bg-white text-purple-700 shadow-2xs font-semibold border border-purple-200/70"
+                                    : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
                             }`}
                         >
-                            <Icon className={`text-[12px] shrink-0 ${isSelected ? "text-purple-600" : "text-slate-400"}`} />
-                            <span className="truncate">{t.label}</span>
+                            <Icon className={`text-xs shrink-0 ${isSelected ? "text-purple-600" : "text-slate-400"}`} />
+                            <span className="whitespace-nowrap">{t.label}</span>
                         </button>
                     );
                 })}

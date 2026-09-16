@@ -12,6 +12,7 @@ import Nosepass from './Nosepass';
 import Onyx from './Onyx';
 import Pikachu from './Pikachu';
 import Rhyhorn from './Rhyhorn';
+import Cascade from './Cascade';
 import { normalizeLayout } from '../../utils/layoutUtils';
 
 const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) => {
@@ -174,6 +175,7 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
       case 'onyx': return <Onyx {...sharedProps} />;
       case 'pikachu': return <Pikachu {...sharedProps} />;
       case 'rhyhorn': return <Rhyhorn {...sharedProps} />;
+      case 'cascade': return <Cascade {...sharedProps} />;
       default: return <Azurill {...sharedProps} />;
     }
   };

@@ -1,4 +1,5 @@
 import Rating from './Rating';
+import { shouldShowRating } from '../../../utils/ratingUtils';
 
 const Section = ({
   section,
@@ -78,11 +79,9 @@ const Section = ({
                   />
                 )}
 
-                {level !== undefined &&
-                  level !== null &&
-                  !isNaN(level) && (
-                    <Rating level={level} themeColors={themeColors} />
-                  )}
+                {shouldShowRating(section, item, levelKey) && (
+                  <Rating level={level} themeColors={themeColors} />
+                )}
 
                 {keywords.length > 0 && (
                   <p className="text-sm" style={{ color: isSidebar ? themeColors[0] : themeColors[1] }}>
