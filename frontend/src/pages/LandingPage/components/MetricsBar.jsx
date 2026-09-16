@@ -4,56 +4,62 @@ const METRICS = [
   {
     value: "24,800+",
     label: "Resumes Built",
-    sublabel: "Crafted for technical, finance & product roles",
+    sublabel: "Engineered for tech, finance & product roles",
   },
   {
     value: "98.4%",
-    label: "ATS Extraction Rate",
-    sublabel: "Tested against Workday, Lever & Greenhouse scanners",
+    label: "ATS Pass Rate",
+    sublabel: "Tested across Workday, Lever & Greenhouse",
   },
   {
     value: "12 Mins",
-    label: "Average Completion",
-    sublabel: "From blank canvas to recruiter-ready export",
+    label: "Average Build Time",
+    sublabel: "From blank canvas to recruiter-ready PDF",
   },
   {
-    value: "Expanding",
-    label: "Recruiter Standards",
-    sublabel: "Single and multi-column layouts updated regularly",
+    value: "16+ Layouts",
+    label: "Continuously Expanding",
+    sublabel: "Single and two-column standards, updated regularly",
   },
 ];
 
 const MetricsBar = () => {
   return (
-    <section className="relative py-14 sm:py-20 bg-gradient-to-b from-white via-slate-50/30 to-white">
+    <section className="relative py-16 sm:py-20 border-y border-slate-200/80 bg-slate-50/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Unified, Understated Editorial Proof Strip (No bubbly AI cards or pill badges) */}
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_8px_30px_-10px_rgba(0,0,0,0.04)] overflow-hidden"
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-            {METRICS.map((metric) => (
-              <div
-                key={metric.label}
-                className="p-6 sm:p-7 lg:py-8 lg:px-7 hover:bg-slate-50/50 transition-colors duration-200 group flex flex-col justify-center"
-              >
-                <div className="text-3xl sm:text-[32px] lg:text-4xl font-black text-slate-900 tracking-tight tabular-nums leading-none group-hover:text-slate-950 transition-colors">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-0 lg:divide-x divide-slate-200/80">
+          {METRICS.map((metric, idx) => (
+            <motion.div
+              key={metric.label}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.45,
+                delay: idx * 0.08,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="flex flex-col justify-between lg:px-8 first:lg:pl-0 last:lg:pr-0 group"
+            >
+              <div>
+                <span className="text-[11px] font-mono font-bold tracking-widest text-slate-400 block mb-2 select-none">
+                  0{idx + 1}
+                </span>
+                <div className="text-3xl sm:text-4xl lg:text-[42px] font-black text-slate-900 tracking-tight tabular-nums leading-none group-hover:text-slate-950 transition-colors">
                   {metric.value}
                 </div>
-                <div className="text-xs sm:text-[13px] font-bold text-slate-800 mt-2.5 tracking-tight">
+              </div>
+              <div className="mt-4 sm:mt-5">
+                <div className="text-sm font-bold text-slate-900 tracking-tight">
                   {metric.label}
                 </div>
-                <div className="text-[11px] sm:text-xs text-slate-500 mt-1 leading-relaxed font-normal">
+                <div className="text-xs text-slate-500 mt-1 leading-relaxed font-normal max-w-[28ch]">
                   {metric.sublabel}
                 </div>
               </div>
-            ))}
-          </div>
-        </motion.div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );
