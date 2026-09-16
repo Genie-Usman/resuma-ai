@@ -395,6 +395,12 @@ const Dashboard = () => {
         isOpen={!!selectedShareResume}
         onClose={() => setSelectedShareResume(null)}
         resume={selectedShareResume}
+        onUpdateResume={(updated) => {
+          setAllResumes((prev) =>
+            prev.map((r) => (r._id === updated._id ? { ...r, ...updated } : r))
+          );
+          setSelectedShareResume((prev) => (prev ? { ...prev, ...updated } : null));
+        }}
       />
 
       {/* Delete Confirmation Modal */}

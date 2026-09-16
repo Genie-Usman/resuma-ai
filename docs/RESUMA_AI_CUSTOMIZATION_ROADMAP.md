@@ -239,13 +239,15 @@ A comprehensive guide and specification document outlining planned customization
   * **Multi-Channel Availability**: 1-click download in Studio Export dropdown menu (`Download Word Document (.docx)`) and on recruiter public portfolio links (`resuma.ai/p/:slug`).
   * **Dual REST Endpoints**: `GET /api/resume/:id/export-docx` (authenticated) and `GET /api/resume/public/:slug/export-docx` (public).
 
-### 5.2 Public Web Portfolio Link (`resuma.ai/p/:slug`)
+### 5.2 Public Web Portfolio Link (`resuma.ai/p/:slug`) [COMPLETED]
 * **Goal**: Allow users to share a beautiful responsive web version of their resume with a single link.
 * **Features**:
-  * Custom public URL slug (e.g., `resuma.ai/p/usman-fullstack`).
-  * "Download PDF" button directly on the page.
-  * View analytics (visitor count, country, referral source).
-  * Optional password protection for sensitive contact info.
+  * **Canonical Portfolio Route**: Instant recruiter access via `/p/:slug` (and legacy `/view/:slug`, `/r/:slug`).
+  * **Dual Presentation Modes**: Seamless toolbar toggle between **Document (A4) Mode** (scaled vector sheet) and **Responsive Web Portfolio Mode** (fluid cards, timeline, skill tags, project demos).
+  * **Custom URL Slug Editor**: Inline customize & live validate custom handles (e.g. `resuma.ai/p/usman-fullstack`) with collision prevention via `PUT /api/resume/:id/slug`.
+  * **Direct Multi-Channel Downloads**: 1-click **Download PDF** and **Word (.docx)** directly on the portfolio header and mobile floating action pill.
+  * **Granular Recruiter Analytics**: Tracks visitor counts, top visitor countries (with country flags and percentage bars), and referral channels (LinkedIn, GitHub, X/Twitter, Google Search, Indeed, Direct) plus recent visitor logs via `GET /api/resume/:id/analytics`.
+  * **Password Protection for Sensitive Contact Info**: Bcrypt-hashed PIN protection hiding email, phone, and direct contact details behind a glassmorphic recruiter unlock prompt with session persistence.
 
 ### 5.3 Resume Forking & Multi-Version Cloning
 * **Goal**: Support managing multiple tailored resumes for different roles.
@@ -268,7 +270,7 @@ A comprehensive guide and specification document outlining planned customization
 | **Custom Sections (Certifications, Awards)** | Content | High | Medium (2 days) | 🟡 Phase 2 |
 | **In-Line AI Bullet Point Polisher** | AI Suite | Very High | Low-Medium (2 days)| 🟡 Phase 2 |
 | **Discreet Contact QR Code** | Content | Medium | Low (1 day) | 🔵 Phase 3 |
-| **Public Portfolio Web Link** | Sharing | High | Medium (3 days) | 🔵 Phase 3 |
+| **Public Portfolio Web Link** | Sharing | High | Medium (3 days) | ✅ Completed |
 | **DOCX / Word Export** | Export | High | High (4 days) | ✅ Completed |
 | **Matched Cover Letter Generator** | AI Suite | Very High | High (4 days) | ✅ Completed |
 

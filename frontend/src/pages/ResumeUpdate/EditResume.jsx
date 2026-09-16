@@ -1296,6 +1296,9 @@ const EditResume = () => {
         isOpen={openShareModal}
         onClose={() => setOpenShareModal(false)}
         resume={resumeData}
+        onUpdateResume={(updated) => {
+          setResumeData((prev) => ({ ...prev, ...updated }));
+        }}
       />
 
       {/* Delete Confirmation Modal */}

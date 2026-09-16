@@ -10,6 +10,36 @@ const ResumeSchema = new mongoose.Schema(
         isPublic: { type: Boolean, default: true },
         viewsCount: { type: Number, default: 0 },
         lastViewedAt: { type: Date, default: null },
+        analytics: {
+            countries: [
+                {
+                    country: { type: String, default: "Unknown" },
+                    code: { type: String, default: "UN" },
+                    count: { type: Number, default: 0 },
+                },
+            ],
+            referrers: [
+                {
+                    source: { type: String, default: "Direct" },
+                    count: { type: Number, default: 0 },
+                },
+            ],
+            recentViews: [
+                {
+                    viewedAt: { type: Date, default: Date.now },
+                    country: { type: String, default: "Unknown" },
+                    countryCode: { type: String, default: "UN" },
+                    referrer: { type: String, default: "Direct" },
+                    device: { type: String, default: "Desktop" },
+                    browser: { type: String, default: "Unknown" },
+                },
+            ],
+        },
+        protection: {
+            isProtected: { type: Boolean, default: false },
+            passwordHash: { type: String, default: null },
+            protectType: { type: String, enum: ['contact_only', 'full'], default: 'contact_only' },
+        },
     },
     { timestamps: true }
 );

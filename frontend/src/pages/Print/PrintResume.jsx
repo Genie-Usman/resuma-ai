@@ -23,7 +23,11 @@ const PrintResume = ({ isPublic = false }) => {
       try {
         let res;
         if (isPublic && slug) {
-          res = await axiosInstance.get(`/api/resume/public/${slug}`);
+          const unlockToken = searchParams.get("unlockToken") || searchParams.get("token");
+          const config = unlockToken
+            ? { headers: { "x-unlock-token": unlockToken } }
+            : {};
+          res = await axiosInstance.get(`/api/resume/public/${slug}`, config);
         } else {
           const config = token
             ? { headers: { Authorization: `Bearer ${token}` } }

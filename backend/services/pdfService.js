@@ -126,7 +126,7 @@ async function generateVectorPdf({ resumeId, token, slug, isPublic = false, fron
     let targetUrl;
 
     if (isPublic && slug) {
-      targetUrl = `${baseUrl}/print/public/${slug}?mode=${encodeURIComponent(mode || "resume")}`;
+      targetUrl = `${baseUrl}/print/public/${slug}?mode=${encodeURIComponent(mode || "resume")}${token ? `&unlockToken=${encodeURIComponent(token)}` : ""}`;
     } else {
       targetUrl = `${baseUrl}/print/${resumeId}?token=${encodeURIComponent(token || "")}&mode=${encodeURIComponent(mode || "resume")}`;
     }

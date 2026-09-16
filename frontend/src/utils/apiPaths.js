@@ -24,9 +24,19 @@ export const API_PATHS = {
             mode === "resume"
                 ? `/api/resume/${id}/export-pdf`
                 : `/api/resume/${id}/export-pdf?mode=${encodeURIComponent(mode)}`,
-        EXPORT_PUBLIC_PDF: (slug) => `/api/resume/public/${slug}/export-pdf`,
+        EXPORT_PUBLIC_PDF: (slug, unlockToken = "") =>
+            unlockToken
+                ? `/api/resume/public/${slug}/export-pdf?unlockToken=${encodeURIComponent(unlockToken)}`
+                : `/api/resume/public/${slug}/export-pdf`,
         EXPORT_DOCX: (id) => `/api/resume/${id}/export-docx`,
-        EXPORT_PUBLIC_DOCX: (slug) => `/api/resume/public/${slug}/export-docx`,
+        EXPORT_PUBLIC_DOCX: (slug, unlockToken = "") =>
+            unlockToken
+                ? `/api/resume/public/${slug}/export-docx?unlockToken=${encodeURIComponent(unlockToken)}`
+                : `/api/resume/public/${slug}/export-docx`,
+        UNLOCK_PUBLIC: (slug) => `/api/resume/public/${slug}/unlock`,
+        UPDATE_SLUG: (id) => `/api/resume/${id}/slug`,
+        UPDATE_PROTECTION: (id) => `/api/resume/${id}/protection`,
+        GET_ANALYTICS: (id) => `/api/resume/${id}/analytics`,
     },
 
     IMAGE: {

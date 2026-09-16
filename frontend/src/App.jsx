@@ -56,6 +56,7 @@ const App = () => {
             <Route path='/print/public/:slug' element={<PrintResume isPublic={true} />} />
 
             {/* Public Shareable Recruiter Routes */}
+            <Route path='/p/:slug' element={<PublicResumeView />} />
             <Route path='/view/:slug' element={<PublicResumeView />} />
             <Route path='/r/:slug' element={<PublicResumeView />} />
 

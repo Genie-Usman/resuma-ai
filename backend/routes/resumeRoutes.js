@@ -7,6 +7,10 @@ const {
   deleteResume,
   duplicateResume,
   getPublicResume,
+  unlockPublicResume,
+  updateResumeSlug,
+  updateResumeProtection,
+  getResumeAnalytics,
   exportResumePdf,
   exportPublicResumePdf,
   exportResumeDocx,
@@ -22,8 +26,9 @@ const { createResumeSchema, updateResumeSchema } = require("../validators/resume
 
 const router = express.Router();
 
-// Public Resume Routes (Unauthenticated Recruiter View & PDF Export)
+// Public Resume Routes (Unauthenticated Recruiter View, PDF Export & Unlock)
 router.get("/public/:slug", getPublicResume);
+router.post("/public/:slug/unlock", unlockPublicResume);
 router.get("/public/:slug/export-pdf", exportPublicResumePdf);
 router.get("/public/:slug/export-docx", exportPublicResumeDocx);
 
@@ -31,6 +36,9 @@ router.get("/public/:slug/export-docx", exportPublicResumeDocx);
 router.post("/", protect, validateRequest(createResumeSchema), createResume);
 router.get("/", protect, getUserResumes);
 router.get("/:id", protect, getResumeById);
+router.get("/:id/analytics", protect, getResumeAnalytics);
+router.put("/:id/slug", protect, updateResumeSlug);
+router.put("/:id/protection", protect, updateResumeProtection);
 router.get("/:id/export-pdf", protect, exportResumePdf);
 router.get("/:id/export-docx", protect, exportResumeDocx);
 router.post("/:id/duplicate", protect, duplicateResume);
