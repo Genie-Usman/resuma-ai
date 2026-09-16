@@ -84,10 +84,11 @@ const MatchedCoverLetter = ({
     return [];
   }, [coverLetter]);
 
-  // Check if active template is Cascade
-  const isCascade =
-    (metadata?.template && String(metadata.template).toLowerCase() === "cascade") ||
-    (coverLetter?.template && String(coverLetter.template).toLowerCase() === "cascade");
+  // Check template type
+  const currentTemplate = String(metadata?.template || coverLetter?.template || "").toLowerCase();
+  const isCascade = currentTemplate === "cascade";
+  const isMeridian = currentTemplate === "meridian";
+  const isVanguard = currentTemplate === "vanguard";
 
   if (isCascade) {
     const formattedDateLocation = basics.location
@@ -275,28 +276,38 @@ const MatchedCoverLetter = ({
 
   return (
     <div
-      className="matched-cover-letter w-full box-border flex flex-col justify-start text-left"
+      className={`matched-cover-letter w-full box-border flex flex-col justify-start text-left ${
+        isMeridian ? "border-l-[10px]" : ""
+      }`}
       style={{
         fontFamily: activeFont,
         color: colors[1],
         backgroundColor: colors[0],
+        borderColor: isMeridian ? colors[2] || "#0d2f5a" : undefined,
         width: containerWidth ? `${containerWidth}px` : "100%",
         ...paddingStyle,
       }}
     >
       {/* 1. Synchronized Header (Matches Candidate Resume Aesthetic) */}
-      <header className="pb-3.5 border-b border-slate-200/80 mb-4">
+      <header
+        className={`pb-3.5 mb-4 ${
+          isVanguard
+            ? "-mx-12 sm:-mx-14 -mt-10 sm:-mt-12 px-12 sm:px-14 py-8 mb-6 text-white"
+            : "border-b border-slate-200/80"
+        }`}
+        style={isVanguard ? { backgroundColor: colors[2] || "#2d3748" } : {}}
+      >
         <div className="flex items-center justify-between gap-4">
           <div className="space-y-0.5 min-w-0">
             <h1
               className="text-2xl font-bold tracking-tight"
               style={{
-                color: activeHeaderStyle === "pill" ? "#ffffff" : colors[1],
+                color: isVanguard ? "#ffffff" : activeHeaderStyle === "pill" ? "#ffffff" : colors[1],
                 backgroundColor:
-                  activeHeaderStyle === "pill" ? colors[2] : "transparent",
-                padding: activeHeaderStyle === "pill" ? "4px 12px" : "0",
-                borderRadius: activeHeaderStyle === "pill" ? "8px" : "0",
-                display: activeHeaderStyle === "pill" ? "inline-block" : "block",
+                  !isVanguard && activeHeaderStyle === "pill" ? colors[2] : "transparent",
+                padding: !isVanguard && activeHeaderStyle === "pill" ? "4px 12px" : "0",
+                borderRadius: !isVanguard && activeHeaderStyle === "pill" ? "8px" : "0",
+                display: !isVanguard && activeHeaderStyle === "pill" ? "inline-block" : "block",
               }}
             >
               {basics.name || "Candidate Name"}
@@ -305,14 +316,18 @@ const MatchedCoverLetter = ({
             {basics.headline && (
               <p
                 className="text-xs sm:text-sm font-semibold tracking-normal"
-                style={{ color: colors[2] }}
+                style={{ color: isVanguard ? "rgba(255,255,255,0.85)" : colors[2] }}
               >
                 {basics.headline}
               </p>
             )}
 
             {/* Contact Chips */}
-            <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[11px] sm:text-xs text-slate-500 pt-0.5">
+            <div
+              className={`flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[11px] sm:text-xs pt-0.5 ${
+                isVanguard ? "text-slate-300" : "text-slate-500"
+              }`}
+            >
               {basics.location && (
                 <span className="inline-flex items-center gap-1">
                   <LuMapPin style={{ color: colors[2] }} className="shrink-0 size-3" />

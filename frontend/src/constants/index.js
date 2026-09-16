@@ -11,93 +11,120 @@ import ONYX from "../assets/template_images/onyx.jpg"
 import PIKACHU from "../assets/template_images/pikachu.jpg"
 import RHYHORN from "../assets/template_images/rhyhorn.jpg"
 import CASCADE from "../assets/template_images/cascade.jpg"
+import MERIDIAN from "../assets/template_images/meridian.webp"
+import CLARITY from "../assets/template_images/clarity.webp"
+import VANGUARD from "../assets/template_images/vanguard.webp"
 
 export { TWO_COLUMN_TEMPLATES, isTwoColumnTemplate } from "../utils/layoutUtils";
 
 export const RESUME_TEMPLATES = [
     {
         id: 'azurill',
+        name: 'Azurill',
         thumbnail: AZURILL,
         colorPaletteCode: 'azurill',
         columns: 2,
         layoutType: 'two-column',
+        description: 'Modern Clean Dot 2-Column',
     },
     {
         id: 'bronzor',
+        name: 'Bronzor',
         thumbnail: BRONZOR,
         colorPaletteCode: 'bronzor',
         columns: 1,
         layoutType: 'single-column',
+        description: 'Executive Minimal 1-Column',
     },
     {
         id: 'chikorita',
+        name: 'Chikorita',
         thumbnail: CHIKORITA,
         colorPaletteCode: 'chikorita',
         columns: 2,
         layoutType: 'two-column',
+        description: 'Forest Bleed Sidebar 2-Column',
     },
     {
         id: 'ditto',
+        name: 'Ditto',
         thumbnail: DITTO,
         colorPaletteCode: 'ditto',
         columns: 2,
         layoutType: 'two-column',
+        description: 'Cyan Header Bar 2-Column',
     },
     {
         id: 'gengar',
+        name: 'Gengar',
         thumbnail: GENGAR,
         colorPaletteCode: 'gengar',
         columns: 2,
         layoutType: 'two-column',
+        description: 'Dark Indigo Contrast 2-Column',
     },
     {
         id: 'glalie',
+        name: 'Glalie',
         thumbnail: GLALIE,
         colorPaletteCode: 'glalie',
         columns: 2,
         layoutType: 'two-column',
+        description: 'Tinted Sage Contact 2-Column',
     },
     {
         id: 'kakuna',
+        name: 'Kakuna',
         thumbnail: KAKUNA,
         colorPaletteCode: 'kakuna',
         columns: 1,
         layoutType: 'single-column',
+        description: 'Centered Editorial 1-Column',
     },
     {
         id: 'leafish',
+        name: 'Leafish',
         thumbnail: LEAFISH,
         colorPaletteCode: 'leafish',
         columns: 2,
         layoutType: 'two-column',
+        description: 'Dual-Tier Warm Banner 2-Column',
     },
     {
         id: 'nosepass',
+        name: 'Nosepass',
         thumbnail: NOSEPASS,
         colorPaletteCode: 'nosepass',
         columns: 1,
         layoutType: 'single-column',
+        description: 'Europass Split Date 1-Column',
     },
     {
         id: 'onyx',
+        name: 'Onyx',
         thumbnail: ONYX,
         colorPaletteCode: 'onyx',
         columns: 1,
         layoutType: 'single-column',
+        description: 'Crimson Corporate 1-Column',
     },
     {
         id: 'pikachu',
+        name: 'Pikachu',
         thumbnail: PIKACHU,
         colorPaletteCode: 'pikachu',
         columns: 2,
         layoutType: 'two-column',
+        description: 'Warm Amber Card 2-Column',
     },
     {
         id: 'rhyhorn',
+        name: 'Rhyhorn',
         thumbnail: RHYHORN,
         colorPaletteCode: 'rhyhorn',
         columns: 1,
         layoutType: 'single-column',
+        description: 'Clean Border Divider 1-Column',
     },
     {
         id: 'cascade',
@@ -108,11 +135,41 @@ export const RESUME_TEMPLATES = [
         layoutType: 'two-column',
         description: 'Sleek design with a modern edge, blending professionalism and creativity',
     },
+    {
+        id: 'meridian',
+        name: 'Meridian',
+        thumbnail: MERIDIAN,
+        colorPaletteCode: 'meridian',
+        columns: 2,
+        layoutType: 'two-column',
+        description: 'Timeline spine with left date bar and circular node badges',
+    },
+    {
+        id: 'clarity',
+        name: 'Clarity',
+        thumbnail: CLARITY,
+        colorPaletteCode: 'clarity',
+        columns: 2,
+        layoutType: 'two-column',
+        description: 'Modern crisp white layout with top summary and circular icon badges',
+    },
+    {
+        id: 'vanguard',
+        name: 'Vanguard',
+        thumbnail: VANGUARD,
+        colorPaletteCode: 'vanguard',
+        columns: 2,
+        layoutType: 'two-column',
+        description: 'Executive dark header banner with left narrative and tinted sidebar block',
+    },
 ]
 
 // [backgroundColor, textColor, accentColor]
 export const THEME_COLOR_PALETTE = {
   cascade: ['#ffffff', '#1e293b', '#1a365d'],
+  meridian: ['#ffffff', '#1e293b', '#0d2f5a'],
+  clarity: ['#ffffff', '#1e293b', '#1e293b'],
+  vanguard: ['#ffffff', '#1e293b', '#2d3748'],
   classic: ['#ffffff', '#000000', '#ca8a04'],
   midnight: ['#0f172a', '#f8fafc', '#38bdf8'],
   graphite: ['#1e293b', '#e2e8f0', '#f59e0b'],

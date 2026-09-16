@@ -7,6 +7,7 @@ import {
   LuShieldCheck,
   LuShieldAlert,
   LuPipette,
+  LuLayoutTemplate,
 } from "react-icons/lu";
 import { RESUME_TEMPLATES, THEME_COLOR_PALETTE } from "../../../../constants";
 import {
@@ -15,10 +16,53 @@ import {
   normalizeHex,
 } from "../../../../utils/contrastUtils";
 
+const NEW_TEMPLATE_IDS = new Set(["meridian", "clarity", "vanguard"]);
+
+const TemplateThumbnail = ({ thumbnail, name, isTwoCol, isNew }) => {
+  const [imgError, setImgError] = useState(false);
+
+  if (!thumbnail || imgError) {
+    return (
+      <div className="w-full h-full flex flex-col justify-between p-3 bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200/70 text-slate-500 select-none">
+        <div className="flex items-center justify-between">
+          <div className="h-2.5 w-14 bg-slate-300 rounded-full" />
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-200/90 text-slate-700">
+            {isTwoCol ? "2-Col" : "1-Col"}
+          </span>
+        </div>
+
+        <div className="space-y-1.5 my-auto py-2">
+          <div className="h-2 w-3/4 bg-slate-300/80 rounded" />
+          <div className="h-1.5 w-full bg-slate-200 rounded" />
+          <div className="h-1.5 w-5/6 bg-slate-200 rounded" />
+          <div className="h-1.5 w-2/3 bg-slate-200 rounded" />
+        </div>
+
+        <div className="pt-2 border-t border-slate-200 text-center">
+          <span className="text-[11px] font-bold text-slate-700 block truncate">
+            {name}
+          </span>
+          <span className="text-[9px] text-slate-400">Preview Layout</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={thumbnail}
+      alt={name}
+      onError={() => setImgError(true)}
+      className="w-full h-full object-cover object-top transition-transform group-hover:scale-103 duration-200"
+      loading="lazy"
+    />
+  );
+};
+
 /**
  * TemplatesDrawer Component
  * Replaces the oversized modal with a contextual, in-place drawer.
- * Allows users to choose color swatches and switch between all 12 templates
+ * Allows users to choose color swatches and switch between all templates
  * while watching their resume update live on the canvas.
  */
 const TemplatesDrawer = ({
@@ -29,6 +73,7 @@ const TemplatesDrawer = ({
   onClose,
 }) => {
   const [showCustomColorPicker, setShowCustomColorPicker] = useState(false);
+  const [filterCategory, setFilterCategory] = useState("all"); // "all" | "new" | "two-col" | "single-col"
   const activeAccent = currentColors[2] || "#ca8a04";
   const [customHex, setCustomHex] = useState(activeAccent);
 
@@ -62,6 +107,14 @@ const TemplatesDrawer = ({
       onUpdateColors([currentColors[0] || "#ffffff", currentColors[1] || "#000000", valid]);
     }
   };
+
+  // Filter templates
+  const filteredTemplates = RESUME_TEMPLATES.filter((tpl) => {
+    if (filterCategory === "new") return NEW_TEMPLATE_IDS.has(tpl.id);
+    if (filterCategory === "two-col") return tpl.columns === 2;
+    if (filterCategory === "single-col") return tpl.columns === 1;
+    return true;
+  });
 
   return (
     <div className="w-full h-full flex flex-col bg-white select-none overflow-hidden">
@@ -190,16 +243,68 @@ const TemplatesDrawer = ({
 
         {/* 2. Resume Templates Grid */}
         <div>
-          <div className="flex items-center justify-between mb-2.5">
+          <div className="flex items-center justify-between mb-2">
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-              All 12 Templates
+              All {RESUME_TEMPLATES.length} Templates
             </label>
             <span className="text-[11px] text-slate-400 font-medium">ATS-Friendly</span>
           </div>
 
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setFilterCategory("all")}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                filterCategory === "all"
+                  ? "bg-purple-600 text-white shadow-xs"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              }`}
+            >
+              All ({RESUME_TEMPLATES.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterCategory("new")}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1 ${
+                filterCategory === "new"
+                  ? "bg-emerald-600 text-white shadow-xs"
+                  : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60"
+              }`}
+            >
+              <span>New</span>
+              <span className="px-1 py-0.2 rounded-full bg-emerald-700/30 text-[9px]">3</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterCategory("two-col")}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                filterCategory === "two-col"
+                  ? "bg-purple-600 text-white shadow-xs"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              }`}
+            >
+              2-Column
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterCategory("single-col")}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                filterCategory === "single-col"
+                  ? "bg-purple-600 text-white shadow-xs"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              }`}
+            >
+              1-Column
+            </button>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
-            {RESUME_TEMPLATES.map((tpl) => {
+            {filteredTemplates.map((tpl) => {
               const isSelected = currentTemplate === tpl.id;
+              const templateName = tpl.name || (tpl.id ? tpl.id.charAt(0).toUpperCase() + tpl.id.slice(1) : "Template");
+              const isNew = NEW_TEMPLATE_IDS.has(tpl.id);
+              const isTwoCol = tpl.columns === 2;
 
               return (
                 <button
@@ -216,12 +321,19 @@ const TemplatesDrawer = ({
                 >
                   {/* Thumbnail Container */}
                   <div className="relative w-full aspect-[210/297] rounded-lg overflow-hidden bg-slate-100 border border-slate-200/70 mb-2 group-hover:opacity-95">
-                    <img
-                      src={tpl.thumbnail}
-                      alt={tpl.name}
-                      className="w-full h-full object-cover object-top transition-transform group-hover:scale-103 duration-200"
-                      loading="lazy"
+                    <TemplateThumbnail
+                      thumbnail={tpl.thumbnail}
+                      name={templateName}
+                      isTwoCol={isTwoCol}
+                      isNew={isNew}
                     />
+
+                    {/* New Badge */}
+                    {isNew && !isSelected && (
+                      <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-emerald-600 text-white text-[9px] font-black uppercase tracking-wider shadow-xs">
+                        New
+                      </div>
+                    )}
 
                     {/* Active Selected Badge */}
                     {isSelected && (
@@ -233,13 +345,16 @@ const TemplatesDrawer = ({
                   </div>
 
                   {/* Template Details */}
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-1">
                     <span className={`text-xs font-bold truncate ${isSelected ? "text-purple-900" : "text-slate-800"}`}>
-                      {tpl.name}
+                      {templateName}
+                    </span>
+                    <span className="text-[9px] font-medium text-slate-400 shrink-0">
+                      {isTwoCol ? "2-Col" : "1-Col"}
                     </span>
                   </div>
                   <p className="text-[10px] text-slate-400 line-clamp-1 leading-tight mt-0.5">
-                    {tpl.description || "Executive ATS Layout"}
+                    {tpl.description || (isTwoCol ? "Two-Column Layout" : "Single-Column Layout")}
                   </p>
                 </button>
               );

@@ -13,6 +13,9 @@ import Onyx from './Onyx';
 import Pikachu from './Pikachu';
 import Rhyhorn from './Rhyhorn';
 import Cascade from './Cascade';
+import Meridian from './Meridian';
+import Clarity from './Clarity';
+import Vanguard from './Vanguard';
 import { normalizeLayout } from '../../utils/layoutUtils';
 
 const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) => {
@@ -176,6 +179,9 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
       case 'pikachu': return <Pikachu {...sharedProps} />;
       case 'rhyhorn': return <Rhyhorn {...sharedProps} />;
       case 'cascade': return <Cascade {...sharedProps} />;
+      case 'meridian': return <Meridian {...sharedProps} />;
+      case 'clarity': return <Clarity {...sharedProps} />;
+      case 'vanguard': return <Vanguard {...sharedProps} />;
       default: return <Azurill {...sharedProps} />;
     }
   };
