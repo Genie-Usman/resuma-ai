@@ -6,7 +6,6 @@ import {
   LuTrash2,
   LuEye,
   LuDownload,
-  LuArrowLeft,
   LuInfo,
   LuTarget,
   LuShare2,
@@ -18,13 +17,16 @@ import {
   LuUndo2,
   LuRedo2,
   LuChevronDown,
-  LuPrinter,
-  LuFileJson,
   LuFileText,
+  LuMail,
+  LuFileArchive,
   LuLayers,
   LuEllipsis,
 } from "react-icons/lu";
 import toast from "react-hot-toast";
+
+// Assets
+import LOGO from "../../assets/logo.svg";
 
 // Hooks
 import { useResumeData } from "./hooks/useResumeData";
@@ -100,6 +102,11 @@ const EditResume = () => {
   const autoSaveTimerRef = useRef(null);
   const exportMenuRef = useRef(null);
   const moreMenuRef = useRef(null);
+  const isNavigatingBackRef = useRef(false);
+  const resumeDataRef = useRef(null);
+  const newProfileImageFileRef = useRef(null);
+  const initialSnapshotRef = useRef(null);
+  const hasUnsavedChangesRef = useRef(false);
 
   const [activePage, setActivePage] = useState("personal-info");
   const [newProfileImageFile, setNewProfileImageFile] = useState(null);
@@ -257,16 +264,46 @@ const EditResume = () => {
     handleDownloadVectorPdf,
     handleDownloadCoverLetterPdf,
     handleDownloadApplicationPackage,
+    handleDownloadZipPackage,
     handleDownloadDocx,
   } = useResumeExport(resumeId, resumeData?.title);
+
+  // Check if cover letter has been created with meaningful content
+  const hasCoverLetter = useMemo(() => {
+    const cl = resumeData?.data?.coverLetter;
+    if (!cl) return false;
+    if (cl.bodyHtml && cl.bodyHtml.replace(/<[^>]*>/g, "").trim().length > 0) return true;
+    if (Array.isArray(cl.bodyParagraphs) && cl.bodyParagraphs.some((p) => p && p.trim().length > 0)) return true;
+    if (cl.opening && cl.opening.trim().length > 0) return true;
+    return false;
+  }, [resumeData?.data?.coverLetter]);
 
   // Snapshot initial loaded data
   useEffect(() => {
     if (!isLoading && resumeData?._id && !initialLoadedRef.current) {
       initialLoadedRef.current = true;
-      lastSavedDataRef.current = JSON.stringify(resumeData);
+      const initialStr = JSON.stringify(resumeData);
+      lastSavedDataRef.current = initialStr;
+      initialSnapshotRef.current = initialStr;
     }
   }, [isLoading, resumeData]);
+
+  // Keep refs synchronized for history popstate and back navigation
+  useEffect(() => {
+    resumeDataRef.current = resumeData;
+  }, [resumeData]);
+
+  useEffect(() => {
+    newProfileImageFileRef.current = newProfileImageFile;
+  }, [newProfileImageFile]);
+
+  useEffect(() => {
+    hasUnsavedChangesRef.current = hasUnsavedChanges;
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    isNavigatingBackRef.current = isNavigatingBack;
+  }, [isNavigatingBack]);
 
   // Auto-correct invalid or legacy empty "custom" activePage
   useEffect(() => {
@@ -421,7 +458,9 @@ const EditResume = () => {
       toast.loading("Saving resume & thumbnail...", { id: "manual-save" });
       const targetElement = offscreenCaptureRef.current || resumeRef.current;
       await uploadImagesAndSave(newProfileImageFile, targetElement, true);
-      lastSavedDataRef.current = JSON.stringify(resumeData);
+      const savedStr = JSON.stringify(resumeData);
+      lastSavedDataRef.current = savedStr;
+      initialSnapshotRef.current = savedStr;
       setHasUnsavedChanges(false);
       toast.success("Resume & thumbnail saved!", { id: "manual-save" });
     } catch (err) {
@@ -430,32 +469,85 @@ const EditResume = () => {
     }
   };
 
-  // Back to Dashboard Handler (Auto-saves progress & generates dashboard thumbnail)
+  // Check if anything was actually modified in the resume
+  const checkIfResumeChanged = () => {
+    if (newProfileImageFileRef.current) return true;
+    if (hasUnsavedChangesRef.current) return true;
+    if (!initialSnapshotRef.current) return false;
+    if (!resumeDataRef.current) return false;
+    return JSON.stringify(resumeDataRef.current) !== initialSnapshotRef.current;
+  };
+
+  // Back to Dashboard Handler (Auto-saves progress & generates dashboard thumbnail ONLY when changed)
   const handleBackToDashboard = async () => {
-    if (isNavigatingBack) return;
-    setIsNavigatingBack(true);
+    if (isNavigatingBackRef.current) return;
+    isNavigatingBackRef.current = true;
 
     if (autoSaveTimerRef.current) {
       clearTimeout(autoSaveTimerRef.current);
     }
 
+    const hasChanges = checkIfResumeChanged();
+
+    // If nothing changed, exit to dashboard immediately without save or thumbnail overhead
+    if (!hasChanges) {
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+
+    // Changes were made: show saving state and generate thumbnail
+    setIsNavigatingBack(true);
+
     try {
       toast.loading("Saving progress & thumbnail...", { id: "back-nav-save" });
       const targetElement = offscreenCaptureRef.current || resumeRef.current;
-      await uploadImagesAndSave(newProfileImageFile, targetElement, true);
+      await uploadImagesAndSave(newProfileImageFileRef.current, targetElement, true);
+      initialSnapshotRef.current = JSON.stringify(resumeDataRef.current);
       toast.success("Progress saved!", { id: "back-nav-save" });
     } catch (err) {
       console.warn("Save on back encountered an issue, saving data directly:", err);
       try {
-        await saveResume(resumeData, true);
+        await saveResume(resumeDataRef.current, true);
         toast.success("Progress saved!", { id: "back-nav-save" });
       } catch (fallbackErr) {
         console.error("Critical: Could not save resume data on back navigation:", fallbackErr);
       }
     } finally {
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     }
   };
+
+  // Intercept browser back button to trigger saving state and thumbnail generation
+  useEffect(() => {
+    if (!window.history.state?.inStudio) {
+      window.history.pushState({ inStudio: true }, "");
+    }
+
+    const handleBrowserPopState = async () => {
+      if (isNavigatingBackRef.current) return;
+      await handleBackToDashboard();
+    };
+
+    window.addEventListener("popstate", handleBrowserPopState);
+    return () => {
+      window.removeEventListener("popstate", handleBrowserPopState);
+    };
+  }, []);
+
+  // Warn user on tab close/refresh if there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasUnsavedChanges && !isNavigatingBackRef.current) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
 
   // Export as standard JSON Resume
   const handleExportJson = () => {
@@ -748,48 +840,33 @@ const EditResume = () => {
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col bg-slate-100 font-sans">
       {/* 1. Studio Top Navigation Bar (Standardized 64px Bar - Cohesive Branding & Workspace Actions) */}
-      <header className="h-16 shrink-0 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between z-30 shadow-2xs">
-        {/* Left: Back button + Full Title + Real-time Save Status */}
-        <div className="flex items-center gap-3 min-w-0">
+      <header className="h-16 shrink-0 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between relative z-30 shadow-2xs">
+        {/* Left: Site Logo in same size as site header + Studio Badge */}
+        <div className="flex items-center gap-3 shrink-0">
           <button
+            type="button"
             onClick={handleBackToDashboard}
             disabled={isNavigatingBack}
-            className="p-2 text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-colors cursor-pointer shrink-0 disabled:opacity-50"
-            title="Save progress & Back to Dashboard"
+            className="cursor-pointer hover:opacity-90 transition-opacity focus:outline-none disabled:opacity-60"
+            title="Back to Dashboard"
           >
-            {isNavigatingBack ? (
-              <LuRefreshCw className="text-lg animate-spin text-purple-600" />
-            ) : (
-              <LuArrowLeft className="text-xl text-slate-700" />
-            )}
-          </button>
-
-          {/* Title with hover edit */}
-          <div className="flex items-center gap-2 min-w-0 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
-            <TitleInput
-              title={resumeData?.title || ""}
-              setTitle={(value) => setResumeData((prev) => ({ ...prev, title: value }))}
+            <img
+              src={LOGO}
+              alt="Resuma AI"
+              className="w-[135px] select-none"
             />
-          </div>
+          </button>
+          <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase bg-purple-50 text-purple-700 border border-purple-200/60 select-none">
+            Studio
+          </span>
+        </div>
 
-          {/* Real-time Save Status Pill */}
-          <div className="hidden sm:flex items-center text-xs font-medium shrink-0">
-            {isSaving || isNavigatingBack ? (
-              <span className="flex items-center gap-1.5 text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/80">
-                <LuRefreshCw className="animate-spin text-xs text-amber-600" />
-                <span>Saving...</span>
-              </span>
-            ) : hasUnsavedChanges ? (
-              <span className="flex items-center gap-1.5 text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/80" title="Changes pending auto-save">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
-                <span>Unsaved changes</span>
-              </span>
-            ) : (
-              <span className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/70">
-                <LuCheck className="text-xs" /> Saved
-              </span>
-            )}
-          </div>
+        {/* Center: Resume Title (Centered in Header) */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center max-w-[32%] sm:max-w-[42%] md:max-w-[50%] min-w-0 z-10 pointer-events-auto">
+          <TitleInput
+            title={resumeData?.title || ""}
+            setTitle={(value) => setResumeData((prev) => ({ ...prev, title: value }))}
+          />
         </div>
 
         {/* Right: Studio Action Buttons */}
@@ -863,12 +940,17 @@ const EditResume = () => {
 
             {/* Floating Export Menu */}
             {exportMenuOpen && (
-              <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-1.5 z-50 text-slate-700 animate-in fade-in-0 zoom-in-95 duration-100">
-                <div className="px-3.5 py-1 border-b border-slate-100 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+              <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 text-slate-700 animate-in fade-in-0 zoom-in-95 duration-100">
+                <div className="px-3.5 py-1 text-[11px] font-bold tracking-wider text-slate-400 uppercase border-b border-slate-100">
                   Export Options
                 </div>
 
-                {/* Direct High Quality PDF (Resume) */}
+                {/* Section 1: RESUME */}
+                <div className="px-3.5 pt-2.5 pb-1 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                  Resume
+                </div>
+
+                {/* 1. Resume PDF */}
                 <button
                   type="button"
                   disabled={isExporting}
@@ -876,21 +958,21 @@ const EditResume = () => {
                     setExportMenuOpen(false);
                     handleDownloadVectorPdf("resume");
                   }}
-                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-emerald-50/80 hover:text-emerald-950 transition-colors cursor-pointer group disabled:opacity-50"
+                  className="w-full text-left px-3.5 py-2 text-xs flex items-center gap-3 hover:bg-emerald-50/80 hover:text-emerald-950 transition-colors cursor-pointer group disabled:opacity-50"
                 >
                   <span className="p-2 rounded-xl bg-emerald-100/90 text-emerald-700 group-hover:bg-emerald-200 transition-colors shrink-0">
-                    <LuDownload className="text-sm" />
+                    <LuFileText className="text-sm" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold text-slate-800 group-hover:text-emerald-900 flex items-center justify-between">
-                      <span>Download Resume (PDF)</span>
-                      <span className="text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md">Vector</span>
+                      <span>Resume (PDF)</span>
+                      <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60">.pdf</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 truncate">High-quality vector resume</p>
+                    <p className="text-[11px] text-slate-500 truncate">Standard PDF document</p>
                   </div>
                 </button>
 
-                {/* Editable Word / DOCX Export */}
+                {/* 2. Resume Word (.docx) */}
                 <button
                   type="button"
                   disabled={isExporting}
@@ -898,102 +980,107 @@ const EditResume = () => {
                     setExportMenuOpen(false);
                     handleDownloadDocx();
                   }}
-                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-blue-50/80 hover:text-blue-950 transition-colors cursor-pointer group disabled:opacity-50"
+                  className="w-full text-left px-3.5 py-2 text-xs flex items-center gap-3 hover:bg-blue-50/80 hover:text-blue-950 transition-colors cursor-pointer group disabled:opacity-50"
                 >
                   <span className="p-2 rounded-xl bg-blue-100/90 text-blue-700 group-hover:bg-blue-200 transition-colors shrink-0">
                     <LuFileText className="text-sm" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold text-slate-800 group-hover:text-blue-900 flex items-center justify-between">
-                      <span>Download Word Document (.docx)</span>
-                      <span className="text-[9px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-md">DOCX</span>
+                      <span>Resume (Word)</span>
+                      <span className="text-[10px] font-medium text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200/60">.docx</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 truncate">Editable Word format for recruiters</p>
+                    <p className="text-[11px] text-slate-500 truncate">Editable Word document</p>
                   </div>
                 </button>
 
-                {/* Direct Matched Cover Letter PDF */}
+                <div className="my-1.5 border-t border-slate-100" />
+
+                {/* Section 2: COVER LETTER */}
+                <div className="px-3.5 pt-1.5 pb-1 text-[10px] font-bold tracking-wider text-slate-400 uppercase flex items-center justify-between">
+                  <span>Cover Letter</span>
+                  {!hasCoverLetter && (
+                    <span className="text-[9px] font-normal text-slate-400 normal-case">Not created</span>
+                  )}
+                </div>
+
+                {/* 3. Cover Letter PDF */}
                 <button
                   type="button"
-                  disabled={isExporting}
+                  disabled={isExporting || !hasCoverLetter}
                   onClick={() => {
+                    if (!hasCoverLetter) return;
                     setExportMenuOpen(false);
                     handleDownloadCoverLetterPdf();
                   }}
-                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-purple-50/80 hover:text-purple-950 transition-colors cursor-pointer group disabled:opacity-50"
+                  className={`w-full text-left px-3.5 py-2 text-xs flex items-center gap-3 transition-colors ${
+                    hasCoverLetter
+                      ? "hover:bg-purple-50/80 hover:text-purple-950 cursor-pointer group"
+                      : "opacity-45 cursor-not-allowed bg-slate-50/50"
+                  }`}
+                  title={hasCoverLetter ? "Download Cover Letter PDF" : "Create a cover letter in the Letter tab first"}
                 >
-                  <span className="p-2 rounded-xl bg-purple-100/90 text-purple-700 group-hover:bg-purple-200 transition-colors shrink-0">
-                    <LuFileText className="text-sm" />
+                  <span className={`p-2 rounded-xl shrink-0 transition-colors ${
+                    hasCoverLetter
+                      ? "bg-purple-100/90 text-purple-700 group-hover:bg-purple-200"
+                      : "bg-slate-100 text-slate-400"
+                  }`}>
+                    <LuMail className="text-sm" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold text-slate-800 group-hover:text-purple-900 flex items-center justify-between">
                       <span>Cover Letter (PDF)</span>
-                      <span className="text-[9px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-md">Matched</span>
+                      <span className="text-[10px] font-medium text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200/60">.pdf</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 truncate">Synchronized 1-page letter</p>
+                    <p className="text-[11px] text-slate-500 truncate">
+                      {hasCoverLetter ? "Standalone cover letter" : "Create in the Letter tab first"}
+                    </p>
                   </div>
                 </button>
 
-                {/* 2-Page Application Package (Resume + Cover Letter) */}
+                <div className="my-1.5 border-t border-slate-100" />
+
+                {/* Section 3: PACKAGE */}
+                <div className="px-3.5 pt-1.5 pb-1 text-[10px] font-bold tracking-wider text-slate-400 uppercase flex items-center justify-between">
+                  <span>Package</span>
+                  {!hasCoverLetter && (
+                    <span className="text-[9px] font-normal text-slate-400 normal-case">Requires cover letter</span>
+                  )}
+                </div>
+
+                {/* 4. Zipped Package */}
                 <button
                   type="button"
-                  disabled={isExporting}
+                  disabled={isExporting || !hasCoverLetter}
                   onClick={() => {
+                    if (!hasCoverLetter) return;
                     setExportMenuOpen(false);
-                    handleDownloadApplicationPackage();
+                    handleDownloadZipPackage();
                   }}
-                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-indigo-50/80 hover:text-indigo-950 transition-colors cursor-pointer group disabled:opacity-50"
+                  className={`w-full text-left px-3.5 py-2 text-xs flex items-center gap-3 transition-colors ${
+                    hasCoverLetter
+                      ? "hover:bg-indigo-50/80 hover:text-indigo-950 cursor-pointer group"
+                      : "opacity-45 cursor-not-allowed bg-slate-50/50"
+                  }`}
+                  title={hasCoverLetter ? "Download separated Resume & Cover Letter in a ZIP archive" : "Create a cover letter first to unlock package"}
                 >
-                  <span className="p-2 rounded-xl bg-indigo-100/90 text-indigo-700 group-hover:bg-indigo-200 transition-colors shrink-0">
-                    <LuLayers className="text-sm" />
+                  <span className={`p-2 rounded-xl shrink-0 transition-colors ${
+                    hasCoverLetter
+                      ? "bg-indigo-100/90 text-indigo-700 group-hover:bg-indigo-200"
+                      : "bg-slate-100 text-slate-400"
+                  }`}>
+                    <LuFileArchive className="text-sm" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold text-slate-800 group-hover:text-indigo-900 flex items-center justify-between">
-                      <span>Application Package (PDF)</span>
-                      <span className="text-[9px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md">2 Pages</span>
+                      <span>Resume + Cover Letter</span>
+                      <span className="text-[10px] font-medium text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200/60">.zip</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 truncate">Unified Resume + Cover Letter</p>
-                  </div>
-                </button>
-
-                {/* Browser Print */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setExportMenuOpen(false);
-                    setOpenPreviewModal(true);
-                  }}
-                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-purple-50/80 hover:text-purple-950 transition-colors cursor-pointer group"
-                >
-                  <span className="p-2 rounded-xl bg-purple-100/90 text-purple-700 group-hover:bg-purple-200 transition-colors shrink-0">
-                    <LuPrinter className="text-sm" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-slate-800 group-hover:text-purple-900">
-                      Print Resume
-                    </div>
-                    <p className="text-[11px] text-slate-500 truncate">Print or save via browser</p>
-                  </div>
-                </button>
-
-                {/* Export Data Backup */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setExportMenuOpen(false);
-                    handleExportJson();
-                  }}
-                  className="w-full text-left px-3.5 py-2.5 text-xs flex items-center gap-3 hover:bg-indigo-50/80 hover:text-indigo-950 transition-colors cursor-pointer group"
-                >
-                  <span className="p-2 rounded-xl bg-indigo-100/90 text-indigo-700 group-hover:bg-indigo-200 transition-colors shrink-0">
-                    <LuFileJson className="text-sm" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-slate-800 group-hover:text-indigo-900 flex items-center justify-between">
-                      <span>Export Resume Data</span>
-                      <span className="text-[9px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md">JSON</span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 truncate">Download backup file for your records</p>
+                    <p className="text-[11px] text-slate-500 truncate">
+                      {hasCoverLetter
+                        ? "Separated PDFs in a ZIP file"
+                        : "Only available with a cover letter"}
+                    </p>
                   </div>
                 </button>
               </div>
@@ -1067,6 +1154,10 @@ const EditResume = () => {
           onToggleDrawer={() => setIsDrawerOpen((prev) => !prev)}
           onBack={handleBackToDashboard}
           overallScore={liveAudit.overallScore}
+          isSaving={isSaving}
+          hasUnsavedChanges={hasUnsavedChanges}
+          isNavigatingBack={isNavigatingBack}
+          onManualSave={handleManualSave}
         />
 
         {/* Standardized Studio Drawer (450px) - Zero Layout Shift Across Modes */}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
+import JSZip from "jszip";
 import axiosInstance from "../../../utils/axiosInstance";
 import { API_PATHS } from "../../../utils/apiPaths";
 
@@ -98,6 +99,84 @@ export const useResumeExport = (resumeId, documentTitle = "Resume") => {
   const handleDownloadApplicationPackage = () => handleDownloadVectorPdf("package");
 
   /**
+   * Zipped Application Package export.
+   * Downloads a .zip archive containing both Resume (PDF) and Cover Letter (PDF) as separate files.
+   */
+  const handleDownloadZipPackage = async () => {
+    if (!resumeId) {
+      toast.error("Resume ID is missing");
+      return;
+    }
+
+    if (isExporting) return;
+    setIsExporting(true);
+
+    const toastId = toast.loading("Creating application package (.zip)...", {
+      id: "zip-export-toast",
+    });
+
+    try {
+      const [resumeRes, coverLetterRes] = await Promise.all([
+        axiosInstance.get(API_PATHS.RESUME.EXPORT_PDF(resumeId, "resume"), {
+          responseType: "blob",
+        }),
+        axiosInstance.get(API_PATHS.RESUME.EXPORT_PDF(resumeId, "cover-letter"), {
+          responseType: "blob",
+        }),
+      ]);
+
+      const processBlob = async (blobData) => {
+        if (blobData instanceof Blob) {
+          const previewText = await blobData.slice(0, 10).text();
+          if (previewText.startsWith('{"0":') || previewText.startsWith('{"typ')) {
+            const fullText = await blobData.text();
+            const parsed = JSON.parse(fullText);
+            const bytes = parsed.data ? parsed.data : Object.values(parsed);
+            return new Blob([new Uint8Array(bytes)], { type: "application/pdf" });
+          }
+          return blobData;
+        }
+        return new Blob([blobData], { type: "application/pdf" });
+      };
+
+      const [resumeBlob, coverLetterBlob] = await Promise.all([
+        processBlob(resumeRes.data),
+        processBlob(coverLetterRes.data),
+      ]);
+
+      const baseTitle = (documentTitle || "Resume")
+        .replace(/[^a-zA-Z0-9-_ ]/g, "")
+        .trim() || "Resume";
+
+      const zip = new JSZip();
+      zip.file(`${baseTitle} - Resume.pdf`, resumeBlob);
+      zip.file(`${baseTitle} - Cover Letter.pdf`, coverLetterBlob);
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      const downloadUrl = window.URL.createObjectURL(zipBlob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = `${baseTitle} - Application Package.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+
+      toast.success("Application package (.zip) downloaded successfully!", {
+        id: toastId,
+      });
+    } catch (err) {
+      console.error("ZIP package export failed:", err);
+      toast.error(
+        err.response?.data?.message || "Failed to generate application package",
+        { id: toastId }
+      );
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  /**
    * Direct 1-click Editable Word (.docx) export.
    * Downloads an ATS-compliant, native Microsoft Word resume generated on the backend.
    */
@@ -172,6 +251,7 @@ export const useResumeExport = (resumeId, documentTitle = "Resume") => {
     handleDownloadVectorPdf,
     handleDownloadCoverLetterPdf,
     handleDownloadApplicationPackage,
+    handleDownloadZipPackage,
     handleDownloadDocx,
     showAtsGuidance,
     setShowAtsGuidance,

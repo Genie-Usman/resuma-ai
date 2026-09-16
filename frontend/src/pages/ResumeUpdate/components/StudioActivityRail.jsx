@@ -5,6 +5,8 @@ import {
   LuMail,
   LuSparkles,
   LuInfo,
+  LuCheck,
+  LuRefreshCw,
 } from "react-icons/lu";
 
 /**
@@ -20,6 +22,10 @@ const StudioActivityRail = ({
   onBack,
   overallScore = 90,
   onOpenHelp,
+  isSaving = false,
+  hasUnsavedChanges = false,
+  isNavigatingBack = false,
+  onManualSave,
 }) => {
   const navItems = [
     {
@@ -128,19 +134,53 @@ const StudioActivityRail = ({
         })}
       </nav>
 
-      {/* Bottom: Quick Help (Placed at the bottom using mt-auto) */}
-      {onOpenHelp && (
-        <div className="mt-auto flex flex-col items-center pt-2">
+      {/* Bottom Area: Save Status Pill & Quick Help (Anchored at the bottom) */}
+      <div className="mt-auto flex flex-col items-center gap-2.5 w-full pt-3 border-t border-slate-800/70">
+        {/* Real-time Save Status Pill */}
+        <div className="w-full flex flex-col items-center">
+          {isSaving || isNavigatingBack ? (
+            <div
+              className="w-full py-1.5 px-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 flex flex-col items-center justify-center gap-1 text-center shadow-xs select-none transition-all"
+              title="Saving resume data & thumbnail..."
+            >
+              <LuRefreshCw className="text-xs animate-spin text-amber-400 shrink-0" />
+              <span className="text-[10px] font-semibold tracking-tight leading-none">Saving</span>
+            </div>
+          ) : hasUnsavedChanges ? (
+            <button
+              type="button"
+              onClick={onManualSave}
+              className="w-full py-1.5 px-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 flex flex-col items-center justify-center gap-1 text-center cursor-pointer transition-all shadow-xs group select-none"
+              title="Unsaved changes (Click to save now)"
+            >
+              <div className="flex items-center justify-center">
+                <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+              </div>
+              <span className="text-[10px] font-semibold tracking-tight leading-none group-hover:underline">Unsaved</span>
+            </button>
+          ) : (
+            <div
+              className="w-full py-1.5 px-1 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 flex flex-col items-center justify-center gap-1 text-center shadow-xs select-none transition-all"
+              title="All changes saved to cloud"
+            >
+              <LuCheck className="text-xs text-emerald-400 shrink-0" />
+              <span className="text-[10px] font-semibold tracking-tight leading-none">Saved</span>
+            </div>
+          )}
+        </div>
+
+        {/* Quick Help (Keyboard Shortcuts & Tips) */}
+        {onOpenHelp && (
           <button
             type="button"
             onClick={onOpenHelp}
-            className="w-10 h-10 rounded-xl hover:bg-slate-900 text-slate-500 hover:text-slate-300 flex items-center justify-center transition-colors cursor-pointer border border-transparent hover:border-slate-800/60"
+            className="w-9 h-9 rounded-xl hover:bg-slate-900 text-slate-500 hover:text-slate-300 flex items-center justify-center transition-colors cursor-pointer border border-transparent hover:border-slate-800/60"
             title="Keyboard Shortcuts & Tips"
           >
-            <LuInfo className="text-lg" />
+            <LuInfo className="text-base" />
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </aside>
   );
 };
