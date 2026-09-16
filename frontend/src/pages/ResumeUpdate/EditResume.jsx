@@ -41,6 +41,7 @@ import ResumeCanvas from "./components/ResumeCanvas.jsx";
 import StudioActivityRail from "./components/StudioActivityRail.jsx";
 import ContentDrawer from "./components/drawers/ContentDrawer.jsx";
 import TemplatesDrawer from "./components/drawers/TemplatesDrawer.jsx";
+import ColorsDrawer from "./components/drawers/ColorsDrawer.jsx";
 import DesignDrawer from "./components/drawers/DesignDrawer.jsx";
 import AiAuditDrawer from "./components/drawers/AiAuditDrawer.jsx";
 import CoverLetterDrawer from "./components/drawers/CoverLetterDrawer.jsx";
@@ -1229,6 +1230,13 @@ const EditResume = () => {
                     },
                   }), true);
                 }}
+                onOpenColors={() => setActiveTab("colors")}
+                onClose={() => setIsDrawerOpen(false)}
+              />
+            )}
+
+            {activeTab === "colors" && (
+              <ColorsDrawer
                 currentColors={themeColorPalette}
                 onUpdateColors={(colors) => {
                   setResumeData((prev) => ({
@@ -1246,6 +1254,7 @@ const EditResume = () => {
                     },
                   }), true);
                 }}
+                onOpenTemplates={() => setActiveTab("templates")}
                 onClose={() => setIsDrawerOpen(false)}
               />
             )}

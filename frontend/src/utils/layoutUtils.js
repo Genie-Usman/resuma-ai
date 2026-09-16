@@ -7,6 +7,7 @@ export const TWO_COLUMN_TEMPLATES = new Set([
   "leafish",
   "pikachu",
   "cascade",
+  "zenith",
   "meridian",
   "clarity",
   "vanguard",

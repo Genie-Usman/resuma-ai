@@ -77,7 +77,7 @@ const mapSectionToComponent = (key, section, reactKey, themeColors, basics) => {
   ) : null;
 };
 
-const Cascade = ({
+const Zenith = ({
   basics = {},
   sections = {},
   metadata = {},
@@ -116,8 +116,8 @@ const Cascade = ({
       ref={resumeRef}
       className="grid min-h-full print:min-h-0 grid-cols-12 text-left"
       style={{
-        backgroundColor: themeColors[0],
-        color: themeColors[1],
+        backgroundColor: themeColors[0] || "#ffffff",
+        color: themeColors[1] || "#1e293b",
         transform: containerWidth > 0 ? `scale(${scale})` : "none",
         transformOrigin: "top left",
         width: containerWidth > 0 ? `${baseWidth}px` : "100%",
@@ -157,8 +157,8 @@ const Cascade = ({
           hasSidebar ? "col-span-8" : "col-span-12"
         }`}
         style={{
-          backgroundColor: themeColors[0],
-          color: themeColors[1],
+          backgroundColor: themeColors[0] || "#ffffff",
+          color: themeColors[1] || "#1e293b",
         }}
       >
         {mainIds.map((key) =>
@@ -175,7 +175,4 @@ const Cascade = ({
   );
 };
 
-import Zenith from "./Zenith";
-
-export { Zenith };
 export default Zenith;

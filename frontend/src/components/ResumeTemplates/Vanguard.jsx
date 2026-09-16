@@ -131,10 +131,11 @@ const Vanguard = ({
     >
       <div
         ref={resumeRef}
-        className="w-full min-h-[1056px] bg-white flex flex-col overflow-hidden select-none font-sans text-slate-800 shadow-sm"
+        className="w-full min-h-[1056px] flex flex-col overflow-hidden select-none shadow-sm transition-colors"
         style={{
-          fontFamily: metadata?.fontFamily || "Inter, system-ui, sans-serif",
-          lineHeight: metadata?.density === "compact" ? "1.3" : "1.5",
+          backgroundColor: themeColors[0] || "#ffffff",
+          color: themeColors[1] || "#1e293b",
+          fontFamily: "inherit",
         }}
       >
         {/* Full-Width Dark Charcoal / Primary Accent Header Banner */}

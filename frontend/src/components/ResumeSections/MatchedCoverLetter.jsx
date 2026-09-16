@@ -86,7 +86,7 @@ const MatchedCoverLetter = ({
 
   // Check template type
   const currentTemplate = String(metadata?.template || coverLetter?.template || "").toLowerCase();
-  const isCascade = currentTemplate === "cascade";
+  const isCascade = currentTemplate === "cascade" || currentTemplate === "zenith";
   const isMeridian = currentTemplate === "meridian";
   const isVanguard = currentTemplate === "vanguard";
 

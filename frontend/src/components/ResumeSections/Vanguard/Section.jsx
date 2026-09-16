@@ -18,12 +18,20 @@ const Section = ({
   const validItems = section.items.filter((item) => item.visible !== false);
   if (!validItems.length) return null;
 
-  return (
-    <section id={section.id} className="w-full mb-6">
-      {/* Section Header with Bold Underline Rule */}
-      <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-1 mb-3.5 select-none">
-        {section.title || section.name}
-      </h3>
+    const primaryColor = themeColors[2] || "#2d3748";
+
+    return (
+      <section id={section.id} className="w-full mb-6">
+        {/* Section Header with Bold Underline Rule */}
+        <h3
+          className="section-title text-sm font-bold uppercase tracking-wider border-b pb-1 mb-3.5 select-none transition-colors"
+          style={{
+            color: primaryColor,
+            borderColor: primaryColor,
+          }}
+        >
+          {section.title || section.name}
+        </h3>
 
       {/* Items List */}
       <div className="space-y-4">

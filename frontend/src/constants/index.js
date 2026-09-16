@@ -10,7 +10,8 @@ import NOSEPASS from "../assets/template_images/nosepass.jpg"
 import ONYX from "../assets/template_images/onyx.jpg"
 import PIKACHU from "../assets/template_images/pikachu.jpg"
 import RHYHORN from "../assets/template_images/rhyhorn.jpg"
-import CASCADE from "../assets/template_images/cascade.jpg"
+import ZENITH from "../assets/template_images/zenith.jpg"
+const CASCADE = ZENITH;
 import MERIDIAN from "../assets/template_images/meridian.webp"
 import CLARITY from "../assets/template_images/clarity.webp"
 import VANGUARD from "../assets/template_images/vanguard.webp"
@@ -127,13 +128,13 @@ export const RESUME_TEMPLATES = [
         description: 'Clean Border Divider 1-Column',
     },
     {
-        id: 'cascade',
-        name: 'Cascade',
-        thumbnail: CASCADE,
-        colorPaletteCode: 'cascade',
+        id: 'zenith',
+        name: 'Zenith',
+        thumbnail: ZENITH,
+        colorPaletteCode: 'zenith',
         columns: 2,
         layoutType: 'two-column',
-        description: 'Sleek design with a modern edge, blending professionalism and creativity',
+        description: 'Sleek dark contrast sidebar with modern two-column layout',
     },
     {
         id: 'meridian',
@@ -166,6 +167,7 @@ export const RESUME_TEMPLATES = [
 
 // [backgroundColor, textColor, accentColor]
 export const THEME_COLOR_PALETTE = {
+  zenith: ['#ffffff', '#1e293b', '#1a365d'],
   cascade: ['#ffffff', '#1e293b', '#1a365d'],
   meridian: ['#ffffff', '#1e293b', '#0d2f5a'],
   clarity: ['#ffffff', '#1e293b', '#1e293b'],

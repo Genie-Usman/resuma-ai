@@ -65,7 +65,7 @@ const Section = ({
           <SectionIcon className="w-3.5 h-3.5" />
         </div>
         <h3
-          className="text-sm sm:text-base font-bold tracking-tight capitalize"
+          className="section-title text-sm sm:text-base font-bold tracking-tight capitalize"
           style={{ color: primaryColor }}
         >
           {section.title || section.name}

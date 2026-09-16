@@ -5,7 +5,8 @@ const Summary = ({ section, themeColors = [] }) => {
     <div className="w-full pb-4 pt-1 select-none">
       <div
         dangerouslySetInnerHTML={{ __html: section.content }}
-        className="wysiwyg text-xs sm:text-[13px] leading-relaxed text-slate-700 font-normal [&>p]:mb-2"
+        style={{ color: themeColors[1] || "inherit" }}
+        className="wysiwyg text-xs sm:text-[13px] leading-relaxed font-normal [&>p]:mb-2"
       />
     </div>
   );

@@ -126,10 +126,11 @@ const Meridian = ({
     >
       <div
         ref={resumeRef}
-        className="relative w-full min-h-[1056px] bg-white flex flex-col overflow-hidden select-none font-sans text-slate-800 shadow-sm pb-8"
+        className="relative w-full min-h-[1056px] flex flex-col overflow-hidden select-none shadow-sm pb-8 transition-colors"
         style={{
-          fontFamily: metadata?.fontFamily || "Inter, system-ui, sans-serif",
-          lineHeight: metadata?.density === "compact" ? "1.3" : "1.5",
+          backgroundColor: themeColors[0] || "#ffffff",
+          color: themeColors[1] || "#1e293b",
+          fontFamily: "inherit",
         }}
       >
         {/* Left Solid Dark Accent Spine across full page height */}

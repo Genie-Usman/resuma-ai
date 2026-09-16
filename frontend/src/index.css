@@ -640,6 +640,76 @@ h1, h2, h3, h4, h5, h6,
   padding-right: 1.5rem !important;
 }
 
+/* ==========================================================================
+   Universal Dynamic Theme Text Color System
+   Ensures all resume text elements respond dynamically to themeColors[1]
+   across all templates and dark/light color schemes.
+   ========================================================================== */
+
+.resume-font-root {
+  color: var(--resume-color-text, #1e293b);
+  background-color: var(--resume-color-bg, #ffffff);
+}
+
+/* Base text elements inherit theme text color */
+.resume-font-root p,
+.resume-font-root li,
+.resume-font-root .wysiwyg,
+.resume-font-root .wysiwyg * {
+  color: inherit;
+}
+
+/* Dynamically remap Tailwind dark text utilities to the active theme text color */
+.resume-font-root .text-slate-900,
+.resume-font-root .text-slate-800,
+.resume-font-root .text-gray-900,
+.resume-font-root .text-gray-800 {
+  color: var(--resume-color-text, #1e293b) !important;
+}
+
+/* Secondary/muted text uses slightly softened opacity of active theme text color */
+.resume-font-root .text-slate-700,
+.resume-font-root .text-slate-600,
+.resume-font-root .text-slate-500,
+.resume-font-root .text-gray-700,
+.resume-font-root .text-gray-600,
+.resume-font-root .text-gray-500 {
+  color: color-mix(in srgb, var(--resume-color-text, #1e293b) 82%, transparent) !important;
+}
+
+/* Preserve crisp white text inside accent sidebars (e.g. Cascade/Zenith) and header banners */
+.resume-font-root aside.sidebar,
+.resume-font-root aside.sidebar *,
+.resume-font-root .sidebar,
+.resume-font-root .sidebar * {
+  --sidebar-text: #ffffff;
+}
+
+.resume-font-root aside.sidebar,
+.resume-font-root aside.sidebar p,
+.resume-font-root aside.sidebar span,
+.resume-font-root aside.sidebar div,
+.resume-font-root aside.sidebar h1,
+.resume-font-root aside.sidebar h2,
+.resume-font-root aside.sidebar h3,
+.resume-font-root aside.sidebar h4,
+.resume-font-root aside.sidebar li,
+.resume-font-root .group-\[\.sidebar\]\:text-white {
+  color: #ffffff !important;
+}
+
+.resume-font-root aside.sidebar .text-slate-200,
+.resume-font-root aside.sidebar .text-slate-300,
+.resume-font-root aside.sidebar .text-slate-400 {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Vanguard Header Banner */
+.resume-font-root .vanguard-banner,
+.resume-font-root .vanguard-banner * {
+  color: #ffffff !important;
+}
+
 .resume-density-spacious .py-4 {
   padding-top: 1.35rem !important;
   padding-bottom: 1.35rem !important;
@@ -659,8 +729,11 @@ h1, h2, h3, h4, h5, h6,
 .resume-margin-narrow .py-5,
 .resume-margin-narrow .p-6,
 .resume-margin-narrow .px-6,
-.resume-margin-narrow .py-6 {
-  padding: 12px !important;
+.resume-margin-narrow .py-6,
+.resume-margin-narrow .p-8,
+.resume-margin-narrow .px-8,
+.resume-margin-narrow .py-8 {
+  padding: 14px !important;
 }
 
 .resume-margin-narrow .sidebar.p-5,
@@ -671,8 +744,14 @@ h1, h2, h3, h4, h5, h6,
 /* 2. Standard Margins (18mm / ~68px - Recommended Default) */
 .resume-margin-standard .p-5,
 .resume-margin-standard .px-5,
-.resume-margin-standard .py-5 {
-  padding: 20px !important;
+.resume-margin-standard .py-5,
+.resume-margin-standard .p-6,
+.resume-margin-standard .px-6,
+.resume-margin-standard .py-6,
+.resume-margin-standard .p-8,
+.resume-margin-standard .px-8,
+.resume-margin-standard .py-8 {
+  padding: 24px !important;
 }
 
 /* 3. Wide Margins (24mm / ~90px - Elegant editorial aesthetic) */
@@ -681,8 +760,11 @@ h1, h2, h3, h4, h5, h6,
 .resume-margin-wide .py-5,
 .resume-margin-wide .p-6,
 .resume-margin-wide .px-6,
-.resume-margin-wide .py-6 {
-  padding: 28px !important;
+.resume-margin-wide .py-6,
+.resume-margin-wide .p-8,
+.resume-margin-wide .px-8,
+.resume-margin-wide .py-8 {
+  padding: 34px !important;
 }
 
 .resume-margin-wide .sidebar.p-5,
@@ -697,7 +779,11 @@ h1, h2, h3, h4, h5, h6,
 /* 1. Underline: Horizontal accent line across section title */
 .resume-header-underline section > h4,
 .resume-header-underline section > div > h4,
-.resume-header-underline section h4 {
+.resume-header-underline section h4,
+.resume-header-underline section > h3,
+.resume-header-underline section > div > h3,
+.resume-header-underline section h3,
+.resume-header-underline .section-title {
   border-bottom: 2px solid var(--resume-color-primary, #ca8a04) !important;
   border-left: none !important;
   border-top: none !important;
@@ -710,7 +796,11 @@ h1, h2, h3, h4, h5, h6,
 /* 2. Left Accent Bar: Modern vertical colored bar on the left */
 .resume-header-left-bar section > h4,
 .resume-header-left-bar section > div > h4,
-.resume-header-left-bar section h4 {
+.resume-header-left-bar section h4,
+.resume-header-left-bar section > h3,
+.resume-header-left-bar section > div > h3,
+.resume-header-left-bar section h3,
+.resume-header-left-bar .section-title {
   border-left: 3.5px solid var(--resume-color-primary, #ca8a04) !important;
   border-bottom: none !important;
   border-top: none !important;
@@ -724,7 +814,11 @@ h1, h2, h3, h4, h5, h6,
 /* 3. Pill / Badge: Subtle tinted background badge */
 .resume-header-pill section > h4,
 .resume-header-pill section > div > h4,
-.resume-header-pill section h4 {
+.resume-header-pill section h4,
+.resume-header-pill section > h3,
+.resume-header-pill section > div > h3,
+.resume-header-pill section h3,
+.resume-header-pill .section-title {
   display: inline-block !important;
   padding: 3px 10px !important;
   border-radius: 6px !important;
@@ -738,7 +832,11 @@ h1, h2, h3, h4, h5, h6,
 /* 4. Minimal Uppercase: Clean tracked uppercase with no lines or badges */
 .resume-header-minimal section > h4,
 .resume-header-minimal section > div > h4,
-.resume-header-minimal section h4 {
+.resume-header-minimal section h4,
+.resume-header-minimal section > h3,
+.resume-header-minimal section > div > h3,
+.resume-header-minimal section h3,
+.resume-header-minimal .section-title {
   text-transform: uppercase !important;
   letter-spacing: 0.08em !important;
   border: none !important;

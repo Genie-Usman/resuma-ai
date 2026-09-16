@@ -1,5 +1,6 @@
 import {
   LuFileText,
+  LuLayoutTemplate,
   LuPalette,
   LuSlidersHorizontal,
   LuMail,
@@ -37,8 +38,14 @@ const StudioActivityRail = ({
     {
       id: "templates",
       label: "Templates",
+      icon: LuLayoutTemplate,
+      tooltip: "Choose ATS resume layout template",
+    },
+    {
+      id: "colors",
+      label: "Colors",
       icon: LuPalette,
-      tooltip: "Choose templates & color palettes",
+      tooltip: "Color presets, custom palettes & contrast",
     },
     {
       id: "formatting",

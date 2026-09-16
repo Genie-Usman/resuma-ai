@@ -13,6 +13,7 @@ import Onyx from './Onyx';
 import Pikachu from './Pikachu';
 import Rhyhorn from './Rhyhorn';
 import Cascade from './Cascade';
+import Zenith from './Zenith';
 import Meridian from './Meridian';
 import Clarity from './Clarity';
 import Vanguard from './Vanguard';
@@ -178,7 +179,8 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
       case 'onyx': return <Onyx {...sharedProps} />;
       case 'pikachu': return <Pikachu {...sharedProps} />;
       case 'rhyhorn': return <Rhyhorn {...sharedProps} />;
-      case 'cascade': return <Cascade {...sharedProps} />;
+      case 'cascade':
+      case 'zenith': return <Zenith {...sharedProps} />;
       case 'meridian': return <Meridian {...sharedProps} />;
       case 'clarity': return <Clarity {...sharedProps} />;
       case 'vanguard': return <Vanguard {...sharedProps} />;
@@ -236,6 +238,8 @@ const RenderResume = ({ templateId, resumeData, colorPalette, containerWidth }) 
       className={`w-full h-full resume-font-root ${densityClass} ${marginClass} ${headerStyleClass}`}
       style={{
         fontFamily: `"${activeFont}", ${getFontFallback(safeMetadata?.typography?.font?.category)}`,
+        color: themeColors[1] || "#000000",
+        backgroundColor: themeColors[0] || "#ffffff",
         "--resume-color-bg": themeColors[0] || "#ffffff",
         "--resume-color-text": themeColors[1] || "#000000",
         "--resume-color-primary": themeColors[2] || "#ca8a04",

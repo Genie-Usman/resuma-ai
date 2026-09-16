@@ -63,7 +63,7 @@ const Section = ({
         >
           <SectionIcon className="w-3 h-3" />
         </div>
-        <h3 className="text-sm sm:text-[15px] font-bold tracking-tight text-slate-900 capitalize shrink-0">
+        <h3 className="section-title text-sm sm:text-[15px] font-bold tracking-tight text-slate-900 capitalize shrink-0">
           {section.title || section.name}
         </h3>
         {/* Horizontal Divider Line in Main Content */}
