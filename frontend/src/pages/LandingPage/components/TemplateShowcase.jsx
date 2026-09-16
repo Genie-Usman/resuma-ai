@@ -1,16 +1,16 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
+import { EffectCoverflow, Navigation, Keyboard } from "swiper/modules";
 import { LuChevronLeft, LuChevronRight, LuArrowRight } from "react-icons/lu";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
-// Swiper core styles
+// Swiper core & effect styles
 import "swiper/css";
+import "swiper/css/effect-coverflow";
 import "swiper/css/navigation";
-import "swiper/css/pagination";
 
-// Template thumbnails
+// All 16 authentic template thumbnails
 import CLARITY from "../../../assets/template_images/clarity.webp";
 import VANGUARD from "../../../assets/template_images/vanguard.webp";
 import MERIDIAN from "../../../assets/template_images/meridian.webp";
@@ -19,259 +19,330 @@ import LEAFISH from "../../../assets/template_images/leafish.jpg";
 import ONYX from "../../../assets/template_images/onyx.jpg";
 import CHIKORITA from "../../../assets/template_images/chikorita.jpg";
 import AZURILL from "../../../assets/template_images/azurill.jpg";
+import BRONZOR from "../../../assets/template_images/bronzor.jpg";
+import DITTO from "../../../assets/template_images/ditto.jpg";
+import GENGAR from "../../../assets/template_images/gengar.jpg";
+import GLALIE from "../../../assets/template_images/glalie.jpg";
+import KAKUNA from "../../../assets/template_images/kakuna.jpg";
+import NOSEPASS from "../../../assets/template_images/nosepass.jpg";
+import PIKACHU from "../../../assets/template_images/pikachu.jpg";
+import RHYHORN from "../../../assets/template_images/rhyhorn.jpg";
 
 const TEMPLATES = [
   {
     id: "clarity",
     name: "Clarity",
-    badge: "Most Popular",
-    category: "executive",
-    cols: "2-Column",
+    style: "Executive 2-Column",
+    tagline: "Crisp white geometry with top executive summary",
     thumbnail: CLARITY,
-    description:
-      "Crisp white layout with modern circular icon badges and an executive top summary. Ideal for senior specialists and directors.",
   },
   {
     id: "vanguard",
     name: "Vanguard",
-    badge: "Executive",
-    category: "executive",
-    cols: "2-Column",
+    style: "Leadership Banner",
+    tagline: "Charcoal header with dedicated career narrative",
     thumbnail: VANGUARD,
-    description:
-      "Charcoal top header banner with dedicated career narrative and clean sidebar. Perfect for managers, leads, and consultants.",
   },
   {
     id: "meridian",
     name: "Meridian",
-    badge: "Recommended",
-    category: "modern",
-    cols: "2-Column",
+    style: "Technical Timeline",
+    tagline: "Vertical milestone spine designed for engineers",
     thumbnail: MERIDIAN,
-    description:
-      "Timeline spine that maps your career progression with circular milestones. Excellent for engineers and technical specialists.",
   },
   {
     id: "zenith",
     name: "Zenith",
-    badge: "Classic",
-    category: "minimal",
-    cols: "2-Column",
+    style: "Classic Sidebar",
+    tagline: "High-contrast left column for deep skill trees",
     thumbnail: ZENITH,
-    description:
-      "Professional left sidebar with high-contrast section headers. Balanced space for skills, software, and history.",
   },
   {
     id: "leafish",
     name: "Leafish",
-    badge: "Creative",
-    category: "modern",
-    cols: "2-Column",
+    style: "Modern Balanced",
+    tagline: "Equal weight for competencies and achievements",
     thumbnail: LEAFISH,
-    description:
-      "Modern warm layout with clean typography. Gives equal weight to technical competencies and career accomplishments.",
   },
   {
     id: "onyx",
     name: "Onyx",
-    badge: "Simple",
-    category: "minimal",
-    cols: "1-Column",
+    style: "Single Column Standard",
+    tagline: "Highest ATS compatibility for legal & corporate roles",
     thumbnail: ONYX,
-    description:
-      "Traditional single-column layout with highest ATS compatibility. Best for federal, legal, and academic applications.",
   },
   {
     id: "chikorita",
     name: "Chikorita",
-    badge: "Fresh",
-    category: "modern",
-    cols: "2-Column",
+    style: "Fresh & Approachable",
+    tagline: "Spacious layout ideal for career changers",
     thumbnail: CHIKORITA,
-    description:
-      "Approachable modern aesthetic with spacious layout. Great for career changers, educators, and graduates.",
   },
   {
     id: "azurill",
     name: "Azurill",
-    badge: "Compact",
-    category: "minimal",
-    cols: "2-Column",
+    style: "High Density Grid",
+    tagline: "Engineered to fit extensive history into 1 page",
     thumbnail: AZURILL,
-    description:
-      "High information density layout designed to fit extensive career histories into a compact, readable single page.",
   },
-];
-
-const CATEGORIES = [
-  { id: "all", label: "All Templates" },
-  { id: "executive", label: "Executive & 2-Col" },
-  { id: "modern", label: "Modern & Tech" },
-  { id: "minimal", label: "Clean & Simple" },
+  {
+    id: "bronzor",
+    name: "Bronzor",
+    style: "Compact Technical",
+    tagline: "Monospace skill grouping with clean hierarchy",
+    thumbnail: BRONZOR,
+  },
+  {
+    id: "ditto",
+    name: "Ditto",
+    style: "Adaptive Minimalist",
+    tagline: "Distraction-free typographic flow for specialists",
+    thumbnail: DITTO,
+  },
+  {
+    id: "gengar",
+    name: "Gengar",
+    style: "High Contrast Dark Accent",
+    tagline: "Bold contrast borders for creative engineers",
+    thumbnail: GENGAR,
+  },
+  {
+    id: "glalie",
+    name: "Glalie",
+    style: "Geometric Crisp",
+    tagline: "Precise lines and clean section divides",
+    thumbnail: GLALIE,
+  },
+  {
+    id: "kakuna",
+    name: "Kakuna",
+    style: "Structured Corporate",
+    tagline: "Strict margins and recruiter-vetted order",
+    thumbnail: KAKUNA,
+  },
+  {
+    id: "nosepass",
+    name: "Nosepass",
+    style: "Analytical Sidebar",
+    tagline: "Quantifiable metric badges and project sections",
+    thumbnail: NOSEPASS,
+  },
+  {
+    id: "pikachu",
+    name: "Pikachu",
+    style: "Clean Accent",
+    tagline: "Modern punchy highlights with classic structure",
+    thumbnail: PIKACHU,
+  },
+  {
+    id: "rhyhorn",
+    name: "Rhyhorn",
+    style: "Solid Columnar",
+    tagline: "Authoritative structure for operations & leadership",
+    thumbnail: RHYHORN,
+  },
 ];
 
 const TemplateShowcase = () => {
   const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeIndex, setActiveIndex] = useState(1);
   const swiperRef = useRef(null);
 
-  const filtered =
-    activeCategory === "all"
-      ? TEMPLATES
-      : TEMPLATES.filter((t) => t.category === activeCategory);
+  const activeTemplate = TEMPLATES[activeIndex] || TEMPLATES[0];
 
   const handleUseTemplate = (templateId) => {
     navigate("/dashboard", { state: { preferredTemplate: templateId } });
   };
 
   return (
-    <section id="templates" className="py-24 relative bg-slate-50/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-          <div className="max-w-2xl space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-200/70 text-slate-700 text-xs font-bold uppercase tracking-wider">
-              <span>Recruiter-Approved Layouts</span>
-            </div>
+    <section
+      id="templates"
+      className="relative py-14 sm:py-18 bg-[#0c0d11] text-white overflow-hidden border-b border-slate-800"
+    >
+      {/* Background Architectural Wireframe Grid */}
+      <div className="absolute inset-0 pointer-events-none select-none opacity-15">
+        <svg
+          className="w-full h-full"
+          xmlns="http://www.w3.org/2000/svg"
+          width="100%"
+          height="100%"
+          fill="none"
+        >
+          <defs>
+            <pattern
+              id="theaterGrid"
+              width="48"
+              height="48"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M 48 0 L 0 0 0 48"
+                fill="none"
+                stroke="rgba(255, 255, 255, 0.12)"
+                strokeWidth="0.5"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#theaterGrid)" />
+        </svg>
+      </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
-              Choose a template that fits your career.
+      {/* Subtle Center Spotlight */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] sm:w-[650px] h-[350px] bg-radial from-indigo-500/10 via-transparent to-transparent blur-3xl pointer-events-none" />
+
+      {/* Strict Page Width Container */}
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+        {/* ========================================================= */}
+        {/* HEADER: Scaled Down & Balanced Editorial Typography       */}
+        {/* ========================================================= */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 sm:mb-10">
+          <div>
+            <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-black text-white tracking-tight leading-[1.08]">
+              Same story.
+              <br />
+              <span className="text-slate-400">A different look.</span>
             </h2>
+          </div>
 
-            <p className="text-base text-slate-600">
-              Every template is built with standard margins, selectable text, and
-              clean headings so hiring systems parse your information with 100%
-              accuracy.
+          <div className="max-w-sm">
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
+              Sixteen recruiter-tested layouts. Pick the standard that matches
+              your seniority. You can adjust typography, color palettes, and
+              margins directly in the studio.
             </p>
           </div>
+        </div>
 
-          {/* Carousel Arrow Controls */}
-          <div className="flex items-center gap-3 shrink-0">
+        {/* ========================================================= */}
+        {/* 3D COVERFLOW: Contained Within Page Width, Unrounded Resumes */}
+        {/* ========================================================= */}
+        <div className="relative overflow-hidden w-full py-2">
+          <Swiper
+            onBeforeInit={(swiper) => {
+              swiperRef.current = swiper;
+            }}
+            effect="coverflow"
+            grabCursor={true}
+            centeredSlides={true}
+            slidesPerView="auto"
+            initialSlide={1}
+            slideToClickedSlide={true}
+            keyboard={{ enabled: true }}
+            coverflowEffect={{
+              rotate: 20,
+              stretch: 0,
+              depth: 160,
+              modifier: 1,
+              slideShadows: true,
+            }}
+            modules={[EffectCoverflow, Navigation, Keyboard]}
+            onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
+            className="w-full py-4"
+          >
+            {TEMPLATES.map((tmpl, idx) => {
+              const isActive = idx === activeIndex;
+              return (
+                <SwiperSlide
+                  key={tmpl.id}
+                  className="!w-[200px] sm:!w-[240px] md:!w-[265px] select-none"
+                >
+                  {/* Physical Paper Document Canvas: Sharp 90-Degree Unrounded Corners */}
+                  <div
+                    className={`relative rounded-none overflow-hidden transition-all duration-300 ${
+                      isActive
+                        ? "shadow-[0_20px_50px_-12px_rgba(0,0,0,0.85)] ring-1 ring-white/25"
+                        : "opacity-70 hover:opacity-85 shadow-lg ring-1 ring-white/10"
+                    }`}
+                  >
+                    {/* Strict A4 Aspect Ratio Paper Sheet */}
+                    <div className="relative aspect-[1/1.414] bg-white overflow-hidden rounded-none">
+                      <img
+                        src={tmpl.thumbnail}
+                        alt={tmpl.name}
+                        className="w-full h-full object-cover object-top pointer-events-none"
+                        loading={idx < 4 ? "eager" : "lazy"}
+                      />
+
+                      {/* Active Center Slide Interactive Overlay */}
+                      {isActive && (
+                        <div className="absolute inset-0 bg-slate-950/50 opacity-0 hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-4">
+                          <button
+                            onClick={() => handleUseTemplate(tmpl.id)}
+                            className="w-full py-2.5 rounded-lg bg-white hover:bg-slate-100 text-slate-900 text-xs font-bold shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5"
+                          >
+                            <span>Use {tmpl.name}</span>
+                            <LuArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
+        </div>
+
+        {/* ========================================================= */}
+        {/* BOTTOM CONTROLS: Scaled Down Arrow Navigation & Meta      */}
+        {/* ========================================================= */}
+        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-800/80">
+          {/* Active Template Meta */}
+          <div className="text-center sm:text-left">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTemplate.id}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.18 }}
+              >
+                <div className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                  {activeTemplate.name}
+                </div>
+                <div className="text-xs text-slate-400 mt-0.5 flex items-center justify-center sm:justify-start gap-2">
+                  <span className="font-semibold text-slate-300">
+                    {activeTemplate.style}
+                  </span>
+                  <span>·</span>
+                  <span>{activeTemplate.tagline}</span>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Navigation Controls: < [Counter] > [CTA] */}
+          <div className="flex items-center gap-3">
             <button
               onClick={() => swiperRef.current?.slidePrev()}
-              className="w-10 h-10 rounded-full border border-slate-300 bg-white hover:bg-slate-100 flex items-center justify-center text-slate-700 transition-colors shadow-2xs cursor-pointer"
+              className="w-10 h-10 rounded-full border border-slate-700 bg-slate-900/80 hover:bg-slate-800 hover:border-slate-500 text-white flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-95"
               aria-label="Previous template"
             >
-              <LuChevronLeft className="w-5 h-5" />
+              <LuChevronLeft className="w-4 h-4" />
             </button>
+
+            {/* Compact Counter */}
+            <div className="font-mono text-xs font-bold text-slate-300 px-3 py-1.5 rounded-md bg-slate-900/60 border border-slate-800 tabular-nums">
+              {activeIndex + 1} / {TEMPLATES.length}
+            </div>
+
             <button
               onClick={() => swiperRef.current?.slideNext()}
-              className="w-10 h-10 rounded-full border border-slate-300 bg-white hover:bg-slate-100 flex items-center justify-center text-slate-700 transition-colors shadow-2xs cursor-pointer"
+              className="w-10 h-10 rounded-full border border-slate-700 bg-slate-900/80 hover:bg-slate-800 hover:border-slate-500 text-white flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-95"
               aria-label="Next template"
             >
-              <LuChevronRight className="w-5 h-5" />
+              <LuChevronRight className="w-4 h-4" />
+            </button>
+
+            {/* Compact CTA */}
+            <button
+              onClick={() => handleUseTemplate(activeTemplate.id)}
+              className="ml-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs transition-all shadow-md active:scale-98"
+            >
+              <span>Customize Template</span>
+              <LuArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
-        </div>
-
-        {/* Category Filters */}
-        <div className="flex flex-wrap items-center gap-2 mb-8">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                activeCategory === cat.id
-                  ? "bg-slate-900 text-white shadow-sm"
-                  : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300"
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Swiper Slider */}
-        <Swiper
-          onBeforeInit={(swiper) => {
-            swiperRef.current = swiper;
-          }}
-          modules={[Navigation, Pagination]}
-          spaceBetween={24}
-          slidesPerView={1}
-          breakpoints={{
-            640: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
-            1280: { slidesPerView: 4 },
-          }}
-          pagination={{ clickable: true, dynamicBullets: true }}
-          className="pb-14"
-        >
-          {filtered.map((tmpl) => (
-            <SwiperSlide key={tmpl.id} className="h-auto">
-              <div className="group relative bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full overflow-hidden">
-                {/* Thumbnail Sheet */}
-                <div className="relative aspect-[3/4] bg-slate-100 overflow-hidden border-b border-slate-100">
-                  <img
-                    src={tmpl.thumbnail}
-                    alt={tmpl.name}
-                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                  />
-
-                  {/* Badges */}
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                    <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-slate-900/90 text-white backdrop-blur-md shadow-xs">
-                      {tmpl.badge}
-                    </span>
-                    <span className="px-2 py-1 rounded-md text-[10px] font-semibold bg-white/95 text-slate-800 shadow-2xs border border-slate-200/60">
-                      {tmpl.cols}
-                    </span>
-                  </div>
-
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end p-4">
-                    <motion.button
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleUseTemplate(tmpl.id)}
-                      className="w-full py-2.5 rounded-xl bg-white text-slate-900 text-xs font-bold shadow-lg hover:bg-slate-100 transition-colors cursor-pointer"
-                    >
-                      Use This Template
-                    </motion.button>
-                  </div>
-                </div>
-
-                {/* Card Information */}
-                <div className="p-4 flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="text-base font-bold text-slate-900">
-                        {tmpl.name}
-                      </h3>
-                      <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        ATS Safe
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">
-                      {tmpl.description}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span className="text-slate-400 text-[11px]">Free to customize</span>
-                    <button
-                      onClick={() => handleUseTemplate(tmpl.id)}
-                      className="font-bold text-slate-900 hover:text-indigo-600 inline-flex items-center gap-1 cursor-pointer transition-colors"
-                    >
-                      <span>Select</span>
-                      <LuArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-
-        {/* View All Button */}
-        <div className="text-center pt-2">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-xs sm:text-sm font-bold text-slate-800 transition-colors shadow-2xs cursor-pointer"
-          >
-            <span>Browse Full Template Library</span>
-            <LuArrowRight className="w-4 h-4" />
-          </button>
         </div>
       </div>
     </section>
