@@ -131,13 +131,12 @@ const Clarity = ({
           fontFamily: "inherit",
         }}
       >
-        {/* Full-Width Top Header */}
-        <ResumeHeader basics={basics} themeColors={themeColors} />
-
-        {/* Full-Width Executive Summary across top */}
-        {sections.summary?.visible && (
-          <Summary section={sections.summary} themeColors={themeColors} />
-        )}
+        {/* Full-Width Top Header with Integrated Summary & Profile Picture */}
+        <ResumeHeader
+          basics={basics}
+          themeColors={themeColors}
+          summarySection={sections.summary}
+        />
 
         {/* 2-Column Body Layout below Header/Summary */}
         <div className="flex-1 flex flex-row px-8 pb-8 gap-8">

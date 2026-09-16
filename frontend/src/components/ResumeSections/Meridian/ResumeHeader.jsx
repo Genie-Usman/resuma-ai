@@ -22,7 +22,7 @@ const ResumeHeader = ({ basics = {}, themeColors = [] }) => {
         {hasPicture && (
           <div className="shrink-0">
             <div className="rounded-xl overflow-hidden shadow-sm ring-2 ring-slate-200">
-              <Picture picture={basics.picture} size={90} />
+              <Picture picture={basics.picture} size={100} borderRadius={12} />
             </div>
           </div>
         )}
