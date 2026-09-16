@@ -9,6 +9,7 @@ import PrintResume from './pages/Print/PrintResume';
 import AuthLayout from "./components/layouts/AuthLayout"
 import Dashboard from './pages/Home/Dashboard';
 import LandingPage from "./pages/LandingPage"
+import TemplatesPage from "./pages/TemplatesPage/TemplatesPage";
 import Login from "./pages/Auth/Login";
 import SignUp from "./pages/Auth/SignUp";
 import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy";
@@ -47,6 +48,7 @@ const App = () => {
 
             {/* Default Route */}
             <Route path='/' element={<LandingPage />} />
+            <Route path='/templates' element={<TemplatesPage />} />
 
             <Route path='/dashboard' element={<Dashboard />} />
             <Route path='/resume/:resumeId' element={<EditResume />} />

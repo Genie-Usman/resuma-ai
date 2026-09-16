@@ -1,111 +1,75 @@
-import { useNavigate } from "react-router-dom"
-import { useContext } from "react";
-import { UserContext } from "../context/userContext";
+import { useEffect } from "react";
 
-// Components
-import Header from "../components/shared/Header";
-import Footer from "../components/shared/Footer";
-
-// Assets
-import HERO_IMG from "../assets/hero-img.png"
-import PATTERN_BG from "../assets/pattern-bg.svg"
+// Modular Landing Page Components
+import LandingNavbar from "./LandingPage/components/LandingNavbar";
+import HeroSection from "./LandingPage/components/HeroSection";
+import MetricsBar from "./LandingPage/components/MetricsBar";
+import TemplateShowcase from "./LandingPage/components/TemplateShowcase";
+import InteractiveSteps from "./LandingPage/components/InteractiveSteps";
+import AtsScannerPreview from "./LandingPage/components/AtsScannerPreview";
+import FeatureSuite from "./LandingPage/components/FeatureSuite";
+import ResumeExamples from "./LandingPage/components/ResumeExamples";
+import ExportFormats from "./LandingPage/components/ExportFormats";
+import PricingSection from "./LandingPage/components/PricingSection";
+import TestimonialsSection from "./LandingPage/components/TestimonialsSection";
+import FaqAccordion from "./LandingPage/components/FaqAccordion";
+import CtaBanner from "./LandingPage/components/CtaBanner";
+import LandingFooter from "./LandingPage/components/LandingFooter";
 
 const LandingPage = () => {
-  const { user } = useContext(UserContext);
-  const navigate = useNavigate();
-
-  const handleCta = () => {
-    if (!user) {
-      navigate('/auth/login');
-    } else {
-      navigate('/dashboard');
-    }
-  }
+  useEffect(() => {
+    // Set descriptive page title and scroll to top on mount
+    document.title = "Resuma | Smart, ATS-Friendly Resume & Cover Letter Builder";
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#fafafc] bg-[radial-gradient(ellipse_100%_45%_at_50%_-10%,rgba(147,40,231,0.07),rgba(255,255,255,0))] text-slate-800 antialiased selection:bg-purple-500 selection:text-white flex flex-col">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+    <div className="min-h-screen bg-white text-slate-900 antialiased selection:bg-slate-900 selection:text-white flex flex-col font-sans overflow-x-hidden">
+      {/* 1. Global Sticky Navigation */}
+      <LandingNavbar />
 
-        {/* Header */}
-        <Header />
+      <main className="flex-1 w-full">
+        {/* 2. Interactive 3D Hero Section with Live Resume Sandbox */}
+        <HeroSection />
 
-        {/* Hero Section */}
-        <div className="flex flex-col md:flex-row items-center">
-          <div className="w-full md:w-1/2 pr-4 mb-8 md:mb-0 ml-0 md:ml-5">
-            <h1 className="text-5xl font-bold mb-6 leading-tight">
-              Build Your{" "}
-              <span className="text-transparent bg-clip-text bg-[radial-gradient(circle,_#7182ff_0%,_#3cff52_100%)] bg-[length:200%_200%] animate-text-shine">
-                Resume Effortlessly
-              </span>
-            </h1>
-            <p className="text-lg text-gray-700 mb-8">
-              Craft a standout resume in minutes with our smart and intuitive resume builder.
-            </p>
-            
-            <button className="btn-get-started" onClick={handleCta}>
-              <span className="text-container">
-                <span className="text">Get Started</span>
-              </span>
-            </button>
+        {/* 3. Authority Metrics Bar */}
+        <MetricsBar />
 
-          </div>
-          <div className="w-full md:w-1/2">
-            <img
-              src={HERO_IMG}
-              alt="Hero Image"
-              className="w-full rounded-lg"
-            />
-          </div>
-        </div>
+        {/* 4. Interactive Template Gallery */}
+        <TemplateShowcase />
 
-        {/* Feature Section */}
-        <section
-          className="mt-24 py-16 px-4 rounded-3xl"
-          style={{
-            backgroundImage: `url(${PATTERN_BG})`,
-            backgroundRepeat: "repeat",
-            backgroundSize: "auto",
-          }}
-        >
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Features That Make You Shine
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* Feature 1 */}
-            <div className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow hover:shadow-lg transition">
-              <h3 className="text-lg font-semibold mb-3">Easy Editing</h3>
-              <p className="text-gray-600">
-                Update your resume sections with live preview and instant
-                formatting.
-              </p>
-            </div>
+        {/* 5. 4-Step Interactive Workflow */}
+        <InteractiveSteps />
 
-            {/* Feature 2 */}
-            <div className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow hover:shadow-lg transition">
-              <h3 className="text-lg font-semibold mb-3">Beautiful Templates</h3>
-              <p className="text-gray-600">
-                Choose from modern, professional templates that are easy to
-                customize.
-              </p>
-            </div>
+        {/* 6. Signature ATS X-Ray Scanner Preview */}
+        <AtsScannerPreview />
 
-            {/* Feature 3 */}
-            <div className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow hover:shadow-lg transition">
-              <h3 className="text-lg font-semibold mb-3">One-Click Export</h3>
-              <p className="text-gray-600">
-                Download your resume instantly as a high-quality PDF with one
-                click.
-              </p>
-            </div>
-          </div>
-        </section>
+        {/* 7. Comprehensive Career Suite Tools */}
+        <FeatureSuite />
 
-      </div>
+        {/* 8. Role-Specific Resume Examples Library */}
+        <ResumeExamples />
 
-      {/* Footer */}
-      <Footer />
+        {/* 9. Universal Multi-Format Export Options */}
+        <ExportFormats />
+
+        {/* 10. Transparent, Honest Pricing */}
+        <PricingSection />
+
+        {/* 11. Social Proof & Candidate Reviews */}
+        <TestimonialsSection />
+
+        {/* 12. Interactive FAQ Accordion */}
+        <FaqAccordion />
+
+        {/* 13. High-Converting Bottom CTA Banner */}
+        <CtaBanner />
+      </main>
+
+      {/* 14. Grand Brand Footer with Stylized Watermark */}
+      <LandingFooter />
     </div>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;

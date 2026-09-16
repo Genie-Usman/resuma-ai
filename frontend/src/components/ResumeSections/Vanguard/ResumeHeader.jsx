@@ -16,7 +16,10 @@ const ResumeHeader = ({ basics = {}, themeColors = [] }) => {
           </h1>
 
           {basics.headline && (
-            <p className="text-sm sm:text-base font-medium text-slate-300 mt-1.5 leading-snug break-words">
+            <p
+              className="text-sm sm:text-base font-medium mt-1.5 leading-snug break-words text-white/90"
+              style={{ color: "#ffffff" }}
+            >
               {basics.headline}
             </p>
           )}
