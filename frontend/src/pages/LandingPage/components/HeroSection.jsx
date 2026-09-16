@@ -32,8 +32,8 @@ const FONT_OPTIONS = [
 ];
 
 // Fixed compact document dimensions for sharp HD physical paper rendering
-const SHEET_WIDTH = 280;
-const SHEET_HEIGHT = 396;
+const SHEET_WIDTH = 272;
+const SHEET_HEIGHT = 380;
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -100,11 +100,11 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative pt-20 pb-16 md:pt-24 md:pb-20 overflow-hidden bg-gradient-to-b from-slate-50/80 via-white to-white border-b border-slate-100">
+    <section className="relative min-h-screen pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-18 flex flex-col justify-center overflow-hidden bg-gradient-to-b from-slate-50/80 via-white to-white border-b border-slate-100">
       {/* Subtle Studio Draft Grid Background for Dimensional Atmosphere */}
       <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] opacity-25 pointer-events-none" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* ========================================================= */}
           {/* LEFT COLUMN: Lively, High-Converting Hero Value Prop      */}
@@ -174,7 +174,7 @@ const HeroSection = () => {
                 onClick={handleStart}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-xl font-bold text-sm text-white bg-slate-900 hover:bg-slate-800 shadow-md shadow-slate-900/20 hover:shadow-lg hover:shadow-slate-900/25 transition-all cursor-pointer tracking-tight"
               >
-                <span>Create My Resume Free</span>
+                <span>Build Your Resume</span>
                 <LuArrowRight className="w-4 h-4" />
               </motion.button>
 
@@ -267,7 +267,7 @@ const HeroSection = () => {
                 initial={{ opacity: 0, y: 8, rotate: 3 }}
                 animate={{ opacity: 1, y: 0, rotate: 3 }}
                 transition={{ delay: 0.25, duration: 0.4 }}
-                className="absolute -top-2 -right-3 z-40 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200/90 shadow-lg shadow-slate-900/5 flex items-center gap-2 text-[11px] font-bold text-slate-800 pointer-events-none select-none"
+                className="absolute top-2 -right-2 z-40 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200/90 shadow-lg shadow-slate-900/5 flex items-center gap-2 text-[11px] font-bold text-slate-800 pointer-events-none select-none"
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>98% ATS Pass Rate</span>

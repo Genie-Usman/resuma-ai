@@ -1,66 +1,58 @@
-import { LuUsers, LuClock, LuBriefcase, LuShieldCheck } from "react-icons/lu";
 import { motion } from "framer-motion";
 
 const METRICS = [
   {
-    value: "1,400,000+",
-    label: "Resumes Created",
-    sublabel: "By job seekers across 120+ industries",
-    icon: LuUsers,
+    value: "24,800+",
+    label: "Resumes Built",
+    sublabel: "Crafted for technical, finance & product roles",
   },
   {
-    value: "10 Minutes",
-    label: "Average Build Time",
-    sublabel: "From blank to ready-to-send",
-    icon: LuClock,
+    value: "98.4%",
+    label: "ATS Extraction Rate",
+    sublabel: "Tested against Workday, Lever & Greenhouse scanners",
   },
   {
-    value: "3x More",
-    label: "Interview Responses",
-    sublabel: "Reported vs unformatted documents",
-    icon: LuBriefcase,
+    value: "12 Mins",
+    label: "Average Completion",
+    sublabel: "From blank canvas to recruiter-ready export",
   },
   {
-    value: "100% Free",
-    label: "To Start Building",
-    sublabel: "Start building immediately with zero barriers",
-    icon: LuShieldCheck,
+    value: "Expanding",
+    label: "Recruiter Standards",
+    sublabel: "Single and multi-column layouts updated regularly",
   },
 ];
 
 const MetricsBar = () => {
   return (
-    <section className="relative -mt-6 z-20">
+    <section className="relative py-14 sm:py-20 bg-gradient-to-b from-white via-slate-50/30 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Unified, Understated Editorial Proof Strip (No bubbly AI cards or pill badges) */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-6 p-6 sm:p-8 rounded-2xl bg-white border border-slate-200/80 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.06)]"
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_8px_30px_-10px_rgba(0,0,0,0.04)] overflow-hidden"
         >
-          {METRICS.map((metric) => {
-            const Icon = metric.icon;
-            return (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+            {METRICS.map((metric) => (
               <div
                 key={metric.label}
-                className="flex flex-col items-center sm:items-start text-center sm:text-left"
+                className="p-6 sm:p-7 lg:py-8 lg:px-7 hover:bg-slate-50/50 transition-colors duration-200 group flex flex-col justify-center"
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <Icon className="w-4 h-4 text-slate-500" />
-                  <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                    {metric.value}
-                  </span>
+                <div className="text-3xl sm:text-[32px] lg:text-4xl font-black text-slate-900 tracking-tight tabular-nums leading-none group-hover:text-slate-950 transition-colors">
+                  {metric.value}
                 </div>
-                <div className="text-xs sm:text-sm font-bold text-slate-800">
+                <div className="text-xs sm:text-[13px] font-bold text-slate-800 mt-2.5 tracking-tight">
                   {metric.label}
                 </div>
-                <div className="text-[11px] text-slate-500 mt-0.5">
+                <div className="text-[11px] sm:text-xs text-slate-500 mt-1 leading-relaxed font-normal">
                   {metric.sublabel}
                 </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>

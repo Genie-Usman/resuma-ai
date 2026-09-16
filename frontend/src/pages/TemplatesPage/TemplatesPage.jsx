@@ -153,7 +153,7 @@ const TemplatesPage = () => {
           <span>
             Showing <strong className="text-slate-900">{filteredTemplates.length}</strong> recruiter-tested layouts
           </span>
-          <span className="hidden sm:inline">100% Free to Build and Download</span>
+          <span className="hidden sm:inline">1200 DPI Vector PDF Quality</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
