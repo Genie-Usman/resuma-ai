@@ -213,12 +213,33 @@ const TemplateShowcase = () => {
           </div>
         </div>
 
+        {/* Scoped CSS: Swiper wrapper in 3D sits in front of recessed slides. Passing pointer-events allows clicks directly to slides */}
+        <style>{`
+          #templates .swiper-wrapper {
+            pointer-events: none !important;
+          }
+          #templates .swiper-slide {
+            pointer-events: auto !important;
+            z-index: 10;
+          }
+          #templates .swiper-slide-active {
+            z-index: 50 !important;
+          }
+          #templates .swiper-slide-shadow-left,
+          #templates .swiper-slide-shadow-right {
+            pointer-events: none !important;
+          }
+        `}</style>
+
         {/* ========================================================= */}
         {/* 3D COVERFLOW: Contained Within Page Width, Unrounded Resumes */}
         {/* ========================================================= */}
         <div className="relative overflow-hidden w-full py-2">
           <Swiper
             onBeforeInit={(swiper) => {
+              swiperRef.current = swiper;
+            }}
+            onSwiper={(swiper) => {
               swiperRef.current = swiper;
             }}
             effect="coverflow"
@@ -244,15 +265,15 @@ const TemplateShowcase = () => {
               return (
                 <SwiperSlide
                   key={tmpl.id}
-                  className="!w-[200px] sm:!w-[240px] md:!w-[265px] select-none"
+                  onClick={() => swiperRef.current?.slideTo(idx)}
+                  className="!w-[200px] sm:!w-[240px] md:!w-[265px] select-none cursor-pointer"
                 >
                   {/* Physical Paper Document Canvas: Sharp 90-Degree Unrounded Corners */}
                   <div
-                    className={`relative rounded-none overflow-hidden transition-all duration-300 ${
-                      isActive
+                    className={`relative rounded-none overflow-hidden transition-all duration-300 ${isActive
                         ? "shadow-[0_20px_50px_-12px_rgba(0,0,0,0.85)] ring-1 ring-white/25"
                         : "opacity-70 hover:opacity-85 shadow-lg ring-1 ring-white/10"
-                    }`}
+                      }`}
                   >
                     {/* Strict A4 Aspect Ratio Paper Sheet */}
                     <div className="relative aspect-[1/1.414] bg-white overflow-hidden rounded-none">
@@ -267,7 +288,10 @@ const TemplateShowcase = () => {
                       {isActive && (
                         <div className="absolute inset-0 bg-slate-950/50 opacity-0 hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-4">
                           <button
-                            onClick={() => handleUseTemplate(tmpl.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUseTemplate(tmpl.id);
+                            }}
                             className="w-full py-2.5 rounded-lg bg-white hover:bg-slate-100 text-slate-900 text-xs font-bold shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5"
                           >
                             <span>Use {tmpl.name}</span>
