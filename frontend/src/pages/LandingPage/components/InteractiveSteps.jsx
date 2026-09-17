@@ -237,11 +237,12 @@ const InteractiveSteps = () => {
 
                       {/* CRISP REAL-TYPOGRAPHY DOCUMENT SHEET (AUTHENTIC DESIGNS) */}
                       <div className="relative bg-white border border-slate-200 shadow-sm overflow-hidden h-[340px]">
-                        {/* Subtle Animated ATS Scanner Beam */}
+                        {/* Subtle Animated ATS Scanner Beam (GPU-accelerated y transform) */}
                         <motion.div
-                          className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent pointer-events-none z-20"
-                          animate={{ top: ["3%", "94%", "3%"] }}
-                          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                          className="absolute top-2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent pointer-events-none z-20"
+                          animate={{ y: [0, 315, 0] }}
+                          transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+                          style={{ willChange: "transform" }}
                         >
                           <div className="w-full h-8 -mt-4 bg-gradient-to-b from-emerald-500/15 via-emerald-500/5 to-transparent blur-xs pointer-events-none" />
                         </motion.div>
